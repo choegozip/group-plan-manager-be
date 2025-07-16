@@ -40,3 +40,4 @@ bin/
 
 ### Settings ###
 application-*.yml
+.env
