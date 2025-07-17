@@ -49,4 +49,12 @@ public class UserService {
 
         userRepository.save(savedUser);
     }
+
+    @Transactional
+    public void delete(Long userId) {
+        User savedUser = userComponent.getById(userId);
+        savedUser.delete();
+
+        userRepository.save(savedUser);
+    }
 }

@@ -45,4 +45,11 @@ public class UserController {
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_USER);
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<ApiSuccessRes<Void>> deleteUser(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        userService.delete(userPrincipal.userId());
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_DELETE_USER);
+    }
 }
