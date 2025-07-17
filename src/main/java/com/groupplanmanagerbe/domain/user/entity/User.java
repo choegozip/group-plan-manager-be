@@ -2,6 +2,8 @@ package com.groupplanmanagerbe.domain.user.entity;
 
 import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
+import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -58,5 +60,12 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.password = password;
         this.profileUrl = profileUrl;
+    }
+
+    public void delete() {
+        if(this.isDelete) {
+            throw new InvalidException(ApiErrorCode.ALREADY_DELETED);
+        }
+        this.isDelete = true;
     }
 }
