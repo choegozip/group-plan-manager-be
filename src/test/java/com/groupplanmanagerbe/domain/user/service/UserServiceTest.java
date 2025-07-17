@@ -6,6 +6,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     private CreateUserReq createUserReq;
+    private UpdateUserReq updateUserReq;
 
     @BeforeEach
     void setup() {
@@ -45,6 +47,12 @@ class UserServiceTest {
                 "test@example.com",
                 "칙피",
                 "Password123!",
+                "https://image.url"
+        );
+
+        updateUserReq = new UpdateUserReq(
+                "최구",
+                "Password1234!",
                 "https://image.url"
         );
     }
@@ -104,6 +112,42 @@ class UserServiceTest {
 
         // when & then
         assertThatThrownBy(() -> userService.get(1L))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void 회원정보_수정_성공() {
+        // given
+        User user = User.of(
+                "test@example.com",
+                "기존닉네임",
+                "기존패스워드",
+                "https://old-image.url");
+
+        String encodedPassword = "encodedPassword123!";
+        when(userComponent.getById(1L)).thenReturn(user);
+        when(passwordEncoder.encode(updateUserReq.password())).thenReturn(encodedPassword);
+
+        // when
+        userService.update(1L, updateUserReq);
+
+        // then
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(captor.capture());
+
+        User savedUser = captor.getValue();
+        assertEquals(updateUserReq.nickname(), savedUser.getNickname());
+        assertEquals(encodedPassword, savedUser.getPassword());
+        assertEquals(updateUserReq.profileUrl(), savedUser.getProfileUrl());
+    }
+
+    @Test
+    void 회원정보_수정_없는_회원() {
+        // given
+        when(userComponent.getById(1L)).thenThrow(new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
+
+        // when & then
+        assertThatThrownBy(() -> userService.update(1L, updateUserReq))
                 .isInstanceOf(NotFoundException.class);
     }
 }
