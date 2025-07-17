@@ -39,7 +39,7 @@ public class UserController {
     @PatchMapping("/me")
     public ResponseEntity<ApiSuccessRes<Void>> updateUser(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody UpdateUserReq request
+            @Valid @RequestBody UpdateUserReq request
     ) {
         userService.update(userPrincipal.userId(), request);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_USER);
