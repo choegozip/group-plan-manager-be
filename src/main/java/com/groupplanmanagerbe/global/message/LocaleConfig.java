@@ -1,4 +1,4 @@
-package com.groupplanmanagerbe.global.config;
+package com.groupplanmanagerbe.global.message;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

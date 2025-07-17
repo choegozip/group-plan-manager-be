@@ -1,8 +1,7 @@
 package com.groupplanmanagerbe.global.common.response;
 
+import com.groupplanmanagerbe.global.message.MessageResolver;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -15,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RequiredArgsConstructor
 public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 
-    private final MessageSource messageSource;
+    private final MessageResolver messageResolver;
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
@@ -29,9 +28,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             ServerHttpRequest request, ServerHttpResponse response
     ) {
         if (body instanceof ApiSuccessRes<?> res) {
-            String localizedMessage = messageSource.getMessage(
-                    res.messageKey(), null, LocaleContextHolder.getLocale());
-
+            String localizedMessage = messageResolver.get(res.messageKey());
             return new ApiSuccessRes<>(res.code(), localizedMessage, res.data());
         }
 
