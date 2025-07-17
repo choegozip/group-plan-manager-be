@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.UserPrincipal;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,4 +35,14 @@ public class UserController {
         UserRes response = userService.get(userPrincipal.userId());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_USER, response);
     }
+
+    @PatchMapping("/me")
+    public ResponseEntity<ApiSuccessRes<Void>> updateUser(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody UpdateUserReq request
+    ) {
+        userService.update(userPrincipal.userId(), request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_USER);
+    }
+
 }

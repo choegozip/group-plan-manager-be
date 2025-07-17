@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.domain.user.repository.UserRepository;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,4 +38,15 @@ public class UserService {
         return UserRes.from(savedUser);
     }
 
+    @Transactional
+    public void update(Long userId, UpdateUserReq request) {
+        User savedUser = userComponent.getById(userId);
+
+        if (!(request.password() == null)) {
+            String encodedPassword = passwordEncoder.encode(request.password());
+            savedUser.updateUserInfo(request.nickname(), encodedPassword, request.profileUrl());
+        }
+
+        userRepository.save(savedUser);
+    }
 }
