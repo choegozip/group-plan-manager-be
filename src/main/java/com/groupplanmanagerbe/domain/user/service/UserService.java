@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.domain.user.repository.UserRepository;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,4 +31,10 @@ public class UserService {
 
         userRepository.save(newUser);
     }
+
+    public UserRes get(Long userId) {
+        User savedUser = userComponent.getById(userId);
+        return UserRes.from(savedUser);
+    }
+
 }
