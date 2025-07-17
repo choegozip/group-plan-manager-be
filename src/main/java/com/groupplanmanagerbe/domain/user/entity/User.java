@@ -53,4 +53,10 @@ public class User extends BaseEntity {
                 .profileUrl(profileUrl)
                 .build();
     }
+
+    public void updateUserInfo(String nickname, String password, String profileUrl) {
+        this.nickname = nickname;
+        this.password = password;
+        this.profileUrl = profileUrl;
+    }
 }
