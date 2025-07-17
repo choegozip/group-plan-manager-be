@@ -16,4 +16,9 @@ public class UserComponent {
     public boolean isExist(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    public User getById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
+    }
 }
