@@ -24,7 +24,7 @@ public class UserService {
     @Transactional
     public void create(CreateUserReq request) {
         if (userComponent.isExist(request.email())) {
-            throw new DuplicateException(ApiErrorCode.DUPLICATED_EMAIL);
+            throw new DuplicateException(ApiErrorCode.USER_DUPLICATED_EMAIL);
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
