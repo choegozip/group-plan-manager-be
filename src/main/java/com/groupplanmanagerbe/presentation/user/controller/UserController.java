@@ -3,7 +3,7 @@ package com.groupplanmanagerbe.presentation.user.controller;
 import com.groupplanmanagerbe.domain.user.service.UserService;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
-import com.groupplanmanagerbe.global.security.UserPrincipal;
+import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
@@ -30,26 +30,26 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiSuccessRes<UserRes>> getUser(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        UserRes response = userService.get(userPrincipal.userId());
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_USER, response);
+        UserRes response = userService.get(authUser.userId());
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_USER_GET, response);
     }
 
     @PatchMapping("/me")
     public ResponseEntity<ApiSuccessRes<Void>> updateUser(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody UpdateUserReq request
     ) {
-        userService.update(userPrincipal.userId(), request);
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_USER);
+        userService.update(authUser.userId(), request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_USER_UPDATE);
     }
 
     @DeleteMapping("/me")
     public ResponseEntity<ApiSuccessRes<Void>> deleteUser(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        userService.delete(userPrincipal.userId());
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_DELETE_USER);
+        userService.delete(authUser.userId());
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_USER_DELETE);
     }
 }

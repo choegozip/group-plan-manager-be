@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ApiSuccessCode {
     // USER
-    SUCCESS_SIGNUP("success","user.signup.success"),
-    SUCCESS_GET_USER("success", "user.get.success"),
-    SUCCESS_UPDATE_USER("success", "user.update.success"),
-    SUCCESS_DELETE_USER("success", "user.delete.success")
+    SUCCESS_SIGNUP("SUCCESS_SIGNUP","user.signup.success"),
+    SUCCESS_USER_GET("SUCCESS_USER_GET", "user.get.success"),
+    SUCCESS_USER_UPDATE("SUCCESS_USER_UPDATE", "user.update.success"),
+    SUCCESS_USER_DELETE("SUCCESS_USER_DELETE", "user.delete.success"),
+    SUCCESS_LOGIN("SUCCESS_LOGIN", "user.login.success")
+
     ;
+
     private final String code;
     private final String message;
 }

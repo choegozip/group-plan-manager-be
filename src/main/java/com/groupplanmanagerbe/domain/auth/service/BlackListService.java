@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class BlackListTokenService {
+public class BlackListService {
     private final RefreshTokenRepository refreshTokenRepository;
+
+    public boolean isBlacklisted(String token) {
+        return true;
+    }
 }

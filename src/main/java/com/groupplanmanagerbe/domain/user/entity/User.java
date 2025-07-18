@@ -64,7 +64,7 @@ public class User extends BaseEntity {
 
     public void delete() {
         if(this.isDelete) {
-            throw new InvalidException(ApiErrorCode.ALREADY_DELETED);
+            throw new InvalidException(ApiErrorCode.USER_ALREADY_DELETED);
         }
         this.isDelete = true;
     }

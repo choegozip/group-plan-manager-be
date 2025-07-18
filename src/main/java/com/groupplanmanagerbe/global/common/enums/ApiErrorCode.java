@@ -8,21 +8,41 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ApiErrorCode {
 
-    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "00","접근금지"),
-    INVALID_USER_ROLE(HttpStatus.BAD_REQUEST, "00","유효하지 않은 롤" ),
-
     // 유저 관련 익셉션
-    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "U001", "user.conflict"),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND,"U002", "user.not_found"),
-    ALREADY_DELETED(HttpStatus.BAD_REQUEST,"U003" ,"user.deleted" ),
+    USER_DUPLICATED_EMAIL(HttpStatus.CONFLICT, "USER_DUPLICATED_EMAIL", "user.conflict"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "user.not_found"),
+    USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "USER_ALREADY_DELETED", "user.deleted"),
+    USER_INVALID_ROLE(HttpStatus.BAD_REQUEST, "USER_INVALID_ROLE", "user.invalid.role"),
 
     // 인증 관련 익셉션
-    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED,"A001", "로그인이 필요합니다."),
-    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "00","잘못된 아이디 또는 비밀번호입니다."),
-    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "00","만료된 JWT 토큰입니다."),
-    INVALID_TOKEN(HttpStatus.FORBIDDEN, "00","유효하지 않은 토큰입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "00","서버 내부 오류가 발생했습니다."),
-   ;
+    AUTH_FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH_FORBIDDEN_ACCESS", "auth.forbidden"),
+    AUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH_ACCESS_DENIED", "auth.access.denied"),
+    AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_UNAUTHORIZED_ACCESS", "auth.unauthorized"),
+    AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_LOGIN_FAILED", "auth.login.failed"),
+
+    // 토큰 관련 익셉션
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "token.expired"),
+    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID", "token.invalid"),
+    TOKEN_UNSUPPORTED_FORMAT(HttpStatus.UNAUTHORIZED, "TOKEN_UNSUPPORTED_FORMAT", "token.unsupported_format"),
+    TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "TOKEN_MALFORMED", "token.malformed"),
+    TOKEN_INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_SIGNATURE", "token.invalid_signature"),
+    TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, "TOKEN_EMPTY", "token.empty"),
+    TOKEN_BLACKLISTED(HttpStatus.UNAUTHORIZED, "TOKEN_BLACKLISTED", "token.blacklisted"),
+    TOKEN_MISSING_MEMBER_ID(HttpStatus.UNAUTHORIZED, "TOKEN_MISSING_MEMBER_ID", "token.missing_member_id"),
+    TOKEN_INVALID_MEMBER_ID(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_MEMBER_ID", "token.invalid_member_id"),
+    TOKEN_MISSING_ROLE(HttpStatus.UNAUTHORIZED, "TOKEN_MISSING_ROLE", "token.missing_role"),
+    TOKEN_INVALID_ROLE(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_ROLE", "token.invalid_role"),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "token.not.found"),
+    TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "TOKEN_UNAUTHORIZED", "token.unauthorized"),
+
+    // JWT 시크릿 키 관련
+    JWT_SECRET_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "JWT_SECRET_KEY_EMPTY", "jwt.secret.key.empty"),
+    JWT_SECRET_KEY_INVALID(HttpStatus.INTERNAL_SERVER_ERROR, "JWT_SECRET_KEY_INVALID", "jwt.secret.key.invalid"),
+
+    // 공통
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),
+    ;
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String messageKey;
