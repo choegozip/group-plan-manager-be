@@ -1,6 +1,6 @@
 package com.groupplanmanagerbe.global.security.token;
 
-import com.groupplanmanagerbe.domain.auth.service.BlackListService;
+import com.groupplanmanagerbe.domain.auth.service.BlackListTokenService;
 import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.JwtTokenException;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 
@@ -41,11 +42,11 @@ public class JwtUtil {
         }
     }
 
-    public String createAccessToken(Long memberId, UserRole role) {
+    public String createAccessToken(Long userId, UserRole role) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + securityProperties.token().expiration());
         return Jwts.builder()
-                .setSubject(memberId.toString())
+                .setSubject(userId.toString())
                 .claim("role", role.name())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
@@ -53,11 +54,11 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String createRefreshToken(Long memberId) {
+    public String createRefreshToken(Long userId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + securityProperties.token().refreshExpiration());
         return Jwts.builder()
-                .setSubject(memberId.toString())
+                .setSubject(userId.toString())
                 .setIssuedAt(now)
                 .setExpiration(expiry)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -100,12 +101,12 @@ public class JwtUtil {
     /**
      * 토큰 유효성 검사 (블랙리스트 체크 있음)
      */
-    public Claims validateToken(String token, BlackListService blacklistService) {
+    public Claims validateToken(String token, BlackListTokenService blacklistTokenService) {
         // 1. 토큰 형식 및 서명 검증
         Claims claims = parseClaims(token);
 
         // 2. 블랙리스트 검증
-        if (blacklistService != null && blacklistService.isBlacklisted(token)) {
+        if (blacklistTokenService != null && blacklistTokenService.isBlacklisted(token)) {
             throw new JwtTokenException(ApiErrorCode.TOKEN_BLACKLISTED);
         }
 
@@ -152,6 +153,16 @@ public class JwtUtil {
     }
 
     /**
+     * 블랙리스트 토큰 만료까지 남은 시간 조회
+     */
+    public Duration getRemainingValidity(Claims claims) {
+        Date expirationTime = getExpirationFromToken(claims);
+        long millis = expirationTime.getTime() - System.currentTimeMillis();
+
+        return Duration.ofMillis(Math.max(millis, 0));
+    }
+
+    /**
      * 토큰 발급 시간 조회
      */
     public Date getIssuedAtFromToken(String token) {
@@ -162,8 +173,7 @@ public class JwtUtil {
     /**
      * 토큰 만료 시간 조회
      */
-    public Date getExpirationFromToken(String token) {
-        Claims claims = parseClaims(token);
+    public Date getExpirationFromToken(Claims claims) {
         return claims.getExpiration();
     }
 }
