@@ -14,7 +14,7 @@ import java.util.Locale;
 public class LocaleConfig {
 
     @Bean
-    public LocaleResolver resolver() {
+    public LocaleResolver localeResolver() {
         AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
         resolver.setDefaultLocale(Locale.ENGLISH);
         resolver.setSupportedLocales(List.of(Locale.KOREAN, Locale.ENGLISH));
@@ -24,6 +24,7 @@ public class LocaleConfig {
     @Bean
     public MessageSource messageSource() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        source.setDefaultLocale(Locale.ENGLISH);
         source.setBasenames("messages_success", "messages_error");
         source.setDefaultEncoding("UTF-8");
         return source;
