@@ -61,7 +61,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(jwtSecurityProperties.secret().whiteList().toArray(new String[0])).permitAll()
-                        .anyRequest().hasAnyAuthority(UserRole.ADMIN.name(), UserRole.USER.name())
+                        .anyRequest().permitAll()
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(gpmAuthEntryPoint)

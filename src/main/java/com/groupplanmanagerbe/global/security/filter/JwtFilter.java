@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final BlackListService blackListService;
     private final JwtUtil jwtUtil;
     private final FilterExceptionHandler filterExceptionHandler;
-    private final AntPathMatcher antPathMatcher;
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {

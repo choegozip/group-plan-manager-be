@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.ApiErrorRes;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -18,11 +19,11 @@ public class FilterExceptionHandler {
     private final static String encodingFormat = "UTF-8";
 
     public void send(HttpServletResponse response, ApiErrorCode errorCode) throws IOException {
-        send(response, ApiErrorRes.of(errorCode.getHttpStatus(), errorCode.getMessageKey()));
+        send(response, ApiErrorRes.of(errorCode.getCode(), errorCode.getMessage()), errorCode.getHttpStatus());
     }
 
-    public void send(HttpServletResponse response, ApiErrorRes errorRes) throws IOException {
-        response.setStatus(errorRes.httpStatus().value());
+    public void send(HttpServletResponse response, ApiErrorRes errorRes, HttpStatus httpStatus) throws IOException {
+        response.setStatus(httpStatus.value());
         response.setContentType(contentType);
         response.setCharacterEncoding(encodingFormat);
 
