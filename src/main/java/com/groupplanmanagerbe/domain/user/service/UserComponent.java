@@ -21,4 +21,9 @@ public class UserComponent {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
     }
+
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
+    }
 }
