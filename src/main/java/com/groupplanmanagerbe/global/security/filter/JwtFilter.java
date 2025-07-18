@@ -1,6 +1,6 @@
 package com.groupplanmanagerbe.global.security.filter;
 
-import com.groupplanmanagerbe.domain.auth.service.BlackListService;
+import com.groupplanmanagerbe.domain.auth.service.BlackListTokenService;
 import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.FilterExceptionHandler;
@@ -29,7 +29,7 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtSecurityProperties jwtSecurityProperties;
-    private final BlackListService blackListService;
+    private final BlackListTokenService blackListTokenService;
     private final JwtUtil jwtUtil;
     private final FilterExceptionHandler filterExceptionHandler;
     private final AntPathMatcher antPathMatcher = new AntPathMatcher();
@@ -51,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (bearerJwt != null) {
             String token = jwtUtil.substringToken(bearerJwt);
-            Claims claims = jwtUtil.validateToken(token, blackListService);
+            Claims claims = jwtUtil.validateToken(token, blackListTokenService);
 
             try {
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
