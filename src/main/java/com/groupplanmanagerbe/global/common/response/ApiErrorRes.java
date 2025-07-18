@@ -1,11 +1,9 @@
 package com.groupplanmanagerbe.global.common.response;
 
-import org.springframework.http.HttpStatus;
+public record ApiErrorRes<T>(String code, String message, T data) {
 
-public record ApiErrorRes(HttpStatus httpStatus, String messageKey) {
-
-    public static ApiErrorRes of(HttpStatus httpStatus, String message) {
-        return new ApiErrorRes(httpStatus, message);
+    public static <T> ApiErrorRes<T> of(String code, String message) {
+        return new ApiErrorRes<T>(code, message, null);
     }
 }
 

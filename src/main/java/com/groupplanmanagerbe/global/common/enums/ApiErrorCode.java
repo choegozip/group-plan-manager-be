@@ -19,6 +19,7 @@ public enum ApiErrorCode {
     AUTH_ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH_ACCESS_DENIED", "auth.access.denied"),
     AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_UNAUTHORIZED_ACCESS", "auth.unauthorized"),
     AUTH_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "AUTH_LOGIN_FAILED", "auth.login.failed"),
+    AUTH_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH_INVALID_PASSWORD", "auth.invalid.password"),
 
     // 토큰 관련 익셉션
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "token.expired"),
@@ -45,5 +46,5 @@ public enum ApiErrorCode {
 
     private final HttpStatus httpStatus;
     private final String code;
-    private final String messageKey;
+    private final String message;
 }

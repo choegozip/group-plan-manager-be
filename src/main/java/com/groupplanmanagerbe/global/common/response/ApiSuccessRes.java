@@ -4,7 +4,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public record ApiSuccessRes<T>(String code, String messageKey, T data) {
+public record ApiSuccessRes<T>(String code, String massage, T data) {
 
     // 200 OK
     public static <T> ResponseEntity<ApiSuccessRes<T>> success(ApiSuccessCode successCode, T data) {

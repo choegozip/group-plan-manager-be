@@ -2,15 +2,17 @@ package com.groupplanmanagerbe.global.common.response;
 
 import com.groupplanmanagerbe.global.message.MessageResolver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@Component
+@Slf4j
+@RestControllerAdvice
 @RequiredArgsConstructor
 public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 
@@ -18,7 +20,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return false;
+        return true;
     }
 
     @Override
@@ -28,7 +30,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             ServerHttpRequest request, ServerHttpResponse response
     ) {
         if (body instanceof ApiSuccessRes<?> res) {
-            String localizedMessage = messageResolver.get(res.messageKey());
+            String localizedMessage = messageResolver.get(res.massage());
             return new ApiSuccessRes<>(res.code(), localizedMessage, res.data());
         }
 
