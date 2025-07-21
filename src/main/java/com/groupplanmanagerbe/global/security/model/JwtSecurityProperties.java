@@ -18,6 +18,7 @@ public record JwtSecurityProperties(
 
     public record Token(
             String prefix,
+            String refreshPrefix,
             String blackListPrefix,
             long expiration,
             long refreshExpiration
