@@ -4,6 +4,7 @@ import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,9 +29,18 @@ public class RefreshToken extends BaseEntity {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
+    @Builder
     public RefreshToken(User user, String token, LocalDateTime expiryDate) {
         this.user = user;
         this.token = token;
         this.expiryDate = expiryDate;
+    }
+
+    public static RefreshToken of(User user, String token, LocalDateTime expiryDate) {
+        return RefreshToken.builder()
+                .user(user)
+                .token(token)
+                .expiryDate(expiryDate)
+                .build();
     }
 }

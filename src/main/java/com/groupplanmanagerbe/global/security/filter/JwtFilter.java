@@ -4,6 +4,7 @@ import com.groupplanmanagerbe.domain.auth.service.BlackListTokenService;
 import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.FilterExceptionHandler;
+import com.groupplanmanagerbe.global.exception.custom.JwtTokenException;
 import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.global.security.token.JwtAuthenticationToken;
@@ -48,18 +49,17 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull FilterChain chain
     ) throws IOException, ServletException {
         String bearerJwt = request.getHeader("Authorization");
-
         if (bearerJwt != null) {
+            try {
             String token = jwtUtil.substringToken(bearerJwt);
             Claims claims = jwtUtil.validateToken(token, blackListTokenService);
 
-            try {
                 if (SecurityContextHolder.getContext().getAuthentication() == null) {
                     setAuthentication(token, claims);
                 }
-            } catch (Exception e) {
-                log.error("예기치 못한 오류.");
-                filterExceptionHandler.send(response, ApiErrorCode.TOKEN_UNAUTHORIZED);
+            } catch (JwtTokenException e) {
+                log.warn("JWT 예외 발생: {}", e.getErrorCode());
+                filterExceptionHandler.send(response, e.getErrorCode());
                 return;
             }
         }
