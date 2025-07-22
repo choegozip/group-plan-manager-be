@@ -23,6 +23,6 @@ public class GpmAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
     ) throws IOException {
-        filterExceptionHandler.send(response, ApiErrorCode.AUTH_FORBIDDEN_ACCESS);
+        filterExceptionHandler.send(request, response, ApiErrorCode.AUTH_FORBIDDEN_ACCESS);
     }
 }

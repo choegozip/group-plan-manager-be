@@ -24,6 +24,6 @@ public class GpmAuthEntryPoint implements AuthenticationEntryPoint {
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        filterExceptionHandler.send(response, ApiErrorCode.AUTH_ACCESS_DENIED);
+        filterExceptionHandler.send(request, response, ApiErrorCode.AUTH_ACCESS_DENIED);
     }
 }

@@ -89,6 +89,9 @@ public class JwtUtil {
         } catch (MalformedJwtException e) {
             log.warn("잘못된 형식의 토큰입니다: {}", e.getMessage());
             throw new JwtTokenException(ApiErrorCode.TOKEN_MALFORMED);
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            log.warn("JWT 서명이 일치하지 않습니다: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.TOKEN_INVALID_SIGNATURE);
         } catch (SecurityException e) {
             log.warn("토큰 서명이 유효하지 않습니다: {}", e.getMessage());
             throw new JwtTokenException(ApiErrorCode.TOKEN_INVALID_SIGNATURE);
@@ -104,10 +107,8 @@ public class JwtUtil {
     public Claims validateToken(String token, BlackListTokenService blacklistTokenService) {
         // 1. 토큰 형식 및 서명 검증
         Claims claims = parseClaims(token);
-        log.info("클래임 생성");
         // 2. 블랙리스트 검증
         if (blacklistTokenService != null && blacklistTokenService.isBlacklisted(token)) {
-            log.info("블랙리스트 체크, 예외 쓰로우 전");
             throw new JwtTokenException(ApiErrorCode.TOKEN_BLACKLISTED);
         }
         return claims;
