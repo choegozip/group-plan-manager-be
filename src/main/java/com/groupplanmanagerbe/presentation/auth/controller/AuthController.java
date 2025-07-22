@@ -5,7 +5,8 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.auth.dto.request.LoginReq;
-import com.groupplanmanagerbe.presentation.auth.dto.response.LoginRes;
+import com.groupplanmanagerbe.presentation.auth.dto.request.RefreshTokenReq;
+import com.groupplanmanagerbe.presentation.auth.dto.response.TokenRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +26,26 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiSuccessRes<LoginRes>> login(
+    public ResponseEntity<ApiSuccessRes<TokenRes>> login(
             @Valid @RequestBody LoginReq request
     ) {
-        LoginRes response = authService.login(request);
+        TokenRes response = authService.login(request);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_LOGIN, response);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiSuccessRes<Void>> logout(
-            @AuthenticationPrincipal AuthUser authUser
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         authService.logout(authentication.getCredentials().toString());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_LOGOUT);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiSuccessRes<TokenRes>> refreshAccessToken(
+            @RequestBody RefreshTokenReq request
+    ) {
+        TokenRes response = authService.refreshAccessToken(request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_REFRESH_TOKEN, response);
     }
 }

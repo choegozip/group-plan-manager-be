@@ -22,19 +22,17 @@ public enum ApiErrorCode {
     AUTH_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "AUTH_INVALID_PASSWORD", "auth.invalid.password"),
 
     // 토큰 관련 익셉션
-    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "token.expired"),
-    TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID", "token.invalid"),
-    TOKEN_UNSUPPORTED_FORMAT(HttpStatus.UNAUTHORIZED, "TOKEN_UNSUPPORTED_FORMAT", "token.unsupported_format"),
-    TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "TOKEN_MALFORMED", "token.malformed"),
-    TOKEN_INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_SIGNATURE", "token.invalid_signature"),
-    TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, "TOKEN_EMPTY", "token.empty"),
-    TOKEN_BLACKLISTED(HttpStatus.UNAUTHORIZED, "TOKEN_BLACKLISTED", "token.blacklisted"),
+    TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.expired"),
+    TOKEN_UNSUPPORTED_FORMAT(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.unsupported_format"),
+    TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.malformed"),
+    TOKEN_INVALID_SIGNATURE(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.invalid_signature"),
+    TOKEN_EMPTY(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.empty"),
+    TOKEN_BLACKLISTED(HttpStatus.UNAUTHORIZED, "ACCESS_TOKEN_REQUIRED", "token.blacklisted"),
     TOKEN_MISSING_MEMBER_ID(HttpStatus.UNAUTHORIZED, "TOKEN_MISSING_MEMBER_ID", "token.missing_member_id"),
     TOKEN_INVALID_MEMBER_ID(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_MEMBER_ID", "token.invalid_member_id"),
     TOKEN_MISSING_ROLE(HttpStatus.UNAUTHORIZED, "TOKEN_MISSING_ROLE", "token.missing_role"),
     TOKEN_INVALID_ROLE(HttpStatus.UNAUTHORIZED, "TOKEN_INVALID_ROLE", "token.invalid_role"),
-    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "token.not.found"),
-    TOKEN_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "TOKEN_UNAUTHORIZED", "token.unauthorized"),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "ACCESS_TOKEN_REQUIRED", "token.not.found"),
 
     // JWT 시크릿 키 관련
     JWT_SECRET_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "JWT_SECRET_KEY_EMPTY", "jwt.secret.key.empty"),

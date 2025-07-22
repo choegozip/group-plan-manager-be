@@ -43,4 +43,8 @@ public class RefreshToken extends BaseEntity {
                 .expiryDate(expiryDate)
                 .build();
     }
+
+    public void update(String refreshToken) {
+        this.token = refreshToken;
+    }
 }

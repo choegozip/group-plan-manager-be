@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -32,6 +33,25 @@ public class RefreshTokenService {
     public void delete(Long userId) {
         deleteFromRedis(userId);
         deleteFromDb(userId);
+    }
+
+    public String getByUserId(Long userId) {
+        String key = getKey(userId);
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    public void updateOrCreate(User user, String refreshToken) {
+        long expiration = jwtSecurityProperties.token().refreshExpiration();
+        Optional<RefreshToken> tokenOpt = refreshRepository.findByUserId(user.getId());
+
+        if (tokenOpt.isPresent()) {
+            RefreshToken token = tokenOpt.get();
+            token.update(refreshToken);
+            createToRedis(user.getId(), refreshToken, expiration);
+        } else {
+            createToDb(user, refreshToken,expiration);
+            createToRedis(user.getId(), refreshToken, expiration);
+        }
     }
 
     private void createToDb(User user, String token, long expiration) {

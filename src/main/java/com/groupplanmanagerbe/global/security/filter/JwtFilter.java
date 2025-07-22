@@ -59,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 }
             } catch (JwtTokenException e) {
                 log.warn("JWT 예외 발생: {}", e.getErrorCode());
-                filterExceptionHandler.send(response, e.getErrorCode());
+                filterExceptionHandler.send(request, response, e.getErrorCode());
                 return;
             }
         }

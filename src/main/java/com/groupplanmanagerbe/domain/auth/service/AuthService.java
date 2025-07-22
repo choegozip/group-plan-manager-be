@@ -4,10 +4,13 @@ import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
+import com.groupplanmanagerbe.global.exception.custom.JwtTokenException;
+import com.groupplanmanagerbe.global.exception.custom.UnAuthorizedException;
 import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import com.groupplanmanagerbe.global.security.token.JwtUtil;
 import com.groupplanmanagerbe.presentation.auth.dto.request.LoginReq;
-import com.groupplanmanagerbe.presentation.auth.dto.response.LoginRes;
+import com.groupplanmanagerbe.presentation.auth.dto.request.RefreshTokenReq;
+import com.groupplanmanagerbe.presentation.auth.dto.response.TokenRes;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +34,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public LoginRes login(LoginReq request) {
+    public TokenRes login(LoginReq request) {
         User savedUser = userComponent.getByEmail(request.email());
         if (!passwordEncoder.matches(request.password(), savedUser.getPassword())) {
             throw new InvalidException(ApiErrorCode.AUTH_INVALID_PASSWORD);
@@ -41,7 +44,7 @@ public class AuthService {
 
         refreshTokenService.create(savedUser, refreshToken);
 
-        return LoginRes.of(accessToken, refreshToken);
+        return TokenRes.of(accessToken, refreshToken);
     }
 
     @Transactional
@@ -53,6 +56,27 @@ public class AuthService {
         if (mills > 0) {
             blackListTokenService.save(token, mills);
             refreshTokenService.delete(Long.valueOf(claims.getSubject()));
+        }
+    }
+
+    @Transactional
+    public TokenRes refreshAccessToken(RefreshTokenReq request) {
+        Claims  claims = jwtUtil.parseClaims(request.refreshToken());
+        Long userId = Long.parseLong(claims.getSubject());
+        User savedUser = userComponent.getById(userId);
+        String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
+        String savedToken = refreshTokenService.getByUserId(userId);
+
+        if (!request.refreshToken().equals(savedToken)) {
+            throw new UnAuthorizedException(ApiErrorCode.AUTH_UNAUTHORIZED_ACCESS);
+        }
+
+        if (savedToken == null || savedToken.isBlank()) {
+            String refreshToken = jwtUtil.createRefreshToken(savedUser.getId());
+            refreshTokenService.updateOrCreate(savedUser, refreshToken);
+            return TokenRes.of(accessToken, refreshToken);
+        } else {
+            return TokenRes.of(accessToken, null);
         }
     }
 }

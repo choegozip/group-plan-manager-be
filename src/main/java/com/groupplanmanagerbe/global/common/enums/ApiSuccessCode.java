@@ -11,7 +11,8 @@ public enum ApiSuccessCode {
     SUCCESS_USER_UPDATE("SUCCESS_USER_UPDATE", "user.update.success"),
     SUCCESS_USER_DELETE("SUCCESS_USER_DELETE", "user.delete.success"),
     SUCCESS_LOGIN("SUCCESS_LOGIN", "user.login.success"),
-    SUCCESS_LOGOUT("SUCCESS_LOGOUT", "user.logout.success")
+    SUCCESS_LOGOUT("SUCCESS_LOGOUT", "user.logout.success"),
+    SUCCESS_REFRESH_TOKEN("SUCCESS_REFRESH_TOKEN", "user.refresh.token" )
     ;
 
     private final String code;
