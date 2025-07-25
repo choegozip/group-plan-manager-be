@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "space")
+@Table(name = "spaces")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Space extends BaseEntity {

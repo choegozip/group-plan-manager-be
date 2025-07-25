@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "to_buy_item")
+@Table(name = "to_buy_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToBuyItem extends BaseEntity {

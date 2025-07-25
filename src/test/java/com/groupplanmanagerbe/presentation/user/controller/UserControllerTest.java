@@ -69,19 +69,19 @@ class UserControllerTest {
 
     @Test
     void 회원가입_성공() throws Exception {
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(validCreateReq)))
                 .andExpect(status().isCreated())
                 .andDo(print())
-                .andExpect(jsonPath("$.code").value("success"));
+                .andExpect(jsonPath("$.code").value("SUCCESS_SIGNUP"));
     }
 
     @Test
     void 회원가입_유효하지_않은_값() throws Exception {
         CreateUserReq badReq = new CreateUserReq("333", "칙피", "Password123!", null);
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badReq)))
                 .andExpect(status().isBadRequest())
@@ -95,7 +95,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(validUpdateReq)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(jsonPath("$.code").value("success"));
+                .andExpect(jsonPath("$.code").value("SUCCESS_USER_UPDATE"));
     }
 
     @Test

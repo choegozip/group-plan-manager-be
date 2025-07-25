@@ -1,0 +1,36 @@
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+
+# 환경설정, 민감정보
+application-*.yml
+.env
+
+# Git
+.git
+.gitignore
+
+# Log
+*.log
+logs/
+
+# 테스트 코드 제외
+src/test/

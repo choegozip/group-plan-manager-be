@@ -1,35 +1,12 @@
 services:
-  database:
-    image: 'mysql:latest'
-    container_name: group_pm-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    ports:
-      - '3307:3306'
-    volumes:
-      - mysql-data:/var/lib/mysql
-    restart: unless-stopped
-
-  redis:
-    image: 'redis:7.2'
-    container_name: group_mp-redis
-    ports:
-      - '6379:6379'
-
   app:
     build: .
     container_name: group-pm
-    depends_on:
-      - redis
-      - database
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
     ports:
       - "8080:8080"
-
-volumes:
-  mysql-data:
