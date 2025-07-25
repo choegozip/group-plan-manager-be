@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "to_do_manager")
+@Table(name = "to_do_managers")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TodoManager extends BaseEntity {

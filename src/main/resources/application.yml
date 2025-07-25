@@ -1,4 +1,6 @@
 spring:
   profiles:
-    active: base, dev
+    active:
+     - base
+     - prod
 
