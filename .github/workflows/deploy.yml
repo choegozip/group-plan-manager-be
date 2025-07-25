@@ -1,0 +1,31 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.EC2_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+          docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} -p ${{ secrets.GHCR_TOKEN }}
+          docker pull ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
+          docker stop app || true
+          docker rm app || true
+          docker run -d --name app -p 8080:8080 ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
+          EOF
+
+      - name: Clean up SSH key
+        run: rm -f private_key.pem
