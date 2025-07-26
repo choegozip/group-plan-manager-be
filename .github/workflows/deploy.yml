@@ -60,23 +60,19 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
-              "set -e",
-              "echo \"Starting deployment at $(date)\"",
-              "docker pull ${{ env.DOCKER_IMAGE }}",
-              "docker stop app || echo \"Container app not running\"",
-              "docker rm app || echo \"Container app not found\"",
-              "docker run -d --name app -p 8080:8080 --restart unless-stopped \
-                -e DB_URL='\''${{ secrets.DB_URL }}'\'' \
-                -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' \
-                -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' \
-                -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' \
-                -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' \
-                ${{ env.DOCKER_IMAGE }}",
-              "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped nginx:latest",
-              "sleep 5",
-              "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
-              "echo \"Deployment completed at $(date)\""
-            ]' \
+                "set -e",
+                "echo \"Starting deployment at $(date)\"",
+                "docker pull ${{ env.DOCKER_IMAGE }}",
+                "docker stop app || echo \"app container not running\"",
+                "docker rm app || echo \"app container not found\"",
+                "docker stop nginx || echo \"nginx container not running\"",
+                "docker rm nginx || echo \"nginx container not found\"",
+                "docker run -d --name app -p 8080:8080 --restart unless-stopped -e DB_URL='\''${{ secrets.DB_URL }}'\'' -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' ${{ env.DOCKER_IMAGE }}",
+                "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped nginx:latest",
+                "sleep 5",
+                "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
+                "echo \"Deployment completed at $(date)\""
+              ]' \
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
