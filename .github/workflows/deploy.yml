@@ -73,7 +73,7 @@ jobs:
                 -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' \
                 ${{ env.DOCKER_IMAGE }}",
               "sleep 5",
-              "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
+              "if docker ps -d | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
               "echo \"Deployment completed at $(date)\""
             ]' \
             --timeout-seconds 600 \
