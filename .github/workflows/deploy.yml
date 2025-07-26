@@ -1,31 +1,149 @@
-name: Deploy to EC2
+name: Deploy via SSM
 
 on:
   push:
-    branches: [ "dev" ]
+    branches:
+      - dev
+
+env:
+  AWS_REGION: ap-northeast-2
+  DOCKER_IMAGE: ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up SSH key
+      - name: Create .env from Github  secretes
         run: |
-          echo "${{ secrets.EC2_KEY }}" > private_key.pem
-          chmod 600 private_key.pem
+          echo SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }} >> .env
+          echo SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} >> .env
+          echo SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} >> .env
+          echo SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} >> .env
+          echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+          echo DB_URL=${{ secrets.DB_URL }} >> .env
+          echo DB_USERNAME=${{ secrets.DB_USERNAME }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USERNAME }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Deploy to EC2
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run deployment commands via SSM
+        id: ssm-deploy
         run: |
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-          docker login ghcr.io -u ${{ secrets.GHCR_USERNAME }} -p ${{ secrets.GHCR_TOKEN }}
-          docker pull ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
-          docker stop app || true
-          docker rm app || true
-          docker run -d --name app -p 8080:8080 ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
-          EOF
+          COMMAND_ID=$(aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters 'commands=[
+              "set -e",
+              "echo \"Starting deployment at $(date)\"",
+              "docker pull ${{ env.DOCKER_IMAGE }}",
+              "docker stop app || echo \"Container app not running\"",
+              "docker rm app || echo \"Container app not found\"",
+              "docker run -d --name app -p 8080:8080 --restart unless-stopped \
+                -e DB_URL='\''${{ secrets.DB_URL }}'\'' \
+                -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' \
+                -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' \
+                -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' \
+                -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' \
+                ${{ env.DOCKER_IMAGE }}",
+              "sleep 5",
+              "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
+              "echo \"Deployment completed at $(date)\""
+            ]' \
+            --timeout-seconds 600 \
+            --comment "Deploy via GitHub Actions SSM - Commit: ${{ github.sha }}" \
+            --query "Command.CommandId" \
+            --output text)
+          
+          echo "command-id=$COMMAND_ID" >> $GITHUB_OUTPUT
+          echo "SSM Command ID: $COMMAND_ID"
 
-      - name: Clean up SSH key
-        run: rm -f private_key.pem
+      - name: Wait for command completion
+        run: |
+          COMMAND_ID="${{ steps.ssm-deploy.outputs.command-id }}"
+          echo "Waiting for command $COMMAND_ID to complete..."
+          
+          # 최대 10분 대기 (120 * 5초)
+          for i in {1..120}; do
+            STATUS=$(aws ssm get-command-invocation \
+              --command-id "$COMMAND_ID" \
+              --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+              --query "Status" \
+              --output text 2>/dev/null || echo "InProgress")
+          
+            echo "[$i/120] Current status: $STATUS"
+          
+            case "$STATUS" in
+              "Success")
+                echo "✅ Deployment completed successfully!"
+                aws ssm get-command-invocation \
+                  --command-id "$COMMAND_ID" \
+                  --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+                  --query "StandardOutputContent" \
+                  --output text
+                exit 0
+                ;;
+              "Failed"|"Cancelled"|"TimedOut")
+                echo "❌ Deployment failed with status: $STATUS"
+                echo "Error details:"
+                aws ssm get-command-invocation \
+                  --command-id "$COMMAND_ID" \
+                  --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+                  --query "StandardErrorContent" \
+                  --output text
+                exit 1
+                ;;
+              "InProgress"|"Pending"|"Delayed")
+                sleep 5
+                ;;
+              *)
+                echo "Unknown status: $STATUS"
+                sleep 5
+                ;;
+            esac
+          done
+          
+          echo "❌ Timeout: Command did not complete within 10 minutes"
+          exit 1
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "🧹 Cleaning up failed deployment..."
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters 'commands=[
+              "docker logs app || true",
+              "docker stop app || true", 
+              "docker rm app || true"
+            ]' \
+            --comment "Cleanup failed deployment"
