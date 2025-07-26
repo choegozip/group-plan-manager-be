@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   app:
     build: .
@@ -8,5 +10,24 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       REDIS_URL: ${REDIS_URL}
+    expose:
+      - "8080"  # 외부에 노출 안 하고 nginx만 접근
+    networks:
+      - group-pm-net
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
     ports:
-      - "8080:8080"
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    networks:
+      - group-pm-net
+
+networks:
+  group-pm-net:
+    driver: bridge
