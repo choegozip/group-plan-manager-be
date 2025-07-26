@@ -45,8 +45,6 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE }}
             ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
