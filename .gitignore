@@ -39,5 +39,5 @@ bin/
 .DS_Store
 
 ### Settings ###
-application-*.yml
+application-dev.yml
 .env

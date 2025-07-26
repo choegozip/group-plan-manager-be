@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+  jpa:
+    hibernate:
+      ddl-auto: none
+  data:
+    redis:
+      url: ${REDIS_URL}
+      ssl:
+        enabled: true
+      timeout: 10s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+        shutdown-timeout: 100ms
+
+logging:
+  level:
+    root: debug
+
+jwt:
+  secret:
+    key: "${JWT_SECRET_KEY}"
+    whiteList:
+      - /api/users/signup
+      - /api/auth/login
+      - /actuator/health
+      - /actuator/prometheus
+      - /api/auth/refresh
+  token:
+    prefix: "Bearer "
+    refreshPrefix: "Refresh:"
+    blackListPrefix: "BlackList:"
+    expiration: 1800000
+    refreshExpiration: 1209600000
+
+
+
+
+
