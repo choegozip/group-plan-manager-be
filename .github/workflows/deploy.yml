@@ -37,6 +37,16 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Copy nginx.conf to EC2 via SSM
+        run: |
+          CONTENT=$(base64 -w 0 ./nginx/nginx.conf)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $CONTENT | base64 -d > /home/ec2-user/nginx/nginx.conf"] \
+            --comment "Copy nginx.conf" \
+            --timeout-seconds 60
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -68,7 +78,9 @@ jobs:
                 "docker stop nginx || echo \"nginx container not running\"",
                 "docker rm nginx || echo \"nginx container not found\"",
                 "docker run -d --name app -p 8080:8080 --restart unless-stopped -e DB_URL='\''${{ secrets.DB_URL }}'\'' -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' ${{ env.DOCKER_IMAGE }}",
-                "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped nginx:latest",
+                "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped \
+                  -v /home/ec2-user/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+                  nginx:latest",
                 "sleep 5",
                 "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
