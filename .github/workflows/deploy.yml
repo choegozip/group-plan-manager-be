@@ -56,7 +56,7 @@ jobs:
       - name: Copy nginx config files to EC2 via SSM
         run: |
           # nginx.conf 복사
-          NGINX_CONF=$(base64 -w 0 ./nginx.conf)
+          NGINX_CONF=$(base64 -w 0 ./nginx/nginx.conf)
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
@@ -65,7 +65,7 @@ jobs:
             --timeout-seconds 60
 
           # default.conf 복사
-          DEFAULT_CONF=$(base64 -w 0 ./default.conf)
+          DEFAULT_CONF=$(base64 -w 0 ./nginx/default.conf)
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
