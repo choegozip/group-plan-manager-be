@@ -1,4 +1,4 @@
-name: Deploy via SSM
+name: Deploy via SSM with Docker Compose
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  DOCKER_IMAGE: ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
 
 jobs:
   build-and-deploy:
@@ -18,8 +17,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create .env from Github  secretes
+      - name: Create .env from Github secrets
         run: |
+          echo DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }} >> .env
           echo SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }} >> .env
           echo SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} >> .env
           echo SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} >> .env
@@ -53,14 +53,44 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Copy nginx.conf to EC2 via SSM
+      - name: Copy nginx config files to EC2 via SSM
         run: |
-          CONTENT=$(base64 -w 0 ./nginx/nginx.conf)
+          # nginx.conf 복사
+          NGINX_CONF=$(base64 -w 0 ./nginx.conf)
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $CONTENT | base64 -d > /home/ec2-user/nginx/nginx.conf"] \
+            --parameters commands=["bash","-c","echo $NGINX_CONF | base64 -d > /home/ec2-user/nginx.conf"] \
             --comment "Copy nginx.conf" \
+            --timeout-seconds 60
+
+          # default.conf 복사
+          DEFAULT_CONF=$(base64 -w 0 ./default.conf)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $DEFAULT_CONF | base64 -d > /home/ec2-user/default.conf"] \
+            --comment "Copy default.conf" \
+            --timeout-seconds 60
+
+      - name: Copy docker-compose.yml to EC2 via SSM
+        run: |
+          COMPOSE_CONTENT=$(base64 -w 0 ./docker-compose.yml)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $COMPOSE_CONTENT | base64 -d > /home/ec2-user/docker-compose.yml"] \
+            --comment "Copy docker-compose.yml" \
+            --timeout-seconds 60
+
+      - name: Copy .env to EC2 via SSM
+        run: |
+          ENV_CONTENT=$(base64 -w 0 ./.env)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
+            --comment "Copy .env file" \
             --timeout-seconds 60
 
       - name: Run deployment commands via SSM
@@ -72,22 +102,23 @@ jobs:
             --parameters 'commands=[
                 "set -e",
                 "echo \"Starting deployment at $(date)\"",
+                "cd /home/ec2-user",
+                "echo \"Pulling latest image...\"",
                 "docker pull ${{ env.DOCKER_IMAGE }}",
-                "docker stop app || echo \"app container not running\"",
-                "docker rm app || echo \"app container not found\"",
-                "docker stop nginx || echo \"nginx container not running\"",
-                "docker rm nginx || echo \"nginx container not found\"",
-                "docker run -d --name app -p 8080:8080 --restart unless-stopped -e DB_URL='\''${{ secrets.DB_URL }}'\'' -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' ${{ env.DOCKER_IMAGE }}",
-                "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped \
-                  -v /home/ec2-user/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
-                  -v /etc/letsencrypt:/etc/letsencrypt:ro \
-                  nginx:latest",
-                "sleep 5",
-                "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
+                "echo \"Stopping existing containers...\"",
+                "docker-compose down || echo \"No containers to stop\"",
+                "echo \"Starting new containers with docker-compose...\"",
+                "docker-compose up -d",
+                "echo \"Waiting for containers to be ready...\"",
+                "sleep 10",
+                "echo \"Checking container status...\"",
+                "docker-compose ps",
+                "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
+                "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
               ]' \
             --timeout-seconds 600 \
-            --comment "Deploy via GitHub Actions SSM - Commit: ${{ github.sha }}" \
+            --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
             --output text)
           
@@ -150,8 +181,8 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
-              "docker logs app || true",
-              "docker stop app || true", 
-              "docker rm app || true"
+              "cd /home/ec2-user",
+              "docker-compose logs || true",
+              "docker-compose down || true"
             ]' \
             --comment "Cleanup failed deployment"
