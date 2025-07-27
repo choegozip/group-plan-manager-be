@@ -118,11 +118,9 @@ jobs:
               "docker-compose up -d",
               "sleep 10",
               "docker-compose ps",
-              "echo \"=== app logs ===\"",
-              "docker-compose logs app || true",
-              "echo \"=== nginx logs ===\"",
-              "docker-compose logs nginx || true",
-              "if docker-compose ps | grep -q \"app.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+              "docker-compose logs group-pm",
+              "docker-compose logs nginx",
+              "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
               "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
               "echo \"Deployment completed at $(date)\""
             ]}' \
@@ -133,6 +131,7 @@ jobs:
 
           echo "command-id=$COMMAND_ID" >> $GITHUB_OUTPUT
           echo "SSM Command ID: $COMMAND_ID"
+      
       
       
 
