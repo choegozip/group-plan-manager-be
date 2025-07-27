@@ -115,24 +115,25 @@ jobs:
                 "whoami",
                 "echo $PATH",
                 "which docker",
-                "which docker compose",
-                "ls -la /usr/local/bin/docker  compose",
-                "/usr/local/bin/docker compose --version",
+                "which docker-compose || which docker",
+                "ls -la /usr/local/bin/docker-compose || ls -la /usr/local/lib/docker/cli-plugins/docker-compose",
+                "docker compose version",
                 "echo \"Pulling latest image...\"",
                 "docker pull ${{ env.DOCKER_IMAGE }}",
-                "/usr/local/bin/docker compose down || echo \"No containers to stop\"",
-                "/usr/local/bin/docker compose up -d",
+                "docker compose down || echo \"No containers to stop\"",
+                "docker compose up -d",
                 "sleep 10",
-                "/usr/local/bin/docker compose ps",
-                "if /usr/local/bin/docker compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
-                "if /usr/local/bin/docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
+                "docker compose ps",
+                "if docker compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+                "if docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
             ]}' \
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
             --output text)
-
+          
+          
           echo "command-id=$COMMAND_ID" >> $GITHUB_OUTPUT
           echo "SSM Command ID: $COMMAND_ID"
       
