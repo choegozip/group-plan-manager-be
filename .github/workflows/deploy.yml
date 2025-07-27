@@ -37,16 +37,6 @@ jobs:
           username: ${{ secrets.GHCR_USERNAME }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Copy nginx.conf to EC2 via SSM
-        run: |
-          CONTENT=$(base64 -w 0 ./nginx/nginx.conf)
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $CONTENT | base64 -d > /home/ec2-user/nginx/nginx.conf"] \
-            --comment "Copy nginx.conf" \
-            --timeout-seconds 60
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -62,6 +52,16 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
+
+      - name: Copy nginx.conf to EC2 via SSM
+        run: |
+          CONTENT=$(base64 -w 0 ./nginx/nginx.conf)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $CONTENT | base64 -d > /home/ec2-user/nginx/nginx.conf"] \
+            --comment "Copy nginx.conf" \
+            --timeout-seconds 60
 
       - name: Run deployment commands via SSM
         id: ssm-deploy
