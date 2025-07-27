@@ -117,9 +117,13 @@ jobs:
               "docker pull ${{ env.DOCKER_IMAGE }}",
               "docker-compose up -d",
               "sleep 10",
+              "docker-compose ps",
+              "docker-compose logs group-pm || true",
+              "docker-compose logs nginx || true",
               "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
               "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
-              "echo \"Deployment completed at $(date)\""
+
+             "echo \"Deployment completed at $(date)\""
             ]}' \
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
