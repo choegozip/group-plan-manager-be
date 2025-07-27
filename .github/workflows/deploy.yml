@@ -115,17 +115,17 @@ jobs:
                 "whoami",
                 "echo $PATH",
                 "which docker",
-                "which docker-compose",
-                "ls -la /usr/local/bin/docker-compose",
-                "/usr/local/bin/docker-compose --version",
+                "which docker compose",
+                "ls -la /usr/local/bin/docker  compose",
+                "/usr/local/bin/docker compose --version",
                 "echo \"Pulling latest image...\"",
                 "docker pull ${{ env.DOCKER_IMAGE }}",
-                "/usr/local/bin/docker-compose down || echo \"No containers to stop\"",
-                "/usr/local/bin/docker-compose up -d",
+                "/usr/local/bin/docker compose down || echo \"No containers to stop\"",
+                "/usr/local/bin/docker compose up -d",
                 "sleep 10",
-                "/usr/local/bin/docker-compose ps",
-                "if /usr/local/bin/docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
-                "if /usr/local/bin/docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
+                "/usr/local/bin/docker compose ps",
+                "if /usr/local/bin/docker compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+                "if /usr/local/bin/docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
             ]}' \
             --timeout-seconds 600 \
@@ -194,7 +194,7 @@ jobs:
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
               "cd /home/ec2-user",
-              "docker-compose logs || true",
-              "docker-compose down || true"
+              "docker compose logs || true",
+              "docker compose down || true"
             ]' \
             --comment "Cleanup failed deployment"
