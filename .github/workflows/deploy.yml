@@ -94,16 +94,6 @@ jobs:
             --comment "Copy .env file" \
             --timeout-seconds 60
 
-      - name: Copy .env to EC2 via SSM
-        run: |
-          ENV_CONTENT=$(base64 -w 0 ./.env)
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
-            --comment "Copy .env file" \
-            --timeout-seconds 60
-
       - name: Debug environment variables
         run: |
           echo "DOCKER_IMAGE length: ${#DOCKER_IMAGE}"
@@ -121,20 +111,28 @@ jobs:
                 "set -e",
                 "echo \"Starting deployment at $(date)\"",
                 "cd /home/ec2-user",
+                "echo \"=== 환경 확인 ===\"",
+                "whoami",
+                "echo $PATH",
+                "which docker",
+                "which docker-compose",
+                "ls -la /usr/local/bin/docker-compose",
+                "/usr/local/bin/docker-compose --version",
+                "echo \"=== 테스트 실행 ===\"",
                 "echo \"Pulling latest image...\"",
                 "docker pull ${{ env.DOCKER_IMAGE }}",
                 "echo \"Stopping existing containers...\"",
-                "docker-compose down || echo \"No containers to stop\"",
-                "echo \"Starting new containers with docker-compose...\"",
-                "docker-compose up -d",
+                "/usr/local/bin/docker-compose down || echo \"No containers to stop\"",
+                "echo \"Starting new containers...\"",
+                "/usr/local/bin/docker-compose up -d",
                 "echo \"Waiting for containers to be ready...\"",
                 "sleep 10",
                 "echo \"Checking container status...\"",
-                "docker-compose ps",
-                "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
-                "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
+                "/usr/local/bin/docker-compose ps",
+                "if /usr/local/bin/docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
+                "if /usr/local/bin/docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
-              ]' \
+            ]'
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
