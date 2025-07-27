@@ -7,6 +7,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
+  DOCKER_IMAGE: ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
 
 jobs:
   build-and-deploy:
@@ -19,7 +20,7 @@ jobs:
 
       - name: Create .env from Github secrets
         run: |
-          echo DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }} >> .env
+          echo DOCKER_IMAGE=${{ env.DOCKER_IMAGE }} >> .env
           echo SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }} >> .env
           echo SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} >> .env
           echo SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} >> .env
@@ -43,7 +44,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.DOCKER_IMAGE }}
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
             ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:${{ github.sha }}
 
       - name: Configure AWS Credentials
@@ -92,6 +93,23 @@ jobs:
             --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
             --comment "Copy .env file" \
             --timeout-seconds 60
+
+      - name: Copy .env to EC2 via SSM
+        run: |
+          ENV_CONTENT=$(base64 -w 0 ./.env)
+          aws ssm send-command \
+            --document-name "AWS-RunShellScript" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
+            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
+            --comment "Copy .env file" \
+            --timeout-seconds 60
+
+      - name: Debug environment variables
+        run: |
+          echo "DOCKER_IMAGE length: ${#DOCKER_IMAGE}"
+          echo "DOCKER_IMAGE value: '${{ secrets.DOCKER_IMAGE }}'"
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
 
       - name: Run deployment commands via SSM
         id: ssm-deploy
