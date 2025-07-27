@@ -118,9 +118,9 @@ jobs:
               "docker-compose up -d",
               "sleep 10",
               "docker-compose ps",
-              "docker-compose logs group-pm",
+              "docker-compose logs app",
               "docker-compose logs nginx",
-              "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+              "if docker-compose ps | grep -q \"app.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
               "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
               "echo \"Deployment completed at $(date)\""
             ]}' \
