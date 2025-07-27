@@ -80,6 +80,7 @@ jobs:
                 "docker run -d --name app -p 8080:8080 --restart unless-stopped -e DB_URL='\''${{ secrets.DB_URL }}'\'' -e DB_USERNAME='\''${{ secrets.DB_USERNAME }}'\'' -e DB_PASSWORD='\''${{ secrets.DB_PASSWORD }}'\'' -e REDIS_URL='\''${{ secrets.REDIS_URL }}'\'' -e JWT_SECRET_KEY='\''${{ secrets.JWT_SECRET_KEY }}'\'' ${{ env.DOCKER_IMAGE }}",
                 "docker run -d --name nginx -p 80:80 -p 443:443 --restart unless-stopped \
                   -v /home/ec2-user/nginx/nginx.conf:/etc/nginx/nginx.conf:ro \
+                  -v /etc/letsencrypt:/etc/letsencrypt:ro \
                   nginx:latest",
                 "sleep 5",
                 "if docker ps | grep -q app; then echo \"Deployment successful\"; else echo \"Deployment failed\" && exit 1; fi",
