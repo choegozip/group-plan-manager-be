@@ -118,23 +118,25 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
-                "set -e",
-                "echo \"Starting deployment at $(date)\"",
-                "cd /home/ec2-user",
-                "echo \"Pulling latest image...\"",
-                "docker pull ${{ env.DOCKER_IMAGE }}",
-                "echo \"Stopping existing containers...\"",
-                "docker compose down || echo \"No containers to stop\"",
-                "echo \"Starting new containers with docker compose...\"",
-                "docker compose up -d",
-                "echo \"Waiting for containers to be ready...\"",
-                "sleep 10",
-                "echo \"Checking container status...\"",
-                "docker compose ps",
-                "if docker compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
-                "if docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
-                "echo \"Deployment completed at $(date)\""
-              ]' \
+              "set -e",
+              "echo \"Starting deployment at $(date)\"",
+              "cd /home/ec2-user",
+              "echo \"Checking docker-compose version...\"",
+              "docker-compose --version",
+              "echo \"Pulling latest image...\"",
+              "docker pull ${{ env.DOCKER_IMAGE }}",
+              "echo \"Stopping existing containers...\"",
+              "docker-compose down || echo \"No containers to stop\"",
+              "echo \"Starting new containers...\"",
+              "docker-compose up -d",
+              "echo \"Waiting for containers to be ready...\"",
+              "sleep 10",
+              "echo \"Checking container status...\"",
+              "docker-compose ps",
+              "if docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
+              "if docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
+              "echo \"Deployment completed at $(date)\""
+              ]'
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
