@@ -107,7 +107,7 @@ jobs:
           COMMAND_ID=$(aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters 'commands=[
+            --parameters '{"commands":[
                 "set -e",
                 "echo \"Starting deployment at $(date)\"",
                 "cd /home/ec2-user",
@@ -118,28 +118,24 @@ jobs:
                 "which docker-compose",
                 "ls -la /usr/local/bin/docker-compose",
                 "/usr/local/bin/docker-compose --version",
-                "echo \"=== 테스트 실행 ===\"",
                 "echo \"Pulling latest image...\"",
                 "docker pull ${{ env.DOCKER_IMAGE }}",
-                "echo \"Stopping existing containers...\"",
                 "/usr/local/bin/docker-compose down || echo \"No containers to stop\"",
-                "echo \"Starting new containers...\"",
                 "/usr/local/bin/docker-compose up -d",
-                "echo \"Waiting for containers to be ready...\"",
                 "sleep 10",
-                "echo \"Checking container status...\"",
                 "/usr/local/bin/docker-compose ps",
-                "if /usr/local/bin/docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App deployment successful\"; else echo \"App deployment failed\" && exit 1; fi",
-                "if /usr/local/bin/docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx deployment successful\"; else echo \"Nginx deployment failed\" && exit 1; fi",
+                "if /usr/local/bin/docker-compose ps | grep -q \"group-pm.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+                "if /usr/local/bin/docker-compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
                 "echo \"Deployment completed at $(date)\""
-            ]'
+            ]}' \
             --timeout-seconds 600 \
             --comment "Deploy via GitHub Actions SSM with Docker Compose - Commit: ${{ github.sha }}" \
             --query "Command.CommandId" \
             --output text)
-          
+
           echo "command-id=$COMMAND_ID" >> $GITHUB_OUTPUT
           echo "SSM Command ID: $COMMAND_ID"
+      
 
       - name: Wait for command completion
         run: |
