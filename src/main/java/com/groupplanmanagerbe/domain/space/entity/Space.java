@@ -7,6 +7,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "spaces")
 @Getter
@@ -25,9 +28,23 @@ public class Space extends BaseEntity {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 
+    @OneToMany(mappedBy = "space", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<SpaceMember> members = new ArrayList<>();
+
     @Builder
     public Space(String name, String profileUrl) {
         this.name = name;
         this.profileUrl = profileUrl;
+    }
+
+    public static Space of(String name, String profileUrl) {
+        return Space.builder()
+                .name(name)
+                .profileUrl(profileUrl)
+                .build();
+    }
+
+    public void addMember(SpaceMember member) {
+        members.add(member);
     }
 }

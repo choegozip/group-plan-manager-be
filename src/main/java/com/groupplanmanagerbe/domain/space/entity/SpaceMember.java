@@ -33,4 +33,15 @@ public class SpaceMember extends BaseEntity {
         this.user = user;
         this.space = space;
     }
+
+    public static SpaceMember of(User user, Space space) {
+        return SpaceMember.builder()
+                .user(user)
+                .space(space)
+                .build();
+    }
+
+    public void makeOwner() {
+        this.isOwner = true;
+    }
 }
