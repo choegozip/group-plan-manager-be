@@ -43,7 +43,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager}}:latest
+            ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:latest
             ghcr.io/${{ secrets.GHCR_USERNAME }}/group-plan-manager:${{ github.sha }}
 
       - name: Configure AWS Credentials
