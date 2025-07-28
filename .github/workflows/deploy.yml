@@ -74,13 +74,13 @@ jobs:
             --comment "Copy default.conf" \
             --timeout-seconds 60
 
-      - name: Copy docker-compose.yml to EC2 via SSM
+      - name: Copy docker-compose-prod.yml to EC2 via SSM
         run: |
-          COMPOSE_CONTENT=$(base64 -w 0 ./docker-compose.yml)
+          COMPOSE_CONTENT=$(base64 -w 0 ./docker-compose-prod.yml)
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $COMPOSE_CONTENT | base64 -d > /home/ec2-user/docker-compose.yml"] \
+            --parameters 'commands=["echo '"'"${COMPOSE_CONTENT}"'"' | base64 -d > /home/ec2-user/docker-compose.yml"]' \
             --comment "Copy docker-compose.yml" \
             --timeout-seconds 60
 
