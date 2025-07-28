@@ -17,6 +17,7 @@ services:
       - "8080"
     networks:
       - group-pm-net
+    restart: unless-stopped
 
   nginx:
     image: nginx:latest
@@ -33,6 +34,7 @@ services:
       - app
     networks:
       - group-pm-net
+    restart: unless-stopped
 
 networks:
   group-pm-net:
