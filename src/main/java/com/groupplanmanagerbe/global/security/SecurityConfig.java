@@ -1,6 +1,5 @@
 package com.groupplanmanagerbe.global.security;
 
-import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.global.security.filter.JwtFilter;
 import com.groupplanmanagerbe.global.security.handler.GpmAccessDeniedHandler;
 import com.groupplanmanagerbe.global.security.handler.GpmAuthEntryPoint;
