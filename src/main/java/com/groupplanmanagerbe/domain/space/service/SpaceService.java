@@ -44,4 +44,13 @@ public class SpaceService {
 
         space.updateSpaceInfo(request.name(), request.profileImageKey());
     }
+
+    @Transactional
+    public void deleteSpace(Long spaceId, Long userId) {
+        User user = userComponent.getById(userId);
+        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+
+        space.softDelete();
+    }
 }

@@ -35,7 +35,8 @@ public class User extends BaseEntity {
 
     private String profileImageKey;
 
-    private boolean isDelete;
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;
 
     private LocalDateTime confirmedAt;
 
@@ -83,9 +84,9 @@ public class User extends BaseEntity {
     }
 
     public void delete() {
-        if(this.isDelete) {
+        if(this.deleted) {
             throw new InvalidException(ApiErrorCode.USER_ALREADY_DELETED);
         }
-        this.isDelete = true;
+        this.deleted = true;
     }
 }

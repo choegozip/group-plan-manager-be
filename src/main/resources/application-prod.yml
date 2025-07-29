@@ -8,7 +8,7 @@ spring:
       minimum-idle: 1
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
   data:
     redis:
       url: ${REDIS_URL}
@@ -41,8 +41,4 @@ jwt:
     blackListPrefix: "BlackList:"
     expiration: 1800000
     refreshExpiration: 1209600000
-
-
-
-
 

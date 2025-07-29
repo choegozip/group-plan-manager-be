@@ -25,8 +25,8 @@ public class Space extends BaseEntity {
     @Column(name = "profile_image_key")
     private String profileImageKey;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SpaceMember> members = new ArrayList<>();
@@ -56,6 +56,11 @@ public class Space extends BaseEntity {
         if (profileImageKey != null && !profileImageKey.isBlank()) {
             updateProfileImageKey(profileImageKey);
         }
+    }
+
+    public void softDelete() {
+        this.deleted = true;
+        members.forEach(SpaceMember::softDeleted);
     }
 
     private void updateName(String name) {
