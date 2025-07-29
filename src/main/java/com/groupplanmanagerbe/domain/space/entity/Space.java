@@ -22,8 +22,8 @@ public class Space extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "profile_url")
-    private String profileUrl;
+    @Column(name = "profile_image_key")
+    private String profileImageKey;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
@@ -32,19 +32,37 @@ public class Space extends BaseEntity {
     private List<SpaceMember> members = new ArrayList<>();
 
     @Builder
-    public Space(String name, String profileUrl) {
+    public Space(String name, String profileImageKey) {
         this.name = name;
-        this.profileUrl = profileUrl;
+        this.profileImageKey = profileImageKey;
     }
 
-    public static Space of(String name, String profileUrl) {
+    public static Space of(String name, String profileImageKey) {
         return Space.builder()
                 .name(name)
-                .profileUrl(profileUrl)
+                .profileImageKey(profileImageKey)
                 .build();
     }
 
     public void addMember(SpaceMember member) {
         members.add(member);
+    }
+
+    public void updateSpaceInfo(String name, String profileImageKey) {
+        if (name != null && !name.isBlank()) {
+            updateName(name);
+        }
+
+        if (profileImageKey != null && !profileImageKey.isBlank()) {
+            updateProfileImageKey(profileImageKey);
+        }
+    }
+
+    private void updateName(String name) {
+        this.name = name;
+    }
+
+    private void updateProfileImageKey(String profileImageKey) {
+        this.profileImageKey = profileImageKey;
     }
 }

@@ -12,10 +12,12 @@ public enum ApiSuccessCode {
     SUCCESS_USER_DELETE("SUCCESS_USER_DELETE", "user.delete.success"),
     SUCCESS_LOGIN("SUCCESS_LOGIN", "user.login.success"),
     SUCCESS_LOGOUT("SUCCESS_LOGOUT", "user.logout.success"),
-    SUCCESS_REFRESH_TOKEN("SUCCESS_REFRESH_TOKEN", "user.refresh.token" ),
+    SUCCESS_REFRESH_TOKEN("SUCCESS_REFRESH_TOKEN", "user.refresh.token"),
 
     // SPACE
-    SUCCESS_CREATE_SPACE("SUCCESS_CREATE_SPACE", "space.create.success" );
+    SUCCESS_CREATE_SPACE("SUCCESS_CREATE_SPACE", "space.create.success"),
+    SUCCESS_UPDATE_SPACE("SUCCESS_UPDATE_SPACE", "space.update.success")
+    ;
 
     private final String code;
     private final String message;

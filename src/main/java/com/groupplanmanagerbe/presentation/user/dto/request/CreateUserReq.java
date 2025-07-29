@@ -27,6 +27,6 @@ public record CreateUserReq(
                 message = UserValidationConst.INVALID_PASSWORD_MESSAGE)
         String password,
 
-        String profileUrl
+        String profileImageKey
 ) {
 }
