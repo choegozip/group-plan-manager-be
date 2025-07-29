@@ -5,9 +5,13 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.SortDirection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +49,18 @@ public class SpaceController {
     ) {
         spaceService.deleteSpace(spaceId, authUser.userId());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_DELETE);
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiSuccessRes<SpacePageRes>> getSpaces(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestParam(required = false) String cursor,
+            @RequestParam int size,
+            @RequestParam(defaultValue = "DESCENDING") SortDirection direction
+    ) {
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction);
+
+        SpacePageRes response = spaceService.getSpaces(request, authUser.userId());
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACES_GET, response);
     }
 }

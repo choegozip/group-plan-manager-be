@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface SpaceRepository extends JpaRepository<Space, Long> {
+public interface SpaceRepository extends JpaRepository<Space, Long>, SpaceRepositoryCustom {
    @Query("SELECT s From Space s JOIN s.members m " +
            "WHERE s.id = :spaceId AND s.deleted = false " +
            "AND m.user.id = :userId AND m.user.deleted = false")
