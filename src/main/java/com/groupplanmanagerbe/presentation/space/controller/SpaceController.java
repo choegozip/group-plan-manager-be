@@ -25,7 +25,7 @@ public class SpaceController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         spaceService.createSpace(request, authUser.userId());
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_CREATE_SPACE);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_CREATE);
     }
 
     @PatchMapping("/{spaceId}")
@@ -35,6 +35,15 @@ public class SpaceController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         spaceService.updateSpace(spaceId, request, authUser.userId());
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_SPACE);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_UPDATE);
+    }
+
+    @DeleteMapping("/{spaceId}")
+    public ResponseEntity<ApiSuccessRes<Void>> deleteSpace(
+            @PathVariable Long spaceId,
+            @AuthenticationPrincipal AuthUser authUser
+    ) {
+        spaceService.deleteSpace(spaceId, authUser.userId());
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_DELETE);
     }
 }

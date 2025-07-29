@@ -15,9 +15,9 @@ public enum ApiSuccessCode {
     SUCCESS_REFRESH_TOKEN("SUCCESS_REFRESH_TOKEN", "user.refresh.token"),
 
     // SPACE
-    SUCCESS_CREATE_SPACE("SUCCESS_CREATE_SPACE", "space.create.success"),
-    SUCCESS_UPDATE_SPACE("SUCCESS_UPDATE_SPACE", "space.update.success")
-    ;
+    SUCCESS_SPACE_CREATE("SUCCESS_CREATE_SPACE", "space.create.success"),
+    SUCCESS_SPACE_UPDATE("SUCCESS_UPDATE_SPACE", "space.update.success"),
+    SUCCESS_SPACE_DELETE("SUCCESS_SPACE_DELETE", "space.delete.success");
 
     private final String code;
     private final String message;
