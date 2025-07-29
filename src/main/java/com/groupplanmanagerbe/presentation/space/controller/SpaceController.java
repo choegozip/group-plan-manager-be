@@ -8,6 +8,7 @@ import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
 import com.groupplanmanagerbe.presentation.space.dto.response.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,14 @@ public class SpaceController {
 
         SpacePageRes response = spaceService.getSpaces(request, authUser.userId());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACES_GET, response);
+    }
+
+    @GetMapping("/{spaceId}")
+    public ResponseEntity<ApiSuccessRes<SpaceRes>> getSpace(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId
+    ) {
+        SpaceRes response = spaceService.getSpace(authUser.userId(), spaceId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_GET, response);
     }
 }

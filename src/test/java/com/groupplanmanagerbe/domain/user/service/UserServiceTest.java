@@ -76,7 +76,7 @@ class UserServiceTest {
         assertEquals(createUserReq.email(), savedUser.getEmail());
         assertEquals(createUserReq.nickname(), savedUser.getNickname());
         assertEquals(encodedPassword, savedUser.getPassword());
-        assertEquals(createUserReq.profileUrl(), savedUser.getProfileUrl());
+        assertEquals(createUserReq.profileImageKey(), savedUser.getProfileImageKey());
     }
 
     @Test
@@ -97,13 +97,13 @@ class UserServiceTest {
                 createUserReq.email(),
                 createUserReq.nickname(),
                 createUserReq.password(),
-                createUserReq.profileUrl());
+                createUserReq.profileImageKey());
         when(userComponent.getById(1L)).thenReturn(user);
         // when
         UserRes result = userService.get(1L);
         // then
         assertThat(result.nickname()).isEqualTo(user.getNickname());
-        assertThat(result.profileUrl()).isEqualTo(user.getProfileUrl());
+        assertThat(result.profileImageKey()).isEqualTo(user.getProfileImageKey());
     }
 
     @Test
@@ -125,6 +125,12 @@ class UserServiceTest {
                 "기존패스워드",
                 "https://old-image.url");
 
+        UpdateUserReq updateUserReq = new UpdateUserReq(
+                "새로운닉네임",
+                "새로운패스워드",
+                "https://new-image.url"
+        );
+
         String encodedPassword = "encodedPassword123!";
         when(userComponent.getById(1L)).thenReturn(user);
         when(passwordEncoder.encode(updateUserReq.password())).thenReturn(encodedPassword);
@@ -133,14 +139,11 @@ class UserServiceTest {
         userService.update(1L, updateUserReq);
 
         // then
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(captor.capture());
-
-        User savedUser = captor.getValue();
-        assertEquals(updateUserReq.nickname(), savedUser.getNickname());
-        assertEquals(encodedPassword, savedUser.getPassword());
-        assertEquals(updateUserReq.profileUrl(), savedUser.getProfileUrl());
+        assertEquals(updateUserReq.nickname(), user.getNickname());
+        assertEquals(encodedPassword, user.getPassword());
+        assertEquals(updateUserReq.profileImageKey(), user.getProfileImageKey());
     }
+
 
     @Test
     void 회원정보_수정_없는_회원() {
@@ -162,8 +165,7 @@ class UserServiceTest {
         userService.delete(1L);
 
         // then
-        assertTrue(user.isDelete());
-        verify(userRepository).save(user);
+        assertTrue(user.isDeleted());
     }
 
     @Test
