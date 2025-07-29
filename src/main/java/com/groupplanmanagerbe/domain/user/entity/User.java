@@ -33,33 +33,53 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
-    private String profileUrl;
+    private String profileImageKey;
 
     private boolean isDelete;
 
     private LocalDateTime confirmedAt;
 
     @Builder
-    public User(String nickname, String email, String password, String profileUrl) {
+    public User(String nickname, String email, String password, String profileImageKey) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
-        this.profileUrl = profileUrl;
+        this.profileImageKey = profileImageKey;
     }
 
-    public static User of(String email, String nickname, String password, String profileUrl) {
+    public static User of(String email, String nickname, String password, String profileImageKey) {
         return User.builder()
                 .email(email)
                 .nickname(nickname)
                 .password(password)
-                .profileUrl(profileUrl)
+                .profileImageKey(profileImageKey)
                 .build();
     }
 
-    public void updateUserInfo(String nickname, String password, String profileUrl) {
+    public void updateUserInfo(String nickname, String password, String profileImageKey) {
+        if (nickname != null && !nickname.isBlank()) {
+            updateNickname(nickname);
+        }
+
+        if (password != null && !password.isBlank()) {
+            updatePassword(password);
+        }
+
+        if (profileImageKey != null && !profileImageKey.isBlank()) {
+            updateProfileUrl(profileImageKey);
+        }
+    }
+
+    private void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    private void updatePassword(String password) {
         this.password = password;
-        this.profileUrl = profileUrl;
+    }
+
+    private void updateProfileUrl(String profileImageKey) {
+        this.profileImageKey = profileImageKey;
     }
 
     public void delete() {
