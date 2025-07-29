@@ -38,6 +38,9 @@ public enum ApiErrorCode {
     JWT_SECRET_KEY_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "JWT_SECRET_KEY_EMPTY", "jwt.secret.key.empty"),
     JWT_SECRET_KEY_INVALID(HttpStatus.INTERNAL_SERVER_ERROR, "JWT_SECRET_KEY_INVALID", "jwt.secret.key.invalid"),
 
+    // 스페이스
+    SPACE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SPACE_NOT_FOUND", "space.not.found"),
+
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),
     ;

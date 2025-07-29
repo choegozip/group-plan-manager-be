@@ -6,7 +6,10 @@ import com.groupplanmanagerbe.domain.space.repository.SpaceMemberRepository;
 import com.groupplanmanagerbe.domain.space.repository.SpaceRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
+import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
+import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +26,7 @@ public class SpaceService {
     @Transactional
     public void createSpace(CreateSpaceReq request, Long userId) {
         User user = userComponent.getById(userId);
-        Space space = Space.of(request.name(), request.profileUrl());
+        Space space = Space.of(request.name(), request.profileImageKey());
 
         SpaceMember spaceMember = SpaceMember.of(user, space);
         spaceMember.makeOwner();
@@ -31,5 +34,14 @@ public class SpaceService {
 
         spaceRepository.save(space);
         spaceMemberRepository.save(spaceMember);
+    }
+
+    @Transactional
+    public void updateSpace(Long spaceId, UpdateSpaceReq request, Long userId) {
+        User user = userComponent.getById(userId);
+        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+
+        space.updateSpaceInfo(request.name(), request.profileImageKey());
     }
 }
