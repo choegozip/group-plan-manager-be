@@ -9,10 +9,15 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +57,11 @@ public class SpaceService {
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
 
         space.softDelete();
+    }
+
+    public SpacePageRes getSpaces(CursorPageRequest request, Long userId) {
+        List<SpacesRes> spaces = spaceRepository.findSpacesWithCursor(request, userId);
+
+        return SpacePageRes.of(spaces, request.size());
     }
 }
