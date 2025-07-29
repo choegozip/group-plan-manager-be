@@ -28,7 +28,7 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        User newUser = User.of(request.email(), request.nickname(), encodedPassword, request.profileUrl());
+        User newUser = User.of(request.email(), request.nickname(), encodedPassword, request.profileImageKey());
 
         userRepository.save(newUser);
     }
