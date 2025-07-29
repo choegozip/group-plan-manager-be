@@ -12,6 +12,7 @@ import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
 import com.groupplanmanagerbe.presentation.space.dto.response.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.SpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,5 +64,11 @@ public class SpaceService {
         List<SpacesRes> spaces = spaceRepository.findSpacesWithCursor(request, userId);
 
         return SpacePageRes.of(spaces, request.size());
+    }
+
+    public SpaceRes getSpace(Long userId, Long spaceId) {
+        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+        return SpaceRes.from(space);
     }
 }

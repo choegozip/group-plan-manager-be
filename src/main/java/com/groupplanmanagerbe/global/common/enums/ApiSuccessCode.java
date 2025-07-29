@@ -19,6 +19,7 @@ public enum ApiSuccessCode {
     SUCCESS_SPACE_UPDATE("SUCCESS_UPDATE_SPACE", "space.update.success"),
     SUCCESS_SPACE_DELETE("SUCCESS_SPACE_DELETE", "space.delete.success"),
     SUCCESS_SPACES_GET("SUCCESS_SPACES_GET", "spaces.get.success"),
+    SUCCESS_SPACE_GET("SUCCESS_SPACE_GET", "space.get.success")
     ;
 
     private final String code;

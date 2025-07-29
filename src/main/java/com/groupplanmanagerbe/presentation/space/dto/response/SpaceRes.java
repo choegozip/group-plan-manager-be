@@ -1,4 +1,25 @@
 package com.groupplanmanagerbe.presentation.space.dto.response;
 
-public class SpaceRes {
+import com.groupplanmanagerbe.domain.space.entity.Space;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Builder
+public record SpaceRes(
+        Long spaceId,
+        String name,
+        String profileImageKey,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
+    public static SpaceRes from(Space space) {
+        return SpaceRes.builder()
+                .spaceId(space.getId())
+                .name(space.getName())
+                .profileImageKey(space.getProfileImageKey())
+                .createdAt(space.getCreatedAt())
+                .updatedAt(space.getUpdatedAt())
+                .build();
+    }
 }
