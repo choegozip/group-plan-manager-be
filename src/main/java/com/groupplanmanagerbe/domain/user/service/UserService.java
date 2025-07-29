@@ -28,7 +28,7 @@ public class UserService {
         }
 
         String encodedPassword = passwordEncoder.encode(request.password());
-        User newUser = User.of(request.email(), request.nickname(), encodedPassword, request.profileUrl());
+        User newUser = User.of(request.email(), request.nickname(), encodedPassword, request.profileImageKey());
 
         userRepository.save(newUser);
     }
@@ -42,19 +42,17 @@ public class UserService {
     public void update(Long userId, UpdateUserReq request) {
         User savedUser = userComponent.getById(userId);
 
-        if (!(request.password() == null)) {
-            String encodedPassword = passwordEncoder.encode(request.password());
-            savedUser.updateUserInfo(request.nickname(), encodedPassword, request.profileUrl());
+        String encodedPassword  = null;
+        if (request.password() != null && !request.password().isBlank()) {
+            encodedPassword = passwordEncoder.encode(request.password());
         }
 
-        userRepository.save(savedUser);
+        savedUser.updateUserInfo(request.nickname(), encodedPassword, request.profileImageKey());
     }
 
     @Transactional
     public void delete(Long userId) {
         User savedUser = userComponent.getById(userId);
         savedUser.delete();
-
-        userRepository.save(savedUser);
     }
 }

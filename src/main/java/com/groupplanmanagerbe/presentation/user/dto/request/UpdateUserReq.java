@@ -21,6 +21,6 @@ public record UpdateUserReq(
                 message = UserValidationConst.INVALID_PASSWORD_MESSAGE)
         String password,
 
-        String profileUrl
+        String profileImageKey
 ) {
 }
