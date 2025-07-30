@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpaceInvited extends BaseEntity {
     @Id
-    @Column(name = "invited_key", length = 21)
-    private String invitedKey;
+    @Column(name = "invite_key", length = 21)
+    private String inviteKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id")
@@ -28,7 +28,7 @@ public class SpaceInvited extends BaseEntity {
 
     @Builder
     public SpaceInvited(Space space) {
-        this.invitedKey = NanoIdUtils.randomNanoId(
+        this.inviteKey = NanoIdUtils.randomNanoId(
                 NanoIdUtils.DEFAULT_NUMBER_GENERATOR,
                 NanoIdUtils.DEFAULT_ALPHABET,
                 12);

@@ -98,7 +98,7 @@ class UserServiceTest {
                 createUserReq.nickname(),
                 createUserReq.password(),
                 createUserReq.profileImageKey());
-        when(userComponent.getById(1L)).thenReturn(user);
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenReturn(user);
         // when
         UserRes result = userService.get(1L);
         // then
@@ -109,7 +109,7 @@ class UserServiceTest {
     @Test
     void 회원정보_조회_없는_회원() {
         // given
-        when(userComponent.getById(1L)).thenThrow(new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenThrow(new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
 
         // when & then
         assertThatThrownBy(() -> userService.get(1L))
@@ -132,7 +132,7 @@ class UserServiceTest {
         );
 
         String encodedPassword = "encodedPassword123!";
-        when(userComponent.getById(1L)).thenReturn(user);
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenReturn(user);
         when(passwordEncoder.encode(updateUserReq.password())).thenReturn(encodedPassword);
 
         // when
@@ -148,7 +148,7 @@ class UserServiceTest {
     @Test
     void 회원정보_수정_없는_회원() {
         // given
-        when(userComponent.getById(1L)).thenThrow(new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenThrow(new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
 
         // when & then
         assertThatThrownBy(() -> userService.update(1L, updateUserReq))
@@ -159,7 +159,7 @@ class UserServiceTest {
     void 회원탈퇴_성공() {
         // given
         User user = User.of("email@test.com", "nickname", "pw", "profile");
-        when(userComponent.getById(1L)).thenReturn(user);
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenReturn(user);
 
         // when
         userService.delete(1L);
@@ -173,7 +173,7 @@ class UserServiceTest {
         // given
         User user = User.of("email@test.com", "nickname", "pw", "profile");
         user.delete();
-        when(userComponent.getById(1L)).thenReturn(user);
+        when(userComponent.getByIdAndDeleteFalse(1L)).thenReturn(user);
 
         // when & then
         assertThrows(InvalidException.class, () -> userService.delete(1L));

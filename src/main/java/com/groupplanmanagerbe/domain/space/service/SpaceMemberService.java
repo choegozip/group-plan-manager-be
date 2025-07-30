@@ -2,12 +2,17 @@ package com.groupplanmanagerbe.domain.space.service;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.space.entity.SpaceInvited;
+import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.repository.SpaceInvitedRepository;
 import com.groupplanmanagerbe.domain.space.repository.SpaceRepository;
+import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.ConflictException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
-import com.groupplanmanagerbe.presentation.space.dto.response.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.request.JoinSpaceReq;
+import com.groupplanmanagerbe.presentation.space.dto.response.invite.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.invite.JoinSpaceRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,6 +33,9 @@ public class SpaceMemberService {
     @Value("${app.invitation-path}")
     private String invitationPath;
 
+    public static final String SPACE_BASE_PATH = "spaces";
+
+
     @Transactional
     public InviteSpaceMemberRes inviteMember(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
@@ -39,10 +47,34 @@ public class SpaceMemberService {
                     return spaceInvitedRepository.save(newInvited);
                 });
 
-        String invitationUrl = generateInvitationUrl(invited.getInvitedKey());
+        String invitationUrl = generateInvitationUrl(invited.getInviteKey());
         return InviteSpaceMemberRes.of(invitationUrl);
     }
 
+    @Transactional
+    public JoinSpaceRes joinSpace(Long userId, JoinSpaceReq request) {
+        SpaceInvited invited = spaceInvitedRepository.findByInviteKeyAndDeleted(request.inviteKey())
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
+        Space space = invited.getSpace();
+        User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
+
+        boolean alreadyJoined = space.getMembers().stream()
+                .anyMatch(member -> member.getUser().equals(invitedUser));
+        if (alreadyJoined) {
+            throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
+        }
+
+        SpaceMember.of(invitedUser, space);
+
+        spaceInvitedRepository.delete(invited);
+
+        String landingUrl =  generateLandingUrl(space.getId());
+        return JoinSpaceRes.of(space, landingUrl);
+    }
+
+    private String generateLandingUrl(Long spaceId) {
+        return baseUrl + "/" + SPACE_BASE_PATH + "/" + spaceId;
+    }
     private String generateInvitationUrl(String inviteKey) {
         return baseUrl + "/" + invitationPath + "/" + inviteKey;
     }

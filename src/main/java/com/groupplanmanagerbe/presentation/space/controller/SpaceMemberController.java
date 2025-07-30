@@ -4,14 +4,13 @@ import com.groupplanmanagerbe.domain.space.service.SpaceMemberService;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
-import com.groupplanmanagerbe.presentation.space.dto.response.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.request.JoinSpaceReq;
+import com.groupplanmanagerbe.presentation.space.dto.response.invite.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.invite.JoinSpaceRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/spaces")
@@ -27,5 +26,14 @@ public class SpaceMemberController {
     ) {
         InviteSpaceMemberRes response = spaceMemberService.inviteMember(authUser.userId(), spaceId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_INVITE, response);
+    }
+
+    @PostMapping("/join")
+    public ResponseEntity<ApiSuccessRes<JoinSpaceRes>> joinSpace(
+            @AuthenticationPrincipal AuthUser authUser,
+            @RequestBody JoinSpaceReq request
+    ) {
+        JoinSpaceRes response = spaceMemberService.joinSpace(authUser.userId(), request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_JOIN_SPACE, response);
     }
 }

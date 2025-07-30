@@ -28,7 +28,7 @@ public class Space extends BaseEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
-    @OneToMany(mappedBy = "space", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpaceMember> members = new ArrayList<>();
 
     @Builder
@@ -46,6 +46,7 @@ public class Space extends BaseEntity {
 
     public void addMember(SpaceMember member) {
         members.add(member);
+        member.setSpace(this);
     }
 
     public void updateSpaceInfo(String name, String profileImageKey) {

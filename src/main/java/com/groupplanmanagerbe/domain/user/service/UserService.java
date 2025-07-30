@@ -34,13 +34,13 @@ public class UserService {
     }
 
     public UserRes get(Long userId) {
-        User savedUser = userComponent.getById(userId);
+        User savedUser = userComponent.getByIdAndDeleteFalse(userId);
         return UserRes.from(savedUser);
     }
 
     @Transactional
     public void update(Long userId, UpdateUserReq request) {
-        User savedUser = userComponent.getById(userId);
+        User savedUser = userComponent.getByIdAndDeleteFalse(userId);
 
         String encodedPassword  = null;
         if (request.password() != null && !request.password().isBlank()) {
@@ -52,7 +52,7 @@ public class UserService {
 
     @Transactional
     public void delete(Long userId) {
-        User savedUser = userComponent.getById(userId);
+        User savedUser = userComponent.getByIdAndDeleteFalse(userId);
         savedUser.delete();
     }
 }

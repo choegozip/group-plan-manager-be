@@ -17,8 +17,8 @@ public class UserComponent {
         return userRepository.existsByEmail(email);
     }
 
-    public User getById(Long userId) {
-        return userRepository.findById(userId)
+    public User getByIdAndDeleteFalse(Long userId) {
+        return userRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.USER_NOT_FOUND));
     }
 

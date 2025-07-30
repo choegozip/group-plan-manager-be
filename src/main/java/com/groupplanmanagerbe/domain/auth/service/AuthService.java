@@ -63,7 +63,7 @@ public class AuthService {
     public TokenRes refreshAccessToken(RefreshTokenReq request) {
         Claims  claims = jwtUtil.parseClaims(request.refreshToken());
         Long userId = Long.parseLong(claims.getSubject());
-        User savedUser = userComponent.getById(userId);
+        User savedUser = userComponent.getByIdAndDeleteFalse(userId);
         String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
         String savedToken = refreshTokenService.getByUserId(userId);
 

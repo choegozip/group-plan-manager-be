@@ -11,9 +11,9 @@ import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
-import com.groupplanmanagerbe.presentation.space.dto.response.SpacePageRes;
-import com.groupplanmanagerbe.presentation.space.dto.response.SpaceRes;
-import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpaceRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacesRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,20 +31,18 @@ public class SpaceService {
 
     @Transactional
     public void createSpace(CreateSpaceReq request, Long userId) {
-        User user = userComponent.getById(userId);
+        User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = Space.of(request.name(), request.profileImageKey());
 
         SpaceMember spaceMember = SpaceMember.of(user, space);
         spaceMember.makeOwner();
-        space.addMember(spaceMember);
 
         spaceRepository.save(space);
-        spaceMemberRepository.save(spaceMember);
     }
 
     @Transactional
     public void updateSpace(Long spaceId, UpdateSpaceReq request, Long userId) {
-        User user = userComponent.getById(userId);
+        User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
 
@@ -53,7 +51,7 @@ public class SpaceService {
 
     @Transactional
     public void deleteSpace(Long spaceId, Long userId) {
-        User user = userComponent.getById(userId);
+        User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
 
