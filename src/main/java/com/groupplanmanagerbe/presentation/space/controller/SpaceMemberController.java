@@ -55,7 +55,7 @@ public class SpaceMemberController {
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long spaceId
     ) {
-        List<SpaceMembersRes> response = spaceMemberService.getSpaceMember(authUser.userId(), spaceId);
+        List<SpaceMembersRes> response = spaceMemberService.getSpaceMembers(authUser.userId(), spaceId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_SPACE_MEMBERS, response);
     }
 

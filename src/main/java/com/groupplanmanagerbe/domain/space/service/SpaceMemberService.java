@@ -94,7 +94,7 @@ public class SpaceMemberService {
         space.removeMember(target);
     }
 
-    public List<SpaceMembersRes> getSpaceMember(Long userId, Long spaceId) {
+    public List<SpaceMembersRes> getSpaceMembers(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         List<SpaceMember> members = space.getMembers();
