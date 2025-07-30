@@ -22,6 +22,10 @@ spring:
           min-idle: 0
         shutdown-timeout: 100ms
 
+app:
+  base-url: https://goo3oo.online
+  invitation-path: invite
+
 logging:
   level:
     root: debug
