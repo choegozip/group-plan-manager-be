@@ -1,6 +1,9 @@
 package com.groupplanmanagerbe.domain.space.entity;
 
+import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
+import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -62,6 +65,16 @@ public class Space extends BaseEntity {
     public void softDelete() {
         this.deleted = true;
         members.forEach(SpaceMember::softDeleted);
+    }
+
+    public void deleteMember(Long targetMemberUserId) {
+        SpaceMember target = members.stream()
+                .filter(m -> m.getUser().getId().equals(targetMemberUserId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
+
+        members.remove(target);
+        target.setSpace(null);
     }
 
     private void updateName(String name) {

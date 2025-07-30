@@ -9,6 +9,7 @@ import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.ConflictException;
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.JoinSpaceReq;
 import com.groupplanmanagerbe.presentation.space.dto.response.invite.InviteSpaceMemberRes;
@@ -63,18 +64,28 @@ public class SpaceMemberService {
         if (alreadyJoined) {
             throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
         }
-
         SpaceMember.of(invitedUser, space);
 
         spaceInvitedRepository.delete(invited);
 
-        String landingUrl =  generateLandingUrl(space.getId());
+        String landingUrl = generateLandingUrl(space.getId());
         return JoinSpaceRes.of(space, landingUrl);
+    }
+
+    @Transactional
+    public void deleteMember(Long ownerId, Long spaceId, Long targetMemberUserId) {
+        Space space = spaceRepository.findByIdAndOwnerUserId(spaceId, ownerId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_FORBIDDEN));
+        if (ownerId.equals(targetMemberUserId)) {
+            throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
+        }
+        space.deleteMember(targetMemberUserId);
     }
 
     private String generateLandingUrl(Long spaceId) {
         return baseUrl + "/" + SPACE_BASE_PATH + "/" + spaceId;
     }
+
     private String generateInvitationUrl(String inviteKey) {
         return baseUrl + "/" + invitationPath + "/" + inviteKey;
     }

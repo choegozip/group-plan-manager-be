@@ -36,4 +36,14 @@ public class SpaceMemberController {
         JoinSpaceRes response = spaceMemberService.joinSpace(authUser.userId(), request);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_JOIN_SPACE, response);
     }
+
+    @DeleteMapping("/{spaceId}/members/{memberId}")
+    public ResponseEntity<ApiSuccessRes<Void>> deleteMember(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @PathVariable Long memberId
+    ) {
+        spaceMemberService.deleteMember(authUser.userId(), spaceId, memberId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_DELETE_SPACE_MEMBER);
+    }
 }

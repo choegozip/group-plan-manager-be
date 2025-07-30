@@ -40,7 +40,7 @@ public class SpaceMember extends BaseEntity {
                 .user(user)
                 .space(space)
                 .build();
-        space.getMembers().add(member);
+        space.addMember(member);
         return member;
     }
 
