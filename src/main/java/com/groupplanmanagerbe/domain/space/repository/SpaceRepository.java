@@ -12,4 +12,10 @@ public interface SpaceRepository extends JpaRepository<Space, Long>, SpaceReposi
            "WHERE s.id = :spaceId AND s.deleted = false " +
            "AND m.user.id = :userId AND m.user.deleted = false")
    Optional<Space> findByIdAndUserId(@Param("spaceId")Long spaceId, @Param("userId")Long userId);
+
+   @Query("SELECT s FROM Space s JOIN s.members m " +
+           "WHERE s.id = :spaceId AND s.deleted = false " +
+           "AND m.user.id = :userId AND m.user.deleted = false " +
+           "AND m.isOwner = true")
+   Optional<Space> findByIdAndOwnerUserId(@Param("spaceId") Long spaceId, @Param("userId") Long userId);
 }
