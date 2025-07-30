@@ -49,7 +49,7 @@ public enum ApiErrorCode {
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),
-    ;
+   ;
 
     private final HttpStatus httpStatus;
     private final String code;

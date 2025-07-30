@@ -85,7 +85,13 @@ public class SpaceMemberService {
         if (ownerId.equals(targetMemberUserId)) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }
-        space.deleteMember(targetMemberUserId);
+
+        SpaceMember target = space.getMembers().stream()
+                .filter(m -> m.getUser().getId().equals(targetMemberUserId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
+
+        space.removeMember(target);
     }
 
     public List<SpaceMembersRes> getSpaceMember(Long userId, Long spaceId) {
@@ -96,6 +102,22 @@ public class SpaceMemberService {
         return members.stream()
                 .map(SpaceMembersRes::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void leaveSpace(Long userId, Long spaceId) {
+        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+        SpaceMember me = space.getMembers().stream()
+                .filter(m -> m.getUser().getId().equals(userId))
+                .findFirst()
+                .get();
+
+        if (me.isOwner()) {
+            throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
+        }
+
+        space.removeMember(me);
     }
 
     private String generateLandingUrl(Long spaceId) {

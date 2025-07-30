@@ -23,7 +23,8 @@ public enum ApiSuccessCode {
     SUCCESS_SPACE_INVITE("SUCCESS_SPACE_INVITE", "space.invite.success"),
     SUCCESS_JOIN_SPACE("SUCCESS_JOIN_SPACE", "space.join.success"),
     SUCCESS_DELETE_SPACE_MEMBER("SUCCESS_DELETE_SPACE_MEMBER", "space.delete.member.success"),
-    SUCCESS_GET_SPACE_MEMBERS("SUCCESS_GET_SPACE_MEMBERS", "space.get.members.success")
+    SUCCESS_GET_SPACE_MEMBERS("SUCCESS_GET_SPACE_MEMBERS", "space.get.members.success"),
+    SUCCESS_LEAVE_SPACE("SUCCESS_LEAVE_SPACE", "space.leave.space")
     ;
 
     private final String code;

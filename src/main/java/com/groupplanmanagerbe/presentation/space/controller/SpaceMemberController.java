@@ -58,4 +58,13 @@ public class SpaceMemberController {
         List<SpaceMembersRes> response = spaceMemberService.getSpaceMember(authUser.userId(), spaceId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_SPACE_MEMBERS, response);
     }
+
+    @DeleteMapping("/{spaceId}/members/me")
+    public ResponseEntity<ApiSuccessRes<Void>> leaveSpace(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId
+    ) {
+        spaceMemberService.leaveSpace(authUser.userId(),spaceId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_LEAVE_SPACE);
+    }
 }
