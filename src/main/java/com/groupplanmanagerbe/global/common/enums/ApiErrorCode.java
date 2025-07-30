@@ -42,9 +42,10 @@ public enum ApiErrorCode {
     SPACE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SPACE_NOT_FOUND", "space.not.found"),
     INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "INVITED_NOT_FOUND", "invitation.not.found"),
     SPACE_MEMBER_ALREADY_JOINED(HttpStatus.CONFLICT, "SPACE_MEMBER_ALREADY_JOINED", "space.member.conflict"),
-    SPACE_FORBIDDEN(HttpStatus.FORBIDDEN, "SPACE_FORBIDDEN", "space.forbidden"),
+    SPACE_DELETE_FORBIDDEN(HttpStatus.FORBIDDEN, "SPACE_DELETE_FORBIDDEN", "space.delete.forbidden"),
     SPACE_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "SPACE_MEMBER_NOT_FOUND", "space.member.not.found"),
     OWNER_CANNOT_QUIT_SPACE(HttpStatus.BAD_REQUEST, "OWNER_CANNOT_QUIT_SPACE", "space.owner.cannot.remove.self"),
+    SPACE_MEMBER_GET_FORBIDDEN(HttpStatus.FORBIDDEN, "SPACE_MEMBER_GET_FORBIDDEN", "space.member.get.forbidden"),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),

@@ -60,7 +60,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()
-                        .requestMatchers("/api/spaces/invite").permitAll()
+                        .requestMatchers("/api/spaces/spacemember").permitAll()
                         .requestMatchers(jwtSecurityProperties.secret().whiteList().toArray(new String[0])).permitAll()
                         .anyRequest().permitAll()
                 )

@@ -1,4 +1,4 @@
-package com.groupplanmanagerbe.presentation.space.dto.response.invite;
+package com.groupplanmanagerbe.presentation.space.dto.response.spacemember;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import lombok.Builder;
