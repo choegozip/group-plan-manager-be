@@ -3,7 +3,7 @@ package com.groupplanmanagerbe.domain.space.repository;
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
-import com.groupplanmanagerbe.presentation.space.dto.response.SpacesRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacesRes;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;

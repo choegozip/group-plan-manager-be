@@ -1,10 +1,18 @@
 package com.groupplanmanagerbe.domain.space.repository;
 
 import com.groupplanmanagerbe.domain.space.entity.SpaceInvited;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface SpaceInvitedRepository extends JpaRepository<SpaceInvited, Long> {
-    Optional<SpaceInvited> findBySpaceId(Long spaceId);
+public interface SpaceInvitedRepository extends JpaRepository<SpaceInvited, String> {
+    @Query("SELECT si FROM SpaceInvited si JOIN si.space s " +
+            "WHERE s.id = :spaceId AND s.deleted = false")
+    Optional<SpaceInvited> findBySpaceId(@Param("spaceId") Long spaceId);
+
+    @Query("SELECT si FROM SpaceInvited si JOIN si.space s " +
+            "WHERE si.inviteKey = :inviteKey AND s.deleted = false")
+    Optional<SpaceInvited> findByInviteKeyAndDeleted(@Param("inviteKey") String inviteKey);
 }

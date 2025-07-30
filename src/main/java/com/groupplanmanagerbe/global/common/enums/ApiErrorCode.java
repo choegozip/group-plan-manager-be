@@ -40,6 +40,8 @@ public enum ApiErrorCode {
 
     // 스페이스
     SPACE_NOT_FOUND(HttpStatus.BAD_REQUEST, "SPACE_NOT_FOUND", "space.not.found"),
+    INVITATION_NOT_FOUND(HttpStatus.NOT_FOUND, "INVITED_NOT_FOUND", "invitation_not_found"),
+    SPACE_MEMBER_ALREADY_JOINED(HttpStatus.CONFLICT, "SPACE_MEMBER_ALREADY_JOINED", "space.member.conflict" ),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),
