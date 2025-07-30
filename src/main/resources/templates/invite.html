@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>앱 초대</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/invite.css}" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="content-top">
+        <div class="headline">
+            우리의 일정<br/>하나로 관리해요
+        </div>
+    </div>
+
+    <div class="image-section">
+        <img th:src="@{/images/inviteImg.png}" alt="앱 미리보기 이미지">
+    </div>
+
+    <div class="content-bottom">
+        <a href="https://play.google.com/store/apps/details?id=com.example.app" class="button primary">
+            📱 앱 설치하기
+        </a>
+
+        <a href="myapp://open" class="button secondary">
+            🚀 앱 열기
+        </a>
+    </div>
+</div>
+</body>
+</html>

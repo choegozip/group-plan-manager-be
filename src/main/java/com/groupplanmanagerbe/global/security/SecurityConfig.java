@@ -59,6 +59,8 @@ public class SecurityConfig {
                         .referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/api/spaces/invite").permitAll()
                         .requestMatchers(jwtSecurityProperties.secret().whiteList().toArray(new String[0])).permitAll()
                         .anyRequest().permitAll()
                 )
