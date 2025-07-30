@@ -81,7 +81,7 @@ public class SpaceMemberService {
     @Transactional
     public void deleteMember(Long ownerId, Long spaceId, Long targetMemberUserId) {
         Space space = spaceRepository.findByIdAndOwnerUserId(spaceId, ownerId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_DELETE_FORBIDDEN));
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         if (ownerId.equals(targetMemberUserId)) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }
@@ -96,7 +96,7 @@ public class SpaceMemberService {
 
     public List<SpaceMembersRes> getSpaceMember(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_GET_FORBIDDEN));
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         List<SpaceMember> members = space.getMembers();
 
         return members.stream()
@@ -108,11 +108,7 @@ public class SpaceMemberService {
     public void leaveSpace(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
-        SpaceMember me = space.getMembers().stream()
-                .filter(m -> m.getUser().getId().equals(userId))
-                .findFirst()
-                .get();
-
+        SpaceMember me = space.getMember(userId);
         if (me.isOwner()) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }

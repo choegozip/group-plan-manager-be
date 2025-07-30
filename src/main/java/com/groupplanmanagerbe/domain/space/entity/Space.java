@@ -72,6 +72,13 @@ public class Space extends BaseEntity {
         target.setSpace(null);
     }
 
+    public SpaceMember getMember(Long userId) {
+        return members.stream()
+                .filter(m -> m.getUser().getId().equals(userId))
+                .findFirst()
+                .get();
+    }
+
     private void updateName(String name) {
         this.name = name;
     }
