@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class SpaceViewController {
 
-    @GetMapping("/invite")
+    @GetMapping("/spacemember")
     public String invite() {
-        return "invite";
+        return "spacemember";
     }
 }
