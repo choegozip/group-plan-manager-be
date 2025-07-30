@@ -41,6 +41,7 @@ public class SpaceMemberService {
     private String invitationPath;
 
     public static final String SPACE_BASE_PATH = "spaces";
+    public static final int MAX_MEMBERS = 10;
 
 
     @Transactional
@@ -63,18 +64,23 @@ public class SpaceMemberService {
         SpaceInvited invited = spaceInvitedRepository.findByInviteKeyAndDeleted(request.inviteKey())
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
         Space space = invited.getSpace();
-        User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
 
+        if (space.getMembers().size() >= MAX_MEMBERS) {
+            throw new InvalidException(ApiErrorCode.SPACE_MEMBER_LIMIT_EXCEEDED);
+        }
+
+        User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
         boolean alreadyJoined = space.getMembers().stream()
                 .anyMatch(member -> member.getUser().equals(invitedUser));
+
         if (alreadyJoined) {
             throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
         }
+
         SpaceMember.of(invitedUser, space);
+        String landingUrl = generateLandingUrl(space.getId());
 
         spaceInvitedRepository.delete(invited);
-
-        String landingUrl = generateLandingUrl(space.getId());
         return JoinSpaceRes.of(space, landingUrl);
     }
 

@@ -44,10 +44,11 @@ public enum ApiErrorCode {
     SPACE_MEMBER_ALREADY_JOINED(HttpStatus.CONFLICT, "SPACE_MEMBER_ALREADY_JOINED", "space.member.conflict"),
     SPACE_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "SPACE_MEMBER_NOT_FOUND", "space.member.not.found"),
     OWNER_CANNOT_QUIT_SPACE(HttpStatus.BAD_REQUEST, "OWNER_CANNOT_QUIT_SPACE", "space.owner.cannot.remove.self"),
+    SPACE_MEMBER_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "" ,"space.member.limit.exceeded"),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "server.internal.error"),
-    PERMISSION_DENIED(HttpStatus.FORBIDDEN, "", "permission.denied")
+    PERMISSION_DENIED(HttpStatus.FORBIDDEN, "", "permission.denied"),
     ;
 
     private final HttpStatus httpStatus;
