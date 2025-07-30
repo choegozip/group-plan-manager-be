@@ -12,13 +12,14 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice(annotations = RestController.class)
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
