@@ -80,24 +80,58 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException |
+                 io.jsonwebtoken.security.SignatureException | SecurityException | IllegalArgumentException e) {
+            log.warn("JWT 예외 발생: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    public Claims parseAccessToken(String token) throws JwtTokenException {
+        try {
+            return parseClaims(token);
         } catch (ExpiredJwtException e) {
-            log.warn("토큰이 만료되었습니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_EXPIRED);
+            log.warn("만료 - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            log.warn("지원하지 않는 토큰 형식입니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_UNSUPPORTED_FORMAT);
+            log.warn("형식 미지원 - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_UNSUPPORTED_FORMAT);
         } catch (MalformedJwtException e) {
-            log.warn("잘못된 형식의 토큰입니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_MALFORMED);
+            log.warn("잘못된 형식 - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_MALFORMED);
         } catch (io.jsonwebtoken.security.SignatureException e) {
-            log.warn("JWT 서명이 일치하지 않습니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_INVALID_SIGNATURE);
+            log.warn("JWT 서명 불일치 - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_INVALID_SIGNATURE);
         } catch (SecurityException e) {
-            log.warn("토큰 서명이 유효하지 않습니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_INVALID_SIGNATURE);
+            log.warn("토큰 서명 무효 - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_INVALID_SIGNATURE);
         } catch (IllegalArgumentException e) {
-            log.warn("토큰이 null이거나 빈 문자열입니다: {}", e.getMessage());
-            throw new JwtTokenException(ApiErrorCode.TOKEN_EMPTY);
+            log.warn("토큰 NULL - 어세스 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.ACCESS_TOKEN_EMPTY);
+        }
+    }
+
+    public Claims parseRefreshToken(String token) {
+        try {
+            return parseClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.warn("만료 - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_EXPIRED);
+        } catch (UnsupportedJwtException e) {
+            log.warn("형식 미지원 - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_UNSUPPORTED_FORMAT);
+        } catch (MalformedJwtException e) {
+            log.warn("잘못된 형식 - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_MALFORMED);
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            log.warn("JWT 서명 불일치 - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_INVALID_SIGNATURE);
+        } catch (SecurityException e) {
+            log.warn("토큰 서명 무효 - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_INVALID_SIGNATURE);
+        } catch (IllegalArgumentException e) {
+            log.warn("토큰 NULL - 리프레시 토큰: {}", e.getMessage());
+            throw new JwtTokenException(ApiErrorCode.REFRESH_TOKEN_EMPTY);
         }
     }
 
@@ -106,7 +140,7 @@ public class JwtUtil {
      */
     public Claims validateToken(String token, BlackListTokenService blacklistTokenService) {
         // 1. 토큰 형식 및 서명 검증
-        Claims claims = parseClaims(token);
+        Claims claims = parseAccessToken(token);
         // 2. 블랙리스트 검증
         if (blacklistTokenService != null && blacklistTokenService.isBlacklisted(token)) {
             throw new JwtTokenException(ApiErrorCode.TOKEN_BLACKLISTED);
