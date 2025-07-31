@@ -18,12 +18,13 @@ public class GpmAuthEntryPoint implements AuthenticationEntryPoint {
 
     private final FilterExceptionHandler filterExceptionHandler;
 
+    // 인증 실패, 로그인 필요
     @Override
     public void commence(
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authException
     ) throws IOException, ServletException {
-        filterExceptionHandler.send(request, response, ApiErrorCode.AUTH_ACCESS_DENIED);
+        filterExceptionHandler.send(request, response, ApiErrorCode.AUTH_REQUIRED);
     }
 }
