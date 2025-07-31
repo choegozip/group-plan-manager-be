@@ -25,11 +25,19 @@ public class RefreshTokenService {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtSecurityProperties jwtSecurityProperties;
 
+
     public void create(User user, String refreshToken) {
         long expiration = jwtSecurityProperties.token().refreshExpiration();
 
-        createToDb(user, refreshToken, expiration);
-        createToRedis(user.getId(), refreshToken, expiration);
+        createToDb(user, refreshToken, getExpiryDate(expiration));
+        saveToRedis(user.getId(), refreshToken, expiration);
+    }
+
+    public void update(Long userId, String refreshToken) {
+        long expiration = jwtSecurityProperties.token().refreshExpiration();
+
+        updateToDb(userId, refreshToken, getExpiryDate(expiration));
+        saveToRedis(userId, refreshToken, expiration);
     }
 
     public void delete(Long userId) {
@@ -37,40 +45,30 @@ public class RefreshTokenService {
         deleteFromDb(userId);
     }
 
-    public String getByUserId(Long userId) {
+    public String getFromRedis(Long userId) {
         String key = getKey(userId);
         return redisTemplate.opsForValue().get(key);
     }
 
-    public RefreshToken getFromDb(Long userId) {
-        return refreshRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
+    public Optional<RefreshToken> getFromDb(Long userId) {
+        return refreshRepository.findByUserId(userId);
     }
 
-    public void update(Long userId, String refreshToken) {
-       updateToDb(userId, refreshToken);
-       updateToRedis(userId, refreshToken);
+    public boolean existTokenAtDb(Long userId) {
+        return refreshRepository.existsByUserId(userId);
     }
 
-    private void updateToDb(Long userId, String refreshToken) {
-        refreshRepository.updateTokenByUserId(userId, refreshToken);
-    }
-
-    private void updateToRedis(Long userId, String refreshToken) {
-        long expiration = jwtSecurityProperties.token().refreshExpiration();
-
+    private void saveToRedis(Long userId, String refreshToken, long expiration) {
         String key = getKey(userId);
         redisTemplate.opsForValue().set(key, refreshToken, expiration, TimeUnit.MILLISECONDS);
     }
 
-    private void createToDb(User user, String token, long expiration) {
-        LocalDateTime expiryDate = LocalDateTime.now().plus(Duration.ofMillis(expiration));
-        refreshRepository.save(RefreshToken.of(user, token, expiryDate));
+    private void createToDb(User user, String refreshToken, LocalDateTime expiryDate) {
+        refreshRepository.save(RefreshToken.of(user, refreshToken, expiryDate));
     }
 
-    private void createToRedis(Long userId, String token, long expiration) {
-        String key = getKey(userId);
-        redisTemplate.opsForValue().set(key, token, expiration, TimeUnit.MILLISECONDS);
+    private void updateToDb(Long userId, String refreshToken, LocalDateTime expiryDate) {
+        refreshRepository.updateTokenByUserId(userId, refreshToken, expiryDate);
     }
 
     private void deleteFromRedis(Long userId) {
@@ -87,5 +85,9 @@ public class RefreshTokenService {
     private String getKey(Long userId) {
         String prefix = jwtSecurityProperties.token().refreshPrefix();
         return prefix + userId;
+    }
+
+    private LocalDateTime getExpiryDate(long expiration) {
+        return LocalDateTime.now().plus(Duration.ofMillis(expiration));
     }
 }
