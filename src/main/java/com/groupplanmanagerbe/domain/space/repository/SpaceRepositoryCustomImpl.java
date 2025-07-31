@@ -30,7 +30,8 @@ public class SpaceRepositoryCustomImpl implements SpaceRepositoryCustom {
         // 3. FROM 절의 기준 테이블 설정
         Root<Space> space = query.from(Space.class);
         // 4. 조인 설정
-        Join<Space, SpaceMember> member = space.join("members");
+        Join<Space, SpaceMember> member = space.join("members", JoinType.INNER);
+        member.fetch("user", JoinType.INNER);
 
         List<Predicate> predicates = new ArrayList<>();
         // 조건 1: WHERE m.user_id = :userId
@@ -40,6 +41,9 @@ public class SpaceRepositoryCustomImpl implements SpaceRepositoryCustom {
         if (!request.isFirstPage()) {
             predicates.add(cb.lessThan(space.get("updatedAt"), request.cursor()));
         }
+
+        // 조건 3: 삭제되지 않은 스페이스만
+        predicates.add(cb.equal(space.get("deleted"), false));
 
         // 모든 조건을 AND로 연결 WHERE m.user_id AND s.updated_at < :cursor
         query.where(predicates.toArray(new Predicate[0]));

@@ -6,24 +6,25 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ApiSuccessCode {
     // USER
-    SUCCESS_SIGNUP("SUCCESS_SIGNUP","user.signup.success"),
-    SUCCESS_USER_GET("SUCCESS_USER_GET", "user.get.success"),
-    SUCCESS_USER_UPDATE("SUCCESS_USER_UPDATE", "user.update.success"),
-    SUCCESS_USER_DELETE("SUCCESS_USER_DELETE", "user.delete.success"),
-    SUCCESS_LOGIN("SUCCESS_LOGIN", "user.login.success"),
-    SUCCESS_LOGOUT("SUCCESS_LOGOUT", "user.logout.success"),
-    SUCCESS_REFRESH_TOKEN("SUCCESS_REFRESH_TOKEN", "user.refresh.token"),
+    SUCCESS_SIGNUP("SUCCESS", "user.signup.success"),
+    SUCCESS_USER_GET("SUCCESS", "user.get.success"),
+    SUCCESS_USER_UPDATE("SUCCESS", "user.update.success"),
+    SUCCESS_USER_DELETE("SUCCESS", "user.delete.success"),
+    SUCCESS_LOGIN("SUCCESS", "user.login.success"),
+    SUCCESS_LOGOUT("SUCCESS", "user.logout.success"),
+    SUCCESS_REFRESH_TOKEN("SUCCESS", "user.refresh.token"),
 
     // SPACE
-    SUCCESS_SPACE_CREATE("SUCCESS_CREATE_SPACE", "space.create.success"),
-    SUCCESS_SPACE_UPDATE("SUCCESS_UPDATE_SPACE", "space.update.success"),
-    SUCCESS_SPACE_DELETE("SUCCESS_SPACE_DELETE", "space.delete.success"),
-    SUCCESS_SPACES_GET("SUCCESS_SPACES_GET", "spaces.get.success"),
-    SUCCESS_SPACE_GET("SUCCESS_SPACE_GET", "space.get.success"),
-    SUCCESS_SPACE_INVITE("SUCCESS_SPACE_INVITE", "space.invite.success"),
-    SUCCESS_JOIN_SPACE("SUCCESS_JOIN_SPACE", "space.join.success"),
-    SUCCESS_DELETE_SPACE_MEMBER("SUCCESS_DELETE_SPACE_MEMBER", "space.delete.member.success"),
-    SUCCESS_GET_SPACE_MEMBERS("SUCCESS_GET_SPACE_MEMBERS", "space.get.members.success")
+    SUCCESS_SPACE_CREATE("SUCCESS", "space.create.success"),
+    SUCCESS_SPACE_UPDATE("SUCCESS", "space.update.success"),
+    SUCCESS_SPACE_DELETE("SUCCESS", "space.delete.success"),
+    SUCCESS_SPACES_GET("SUCCESS", "spaces.get.success"),
+    SUCCESS_SPACE_GET("SUCCESS", "space.get.success"),
+    SUCCESS_SPACE_INVITE("SUCCESS", "space.invite.success"),
+    SUCCESS_JOIN_SPACE("SUCCESS", "space.join.success"),
+    SUCCESS_DELETE_SPACE_MEMBER("SUCCESS", "space.delete.member.success"),
+    SUCCESS_GET_SPACE_MEMBERS("SUCCESS", "space.get.members.success"),
+    SUCCESS_LEAVE_SPACE("SUCCESS", "space.leave.space")
     ;
 
     private final String code;

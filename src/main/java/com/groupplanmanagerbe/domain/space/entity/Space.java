@@ -67,14 +67,16 @@ public class Space extends BaseEntity {
         members.forEach(SpaceMember::softDeleted);
     }
 
-    public void deleteMember(Long targetMemberUserId) {
-        SpaceMember target = members.stream()
-                .filter(m -> m.getUser().getId().equals(targetMemberUserId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
-
+    public void removeMember(SpaceMember target) {
         members.remove(target);
         target.setSpace(null);
+    }
+
+    public SpaceMember getMember(Long userId) {
+        return members.stream()
+                .filter(m -> m.getUser().getId().equals(userId))
+                .findFirst()
+                .get();
     }
 
     private void updateName(String name) {

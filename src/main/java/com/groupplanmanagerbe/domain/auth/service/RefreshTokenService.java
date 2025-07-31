@@ -3,6 +3,8 @@ package com.groupplanmanagerbe.domain.auth.service;
 import com.groupplanmanagerbe.domain.auth.entity.RefreshToken;
 import com.groupplanmanagerbe.domain.auth.repository.RefreshTokenRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
+import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,18 +42,25 @@ public class RefreshTokenService {
         return redisTemplate.opsForValue().get(key);
     }
 
-    public void updateOrCreate(User user, String refreshToken) {
-        long expiration = jwtSecurityProperties.token().refreshExpiration();
-        Optional<RefreshToken> tokenOpt = refreshRepository.findByUserId(user.getId());
+    public RefreshToken getFromDb(Long userId) {
+        return refreshRepository.findByUserId(userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
+    }
 
-        if (tokenOpt.isPresent()) {
-            RefreshToken token = tokenOpt.get();
-            token.update(refreshToken);
-            createToRedis(user.getId(), refreshToken, expiration);
-        } else {
-            createToDb(user, refreshToken,expiration);
-            createToRedis(user.getId(), refreshToken, expiration);
-        }
+    public void update(Long userId, String refreshToken) {
+       updateToDb(userId, refreshToken);
+       updateToRedis(userId, refreshToken);
+    }
+
+    private void updateToDb(Long userId, String refreshToken) {
+        refreshRepository.updateTokenByUserId(userId, refreshToken);
+    }
+
+    private void updateToRedis(Long userId, String refreshToken) {
+        long expiration = jwtSecurityProperties.token().refreshExpiration();
+
+        String key = getKey(userId);
+        redisTemplate.opsForValue().set(key, refreshToken, expiration, TimeUnit.MILLISECONDS);
     }
 
     private void createToDb(User user, String token, long expiration) {

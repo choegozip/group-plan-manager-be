@@ -40,42 +40,46 @@ public class GlobalExceptionHandler {
         log.warn("벨리데이션 오류: {}", e.getMessage());
         String localeMessage = messageResolver.get(e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         return createResponseEntity(
-                HttpStatus.BAD_REQUEST, ApiErrorRes.of("VALIDATION_ERROR", localeMessage));
+                HttpStatus.BAD_REQUEST, ApiErrorRes.of("ERROR", localeMessage));
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiErrorRes> handleAccessDeniedException(
-            AccessDeniedException e) {
-        log.warn("접근 권한 없음: {}", e.getMessage());
-        String localeMessage = messageResolver.get(ApiErrorCode.AUTH_FORBIDDEN_ACCESS.getMessage());
-        return createResponseEntity(
-                HttpStatus.FORBIDDEN, ApiErrorRes.of(ApiErrorCode.AUTH_FORBIDDEN_ACCESS.getMessage(), localeMessage));
-    }
+//    @ExceptionHandler(AccessDeniedException.class)
+//    public ResponseEntity<ApiErrorRes> handleAccessDeniedException(
+//            AccessDeniedException e) {
+//        log.warn("접근 권한 없음: {}", e.getMessage());
+//        String localeMessage = messageResolver.get(ApiErrorCode.ACCESS_DENIED.getMessage());
+//        return createResponseEntity(
+//                HttpStatus.FORBIDDEN, ApiErrorRes.of(ApiErrorCode.ACCESS_DENIED.getCode(), localeMessage));
+//    }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiErrorRes> handleAuthenticationException(
-            AuthenticationException e) {
-        log.warn("인증 실패: {}", e.getMessage());
-        ApiErrorCode errorCode = ApiErrorCode.AUTH_UNAUTHORIZED_ACCESS;
-        if (e instanceof BadCredentialsException) {
-            errorCode = ApiErrorCode.AUTH_LOGIN_FAILED;
-        }
-        String localeMessage = messageResolver.get(errorCode.getMessage());
-        return createResponseEntity(errorCode.getHttpStatus(), ApiErrorRes.of(errorCode.getCode() ,localeMessage));
-    }
+//    @ExceptionHandler(AuthenticationException.class)
+//    public ResponseEntity<ApiErrorRes> handleAuthenticationException(
+//            AuthenticationException e) {
+//        log.warn("인증 실패: {}", e.getMessage());
+//        ApiErrorCode errorCode = ApiErrorCode.AUTH_REQUIRED;
+//        if (e instanceof BadCredentialsException) {
+//            errorCode = ApiErrorCode.AUTH_LOGIN_FAILED;
+//        }
+//        String localeMessage = messageResolver.get(errorCode.getMessage());
+//        return createResponseEntity(errorCode.getHttpStatus(), ApiErrorRes.of(errorCode.getCode() ,localeMessage));
+//    }
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ApiErrorRes> handleIOException(IOException e){
         log.warn("IO Exception: {}", e.getMessage());
         String localeMessage = messageResolver.get(ApiErrorCode.INTERNAL_SERVER_ERROR.getMessage());
-        return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ApiErrorRes.of("IOE_EXCEPTION", localeMessage));
+        return createResponseEntity(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ApiErrorRes.of(ApiErrorCode.INVITATION_NOT_FOUND.getCode(), localeMessage));
     }
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ApiErrorRes> handleException(final Exception e) {
         log.error("예상치 못한 에러 발생", e);  // 예상치 못한 에러는 ERROR 레벨로
         String localeMessage = messageResolver.get(ApiErrorCode.INTERNAL_SERVER_ERROR.getMessage());
-        return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, ApiErrorRes.of("INTERNAL_SERVER_ERROR", localeMessage));
+        return createResponseEntity(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ApiErrorRes.of(ApiErrorCode.INVITATION_NOT_FOUND.getCode(), localeMessage));
     }
 
     private ResponseEntity<ApiErrorRes> createResponseEntity(HttpStatus status, ApiErrorRes response) {

@@ -1,6 +1,8 @@
 package com.groupplanmanagerbe.domain.auth.service;
 
+import com.groupplanmanagerbe.domain.auth.entity.RefreshToken;
 import com.groupplanmanagerbe.domain.user.entity.User;
+import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
@@ -49,7 +51,7 @@ public class AuthService {
 
     @Transactional
     public void logout(String token) {
-        Claims claims = jwtUtil.parseClaims(token);
+        Claims claims = jwtUtil.parseAccessToken(token);
         Duration remaining = jwtUtil.getRemainingValidity(claims);
         long mills = remaining.toMillis();
 
@@ -61,22 +63,25 @@ public class AuthService {
 
     @Transactional
     public TokenRes refreshAccessToken(RefreshTokenReq request) {
-        Claims  claims = jwtUtil.parseClaims(request.refreshToken());
+        Claims  claims = jwtUtil.parseRefreshToken(request.refreshToken());
         Long userId = Long.parseLong(claims.getSubject());
-        User savedUser = userComponent.getByIdAndDeleteFalse(userId);
-        String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
-        String savedToken = refreshTokenService.getByUserId(userId);
 
-        if (!request.refreshToken().equals(savedToken)) {
+        String savedRefreshToken = refreshTokenService.getByUserId(userId);
+
+        if (savedRefreshToken == null || savedRefreshToken.isBlank()) {
+            RefreshToken token = refreshTokenService.getFromDb(userId);
+            savedRefreshToken = token.getToken();
+        }
+
+        if (!request.refreshToken().equals(savedRefreshToken)) {
             throw new UnAuthorizedException(ApiErrorCode.AUTH_UNAUTHORIZED_ACCESS);
         }
 
-        if (savedToken == null || savedToken.isBlank()) {
-            String refreshToken = jwtUtil.createRefreshToken(savedUser.getId());
-            refreshTokenService.updateOrCreate(savedUser, refreshToken);
-            return TokenRes.of(accessToken, refreshToken);
-        } else {
-            return TokenRes.of(accessToken, null);
-        }
+        String accessToken = jwtUtil.createAccessToken(userId, UserRole.USER);
+        String refreshToken = jwtUtil.createRefreshToken(userId);
+
+        refreshTokenService.update(userId, refreshToken);
+
+        return TokenRes.of(accessToken, refreshToken);
     }
 }

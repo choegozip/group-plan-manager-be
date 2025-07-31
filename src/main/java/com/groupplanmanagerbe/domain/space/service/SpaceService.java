@@ -7,6 +7,7 @@ import com.groupplanmanagerbe.domain.space.repository.SpaceRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
@@ -42,19 +43,17 @@ public class SpaceService {
 
     @Transactional
     public void updateSpace(Long spaceId, UpdateSpaceReq request, Long userId) {
-        User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
-
+        checkIsOwner(space, userId);
         space.updateSpaceInfo(request.name(), request.profileImageKey());
     }
 
     @Transactional
     public void deleteSpace(Long spaceId, Long userId) {
-        User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
-
+        checkIsOwner(space, userId);
         space.softDelete();
     }
 
@@ -68,5 +67,12 @@ public class SpaceService {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
         return SpaceRes.from(space);
+    }
+
+    private void checkIsOwner(Space space, Long userId) {
+        SpaceMember member = space.getMember(userId);
+        if (!member.isOwner()) {
+            throw new InvalidException(ApiErrorCode.PERMISSION_DENIED);
+        }
     }
 }

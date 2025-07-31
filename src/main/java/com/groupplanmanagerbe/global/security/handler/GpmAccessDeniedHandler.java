@@ -17,12 +17,13 @@ public class GpmAccessDeniedHandler implements AccessDeniedHandler {
 
     private final FilterExceptionHandler filterExceptionHandler;
 
+    // 인증은 됐으나, 유저롤이 달라서 인가가 실패한 경우
     @Override
     public void handle(
             HttpServletRequest request,
             HttpServletResponse response,
             AccessDeniedException accessDeniedException
     ) throws IOException {
-        filterExceptionHandler.send(request, response, ApiErrorCode.AUTH_FORBIDDEN_ACCESS);
+        filterExceptionHandler.send(request, response, ApiErrorCode.ACCESS_DENIED);
     }
 }

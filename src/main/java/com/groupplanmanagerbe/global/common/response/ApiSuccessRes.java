@@ -1,9 +1,11 @@
 package com.groupplanmanagerbe.global.common.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiSuccessRes<T>(String code, String massage, T data) {
 
     // 200 OK

@@ -41,6 +41,7 @@ public class SpaceMemberService {
     private String invitationPath;
 
     public static final String SPACE_BASE_PATH = "spaces";
+    public static final int MAX_MEMBERS = 10;
 
 
     @Transactional
@@ -63,39 +64,62 @@ public class SpaceMemberService {
         SpaceInvited invited = spaceInvitedRepository.findByInviteKeyAndDeleted(request.inviteKey())
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
         Space space = invited.getSpace();
-        User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
 
+        if (space.getMembers().size() >= MAX_MEMBERS) {
+            throw new InvalidException(ApiErrorCode.SPACE_MEMBER_LIMIT_EXCEEDED);
+        }
+
+        User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
         boolean alreadyJoined = space.getMembers().stream()
                 .anyMatch(member -> member.getUser().equals(invitedUser));
+
         if (alreadyJoined) {
             throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
         }
+
         SpaceMember.of(invitedUser, space);
+        String landingUrl = generateLandingUrl(space.getId());
 
         spaceInvitedRepository.delete(invited);
-
-        String landingUrl = generateLandingUrl(space.getId());
         return JoinSpaceRes.of(space, landingUrl);
     }
 
     @Transactional
     public void deleteMember(Long ownerId, Long spaceId, Long targetMemberUserId) {
         Space space = spaceRepository.findByIdAndOwnerUserId(spaceId, ownerId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_DELETE_FORBIDDEN));
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         if (ownerId.equals(targetMemberUserId)) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }
-        space.deleteMember(targetMemberUserId);
+
+        SpaceMember target = space.getMembers().stream()
+                .filter(m -> m.getUser().getId().equals(targetMemberUserId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
+
+        space.removeMember(target);
     }
 
-    public List<SpaceMembersRes> getSpaceMember(Long userId, Long spaceId) {
+    public List<SpaceMembersRes> getSpaceMembers(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_GET_FORBIDDEN));
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         List<SpaceMember> members = space.getMembers();
 
         return members.stream()
                 .map(SpaceMembersRes::from)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void leaveSpace(Long userId, Long spaceId) {
+        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+        SpaceMember me = space.getMember(userId);
+        if (me.isOwner()) {
+            throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
+        }
+
+        space.removeMember(me);
     }
 
     private String generateLandingUrl(Long spaceId) {
