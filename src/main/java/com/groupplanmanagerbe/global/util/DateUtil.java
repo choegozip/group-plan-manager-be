@@ -11,9 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DateParser {
+public class DateUtil {
 
-    public static final DateTimeFormatter[] FORMATTERS = new DateTimeFormatter[] {
+    public static final DateTimeFormatter[] FORMATTERS = new DateTimeFormatter[]{
             DateTimeFormatter.ofPattern("yyyy-MM-dd"),
             DateTimeFormatter.ofPattern("yyyy.MM.dd"),
             DateTimeFormatter.ofPattern("yyyy/MM/dd"),
@@ -21,7 +21,7 @@ public class DateParser {
             DateTimeFormatter.ofPattern("yyyy,MM,dd")
     };
 
-    public static LocalDateTime parseDate(String date) {
+    public static LocalDateTime parseDateTime(String date) {
         for (DateTimeFormatter formatter : FORMATTERS) {
             try {
                 LocalDate localDate = LocalDate.parse(date, formatter);
@@ -31,5 +31,17 @@ public class DateParser {
             }
         }
         throw new InvalidException(ApiErrorCode.INVALID_DATE_FORMAT);
+    }
+
+    public static boolean isAfterToday(LocalDateTime dateTime) {
+        LocalDate today = LocalDate.now();
+        return dateTime.toLocalDate().isAfter(today);    }
+
+    public static LocalDateTime isValidFutureDate(String dateStr) {
+        LocalDateTime dateTime = parseDateTime(dateStr);
+        if (isAfterToday(dateTime)) {
+            return dateTime;
+        }
+        throw new InvalidException(ApiErrorCode.INVALID_DATE);
     }
 }
