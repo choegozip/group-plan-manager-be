@@ -2,6 +2,7 @@ package com.groupplanmanagerbe.global.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -65,7 +66,7 @@ public enum ApiErrorCode {
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
-   ;
+    SPACE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "space.limit.exceeded");
 
     private final HttpStatus httpStatus;
     private final String code;
