@@ -9,12 +9,15 @@ import com.groupplanmanagerbe.domain.tobuyitem.repository.ToBuyItemRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
-import com.groupplanmanagerbe.global.util.DateParser;
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
+import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +44,7 @@ public class ToBuyItemService {
                 user,
                 request.title(),
                 request.quantity(),
-                DateParser.parseDate(request.dueDate()),
+                request.dueDate(),
                 request.urgency(),
                 request.imageUrl(),
                 request.referenceUrl(),
@@ -53,5 +56,29 @@ public class ToBuyItemService {
         toBuyItem.setManagers(managers);
 
         toBuyItemRepository.save(toBuyItem);
+    }
+
+    @Transactional
+    public void updateToBuy(Long userId, UpdateToBuyReq request, Long spaceId, Long toBuyItemId) {
+        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserIdWithSpace(toBuyItemId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
+        if (!toBuyItem.getSpace().getId().equals(spaceId)) {
+            throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
+        }
+
+        List<ToBuyManager> managers = Collections.emptyList();
+        if (request.managerIds() != null && !request.managerIds().isEmpty()) {
+            Set<Long> memberIds = Set.copyOf(request.managerIds());
+            List<SpaceMember> members = toBuyItem.getSpace().getMembers().stream()
+                    .filter(member -> memberIds.contains(member.getUser().getId()))
+                    .toList();
+            managers = members.stream()
+                    .map(member -> ToBuyManager.of(member.getUser(), toBuyItem))
+                    .toList();
+        }
+
+        toBuyItem.updateToBuyItem(
+                request.title(), request.quantity(), request.dueDate(), request.urgency(),
+                request.imageUrl(), request.referenceUrl(), request.memo(), managers);
     }
 }

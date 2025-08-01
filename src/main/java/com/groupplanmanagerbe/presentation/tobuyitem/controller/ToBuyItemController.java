@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,5 +27,16 @@ public class ToBuyItemController {
     ) {
         toBuyItemService.createToBuy(authUser.userId(), request, spaceId);
         return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_TO_BUY_CREATE);
+    }
+
+    @PatchMapping("/{toBuyItemId}")
+    public ResponseEntity<ApiSuccessRes<Void>> updateToBuy(
+            @AuthenticationPrincipal AuthUser authUser,
+            @Valid @RequestBody UpdateToBuyReq update,
+            @PathVariable Long spaceId,
+            @PathVariable Long toBuyItemId
+    ) {
+        toBuyItemService.updateToBuy(authUser.userId(), update, spaceId, toBuyItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_UPDATE);
     }
 }

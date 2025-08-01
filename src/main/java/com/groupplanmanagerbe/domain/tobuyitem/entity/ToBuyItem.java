@@ -4,6 +4,7 @@ import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import com.groupplanmanagerbe.global.common.enums.Urgency;
+import com.groupplanmanagerbe.global.util.DateUtil;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,7 +36,7 @@ public class ToBuyItem extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private short quantity;
+    private Short quantity;
 
     @Column(nullable = false, name = "due_date")
     private LocalDateTime dueDate;
@@ -57,7 +58,7 @@ public class ToBuyItem extends BaseEntity {
 
     @Builder
     public ToBuyItem(
-            Space space, User user, String title, short quantity, LocalDateTime dueDate, Urgency urgency,
+            Space space, User user, String title, Short quantity, LocalDateTime dueDate, Urgency urgency,
             String imageUrl, String referenceUrl, String memo
     ) {
         this.space = space;
@@ -72,7 +73,7 @@ public class ToBuyItem extends BaseEntity {
     }
 
     public static ToBuyItem of(
-            Space space, User user, String title, short quantity, LocalDateTime dueDate, String urgency,
+            Space space, User user, String title, Short quantity, String dueDate, String urgency,
             String imageUrl, String referenceUrl, String memo
     ) {
         return ToBuyItem.builder()
@@ -80,7 +81,7 @@ public class ToBuyItem extends BaseEntity {
                 .user(user)
                 .title(title)
                 .quantity(quantity)
-                .dueDate(dueDate)
+                .dueDate(DateUtil.isValidFutureDate(dueDate))
                 .urgency(Urgency.of(urgency))
                 .imageUrl(imageUrl)
                 .referenceUrl(referenceUrl)
@@ -98,6 +99,43 @@ public class ToBuyItem extends BaseEntity {
 
         for (ToBuyManager  manager : managers ) {
             addManager(manager);
+        }
+    }
+
+    public void updateToBuyItem(
+            String title, Short quantity, String dueDate, String urgency,
+            String imageUrl, String referenceUrl, String memo, List<ToBuyManager> managers
+    ) {
+        if (title != null && !title.isBlank()) {
+            this.title = title;
+        }
+
+        if (quantity != null) {
+            this.quantity = quantity;
+        }
+
+        if (dueDate != null) {
+            this.dueDate = DateUtil.isValidFutureDate(dueDate);
+        }
+
+        if (urgency != null && !urgency.isBlank()) {
+            this.urgency = Urgency.of(urgency);
+        }
+
+        if (imageUrl != null && !imageUrl.isBlank()) {
+            this.imageUrl= imageUrl;
+        }
+
+        if (referenceUrl != null && !referenceUrl.isBlank()) {
+            this.referenceUrl = referenceUrl;
+        }
+
+        if (memo != null && !memo.isBlank()) {
+            this.memo =  memo;
+        }
+
+        if (!managers.isEmpty()) {
+            setManagers(managers);
         }
     }
 }
