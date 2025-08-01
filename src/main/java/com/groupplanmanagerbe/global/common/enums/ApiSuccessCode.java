@@ -24,7 +24,10 @@ public enum ApiSuccessCode {
     SUCCESS_JOIN_SPACE("SUCCESS", "space.join.success"),
     SUCCESS_DELETE_SPACE_MEMBER("SUCCESS", "space.delete.member.success"),
     SUCCESS_GET_SPACE_MEMBERS("SUCCESS", "space.get.members.success"),
-    SUCCESS_LEAVE_SPACE("SUCCESS", "space.leave.space")
+    SUCCESS_LEAVE_SPACE("SUCCESS", "space.leave.space"),
+
+    // TO BUY
+    SUCCESS_TO_BUY_CREATE("SUCCESS", "to.buy.create.success"),
     ;
 
     private final String code;

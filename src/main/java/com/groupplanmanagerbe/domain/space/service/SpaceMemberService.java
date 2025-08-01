@@ -4,8 +4,6 @@ import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.space.entity.SpaceInvited;
 import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.repository.SpaceInvitedRepository;
-import com.groupplanmanagerbe.domain.space.repository.SpaceMemberRepository;
-import com.groupplanmanagerbe.domain.space.repository.SpaceRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
@@ -30,8 +28,7 @@ import java.util.stream.Collectors;
 public class SpaceMemberService {
 
     private final SpaceInvitedRepository spaceInvitedRepository;
-    private final SpaceRepository spaceRepository;
-    private final SpaceMemberRepository spaceMemberRepository;
+    private final SpaceComponent spaceComponent;
     private final UserComponent userComponent;
 
     @Value("${app.base-url}")
@@ -46,8 +43,7 @@ public class SpaceMemberService {
 
     @Transactional
     public InviteSpaceMemberRes inviteMember(Long userId, Long spaceId) {
-        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
 
         SpaceInvited invited = spaceInvitedRepository.findBySpaceId(spaceId)
                 .orElseGet(() -> {
@@ -86,8 +82,8 @@ public class SpaceMemberService {
 
     @Transactional
     public void deleteMember(Long ownerId, Long spaceId, Long targetMemberUserId) {
-        Space space = spaceRepository.findByIdAndOwnerUserId(spaceId, ownerId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
+        Space space = spaceComponent.getByIdAndOwnerId(ownerId, spaceId, ApiErrorCode.PERMISSION_DENIED);
+
         if (ownerId.equals(targetMemberUserId)) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }
@@ -101,8 +97,7 @@ public class SpaceMemberService {
     }
 
     public List<SpaceMembersRes> getSpaceMembers(Long userId, Long spaceId) {
-        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
+        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
         List<SpaceMember> members = space.getMembers();
 
         return members.stream()
@@ -112,8 +107,7 @@ public class SpaceMemberService {
 
     @Transactional
     public void leaveSpace(Long userId, Long spaceId) {
-        Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
+        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
         SpaceMember me = space.getMember(userId);
         if (me.isOwner()) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
