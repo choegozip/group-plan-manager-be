@@ -31,7 +31,6 @@ public class SpaceRepositoryCustomImpl implements SpaceRepositoryCustom {
         Root<Space> space = query.from(Space.class);
         // 4. 조인 설정
         Join<Space, SpaceMember> member = space.join("members", JoinType.INNER);
-        member.fetch("user", JoinType.INNER);
 
         List<Predicate> predicates = new ArrayList<>();
         // 조건 1: WHERE m.user_id = :userId
