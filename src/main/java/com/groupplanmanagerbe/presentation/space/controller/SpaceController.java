@@ -29,7 +29,7 @@ public class SpaceController {
             @AuthenticationPrincipal AuthUser authUser
     ) {
         spaceService.createSpace(request, authUser.userId());
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_CREATE);
+        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_SPACE_CREATE);
     }
 
     @PatchMapping("/{spaceId}")
