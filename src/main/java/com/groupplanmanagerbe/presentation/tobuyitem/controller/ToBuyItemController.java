@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +33,11 @@ public class ToBuyItemController {
     @PatchMapping("/{toBuyItemId}")
     public ResponseEntity<ApiSuccessRes<Void>> updateToBuy(
             @AuthenticationPrincipal AuthUser authUser,
-            @Valid @RequestBody UpdateToBuyReq update,
+            @Valid @RequestBody UpdateToBuyReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId
     ) {
-        toBuyItemService.updateToBuy(authUser.userId(), update, spaceId, toBuyItemId);
+        toBuyItemService.updateToBuy(authUser.userId(), request, spaceId, toBuyItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_UPDATE);
     }
 
@@ -48,5 +49,18 @@ public class ToBuyItemController {
     ) {
         toBuyItemService.deleteToBuy(authUser.userId(), spaceId, toBuyItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_DELETE);
+    }
+
+    @PatchMapping("/{toBuyItemId}/managers/{managerId}")
+    public ResponseEntity<ApiSuccessRes<String>> updateManagerStatus(
+            @AuthenticationPrincipal AuthUser authUser,
+            @Valid @RequestBody UpdateManagerStatusReq request,
+            @PathVariable Long spaceId,
+            @PathVariable Long toBuyItemId,
+            @PathVariable Long managerId
+    ) {
+        String status =
+                toBuyItemService.updateManagerStatus(authUser.userId(), request, spaceId, toBuyItemId, managerId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, status);
     }
 }
