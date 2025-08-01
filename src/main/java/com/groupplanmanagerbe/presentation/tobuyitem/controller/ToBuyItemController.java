@@ -39,4 +39,14 @@ public class ToBuyItemController {
         toBuyItemService.updateToBuy(authUser.userId(), update, spaceId, toBuyItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_UPDATE);
     }
+
+    @DeleteMapping("/{toBuyItemId}")
+    public ResponseEntity<ApiSuccessRes<Void>> deleteToBuy(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @PathVariable Long toBuyItemId
+    ) {
+        toBuyItemService.deleteToBuy(authUser.userId(), spaceId, toBuyItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_DELETE);
+    }
 }

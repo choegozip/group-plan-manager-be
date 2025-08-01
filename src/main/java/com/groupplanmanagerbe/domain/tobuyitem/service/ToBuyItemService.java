@@ -81,4 +81,16 @@ public class ToBuyItemService {
                 request.title(), request.quantity(), request.dueDate(), request.urgency(),
                 request.imageUrl(), request.referenceUrl(), request.memo(), managers);
     }
+
+    @Transactional
+    public void deleteToBuy(Long userId, Long spaceId, Long toBuyItemId) {
+        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserId(toBuyItemId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
+
+        if (!toBuyItem.getSpace().getId().equals(spaceId)) {
+            throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
+        }
+
+        toBuyItemRepository.delete(toBuyItem);
+    }
 }

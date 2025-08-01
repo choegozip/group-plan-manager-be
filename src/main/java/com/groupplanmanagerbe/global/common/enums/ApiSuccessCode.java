@@ -28,7 +28,9 @@ public enum ApiSuccessCode {
 
     // TO BUY
     SUCCESS_TO_BUY_CREATE("SUCCESS", "to.buy.create.success"),
-    SUCCESS_TO_BUY_UPDATE("SUCCESS", "to.buy.update.success");
+    SUCCESS_TO_BUY_UPDATE("SUCCESS", "to.buy.update.success"),
+    SUCCESS_TO_BUY_DELETE("SUCCESS", "to.buy.delete.success")
+    ;
 
     private final String code;
     private final String message;
