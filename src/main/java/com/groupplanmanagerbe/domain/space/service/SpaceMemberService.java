@@ -113,7 +113,7 @@ public class SpaceMemberService {
     @Transactional
     public void leaveSpace(Long userId, Long spaceId) {
         Space space = spaceRepository.findByIdAndUserId(spaceId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.PERMISSION_DENIED));
         SpaceMember me = space.getMember(userId);
         if (me.isOwner()) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);

@@ -7,6 +7,7 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.JwtTokenException;
+import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.global.exception.custom.UnAuthorizedException;
 import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import com.groupplanmanagerbe.global.security.token.JwtUtil;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,10 +43,15 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), savedUser.getPassword())) {
             throw new InvalidException(ApiErrorCode.AUTH_INVALID_PASSWORD);
         }
+
         String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
         String refreshToken = jwtUtil.createRefreshToken(savedUser.getId());
 
-        refreshTokenService.create(savedUser, refreshToken);
+        if (refreshTokenService.existTokenAtDb(savedUser.getId())) {
+            refreshTokenService.update(savedUser.getId(), refreshToken);
+        } else {
+            refreshTokenService.create(savedUser, refreshToken);
+        }
 
         return TokenRes.of(accessToken, refreshToken);
     }
@@ -66,10 +73,11 @@ public class AuthService {
         Claims  claims = jwtUtil.parseRefreshToken(request.refreshToken());
         Long userId = Long.parseLong(claims.getSubject());
 
-        String savedRefreshToken = refreshTokenService.getByUserId(userId);
+        String savedRefreshToken = refreshTokenService.getFromRedis(userId);
 
         if (savedRefreshToken == null || savedRefreshToken.isBlank()) {
-            RefreshToken token = refreshTokenService.getFromDb(userId);
+            RefreshToken token = refreshTokenService.getFromDb(userId)
+                    .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
             savedRefreshToken = token.getToken();
         }
 

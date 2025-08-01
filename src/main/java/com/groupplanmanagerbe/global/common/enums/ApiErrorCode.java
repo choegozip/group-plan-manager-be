@@ -17,7 +17,7 @@ public enum ApiErrorCode {
     // 인증 관련 익셉션
     ACCESS_DENIED(HttpStatus.FORBIDDEN,"ERROR", "auth.forbidden"),
     AUTH_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.access.denied"),
-    AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, null, "auth.unauthorized"),
+    AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.unauthorized"),
     AUTH_INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"ERROR", "auth.invalid.password"),
 
     // 토큰 관련 익셉션

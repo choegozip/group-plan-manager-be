@@ -13,10 +13,6 @@ public record LoginReq(
         String email,
 
         @NotBlank(message = UserValidationConst.PASSWORD_BLANK_MESSAGE)
-        @Size(min = UserValidationConst.PASSWORD_MIN, message = UserValidationConst.PASSWORD_MIN_MESSAGE)
-        @Pattern(
-                regexp = UserValidationConst.PASSWORD_REG,
-                message = UserValidationConst.INVALID_PASSWORD_MESSAGE)
         String password
 ) {
 }
