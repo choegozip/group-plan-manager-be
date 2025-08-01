@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "to_buy_items")
@@ -20,6 +22,10 @@ public class ToBuyItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "space_id", nullable = false)
+    private Space space;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -46,11 +52,15 @@ public class ToBuyItem extends BaseEntity {
 
     private String memo;
 
+    @OneToMany(mappedBy = "toBuyItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ToBuyManager> managers = new ArrayList<>();
+
     @Builder
     public ToBuyItem(
-            User user, String title, short quantity, LocalDateTime dueDate, Urgency urgency,
+            Space space, User user, String title, short quantity, LocalDateTime dueDate, Urgency urgency,
             String imageUrl, String referenceUrl, String memo
     ) {
+        this.space = space;
         this.user = user;
         this.title = title;
         this.quantity = quantity;
@@ -59,5 +69,35 @@ public class ToBuyItem extends BaseEntity {
         this.imageUrl = imageUrl;
         this.referenceUrl = referenceUrl;
         this.memo = memo;
+    }
+
+    public static ToBuyItem of(
+            Space space, User user, String title, short quantity, LocalDateTime dueDate, String urgency,
+            String imageUrl, String referenceUrl, String memo
+    ) {
+        return ToBuyItem.builder()
+                .space(space)
+                .user(user)
+                .title(title)
+                .quantity(quantity)
+                .dueDate(dueDate)
+                .urgency(Urgency.of(urgency))
+                .imageUrl(imageUrl)
+                .referenceUrl(referenceUrl)
+                .memo(memo)
+                .build();
+    }
+
+    public void addManager(ToBuyManager manager) {
+        managers.add(manager);
+        manager.setToBuyItem(this);
+    }
+
+    public void setManagers(List<ToBuyManager> managers) {
+        this.managers.clear();
+
+        for (ToBuyManager  manager : managers ) {
+            addManager(manager);
+        }
     }
 }

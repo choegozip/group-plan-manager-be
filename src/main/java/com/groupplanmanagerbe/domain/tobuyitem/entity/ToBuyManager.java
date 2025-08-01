@@ -5,12 +5,16 @@ import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
-@Table(name = "to_buy_managers")
+@Table(
+        name = "to_buy_managers",
+        indexes = {
+                @Index(name = "idx_to_buy_manager_to_buy_item_id", columnList = "to_buy_item_id"),
+                @Index(name = "idx_to_buy_manager_user_id", columnList = "user_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToBuyManager extends BaseEntity {
@@ -22,6 +26,7 @@ public class ToBuyManager extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_buy_item_id")
     private ToBuyItem toBuyItem;
@@ -30,9 +35,20 @@ public class ToBuyManager extends BaseEntity {
     @Column(nullable = false)
     private ManagerStatus status;
 
-    public ToBuyManager(User user, ToBuyItem toBuyItem, ManagerStatus managerStatus) {
+    @Builder
+    public ToBuyManager(User user, ToBuyItem toBuyItem, ManagerStatus status) {
         this.user = user;
         this.toBuyItem = toBuyItem;
-        this.status = managerStatus;
+        this.status = status;
+    }
+
+    public static ToBuyManager of(User user, ToBuyItem toBuyItem) {
+        ToBuyManager manager = ToBuyManager.builder()
+                .user(user)
+                .toBuyItem(toBuyItem)
+                .status(ManagerStatus.REQUESTED)
+                .build();
+        toBuyItem.addManager(manager);
+        return manager;
     }
 }
