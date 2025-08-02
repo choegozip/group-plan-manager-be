@@ -6,6 +6,7 @@ import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.space.dto.request.JoinSpaceReq;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.InvitedSpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.JoinSpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.SpaceMembersRes;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,14 @@ public class SpaceMemberController {
     ) {
         InviteSpaceMemberRes response = spaceMemberService.inviteMember(authUser.userId(), spaceId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACE_INVITE, response);
+    }
+
+    @GetMapping("/invitation")
+    public ResponseEntity<ApiSuccessRes<InvitedSpaceRes>> getInvitedSpace(
+            @RequestParam String inviteCode
+    ) {
+        InvitedSpaceRes response = spaceMemberService.getInvitedSpace(inviteCode);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_INVITED_SPACE, response);
     }
 
     @PostMapping("/join")

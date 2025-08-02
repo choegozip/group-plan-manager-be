@@ -12,6 +12,7 @@ import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.space.dto.request.JoinSpaceReq;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.InviteSpaceMemberRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.InvitedSpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.JoinSpaceRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.spacemember.SpaceMembersRes;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +50,16 @@ public class SpaceMemberService {
         return InviteSpaceMemberRes.of(invitationUrl);
     }
 
+    public InvitedSpaceRes getInvitedSpace(String inviteCode) {
+        SpaceInvited invited = getValidInvitation(inviteCode);
+        Space space = invited.getSpace();
+
+        return InvitedSpaceRes.of(space);
+    }
+
     @Transactional
     public JoinSpaceRes joinSpace(Long userId, JoinSpaceReq request) {
-        SpaceInvited invited = getValidInvitation(request.inviteKey());
+        SpaceInvited invited = getValidInvitationWithLock(request.inviteKey());
         Space space = invited.getSpace();
 
         validateSpaceCapacity(space);
@@ -106,6 +114,11 @@ public class SpaceMemberService {
 
     private SpaceInvited getValidInvitation(String inviteKey) {
         return spaceInvitedRepository.findByInviteKeyAndDeleted(inviteKey)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
+    }
+
+    private SpaceInvited getValidInvitationWithLock(String inviteKey) {
+        return spaceInvitedRepository.findByInviteKeyAndDeletedWithLock(inviteKey)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
     }
 

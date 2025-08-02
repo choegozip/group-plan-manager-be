@@ -24,7 +24,7 @@ public class SpaceMember extends BaseEntity {
     private Space space;
 
     @Column(name = "is_owner")
-    private boolean isOwner = false;
+    private boolean owner = false;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
@@ -45,7 +45,7 @@ public class SpaceMember extends BaseEntity {
     }
 
     public void makeOwner() {
-        this.isOwner = true;
+        this.owner = true;
     }
 
     public void softDeleted() {

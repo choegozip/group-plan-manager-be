@@ -31,6 +31,6 @@ public interface SpaceRepository extends JpaRepository<Space, Long>, SpaceReposi
    @Query("SELECT s FROM Space s JOIN s.members m " +
            "WHERE s.id = :spaceId AND s.deleted = false " +
            "AND m.user.id = :userId AND m.user.deleted = false " +
-           "AND m.isOwner = true")
+           "AND m.owner = true")
    Optional<Space> findByIdAndOwnerUserId(@Param("spaceId") Long spaceId, @Param("userId") Long userId);
 }

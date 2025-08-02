@@ -52,6 +52,7 @@ public enum ApiErrorCode {
     SPACE_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,"ERROR", "space.member.not.found"),
     OWNER_CANNOT_QUIT_SPACE(HttpStatus.BAD_REQUEST,"ERROR", "space.owner.cannot.remove.self"),
     SPACE_MEMBER_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST,"ERROR","space.member.limit.exceeded"),
+    OWNER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "owner.not.found"),
 
     // 살 것
     URGENCY_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "urgency.invalid"),
@@ -60,7 +61,6 @@ public enum ApiErrorCode {
     MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "manager.not.found"),
     INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
     STATUS_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "manager.status.invalid"),
-
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),

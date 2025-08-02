@@ -15,9 +15,14 @@ public interface SpaceInvitedRepository extends JpaRepository<SpaceInvited, Stri
             "WHERE s.id = :spaceId AND s.deleted = false")
     Optional<SpaceInvited> findBySpaceId(@Param("spaceId") Long spaceId);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @EntityGraph(attributePaths = {"space", "space.members", "space.members.user"})
     @Query("SELECT si FROM SpaceInvited si JOIN si.space s " +
             "WHERE si.inviteKey = :inviteKey AND s.deleted = false")
     Optional<SpaceInvited> findByInviteKeyAndDeleted(@Param("inviteKey") String inviteKey);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = {"space", "space.members", "space.members.user"})
+    @Query("SELECT si FROM SpaceInvited si JOIN si.space s " +
+            "WHERE si.inviteKey = :inviteKey AND s.deleted = false")
+    Optional<SpaceInvited> findByInviteKeyAndDeletedWithLock(@Param("inviteKey") String inviteKey);
 }
