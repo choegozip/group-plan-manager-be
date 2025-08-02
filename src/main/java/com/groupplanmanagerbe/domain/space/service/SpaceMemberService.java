@@ -70,7 +70,7 @@ public class SpaceMemberService {
         String landingUrl = generateLandingUrl(space.getId());
 
         spaceInvitedRepository.delete(invited);
-        return JoinSpaceRes.of(space, landingUrl);
+        return JoinSpaceRes.of(space);
     }
 
     @Transactional

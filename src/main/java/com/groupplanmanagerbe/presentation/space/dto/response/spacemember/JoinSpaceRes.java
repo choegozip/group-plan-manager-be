@@ -5,15 +5,15 @@ import lombok.Builder;
 
 @Builder
 public record JoinSpaceRes(
-        Long spaceId,
+        Long id,
         String name,
-        String landingUrl
+        String profileImageKey
 ) {
-    public static JoinSpaceRes of(Space space, String landingUrl) {
+    public static JoinSpaceRes of(Space space) {
         return JoinSpaceRes.builder()
-                .spaceId(space.getId())
+                .id(space.getId())
                 .name(space.getName())
-                .landingUrl(landingUrl)
+                .profileImageKey(space.getProfileImageKey())
                 .build();
     }
 }
