@@ -85,6 +85,7 @@ public class ToBuyItemService {
         return request.managerStatus();
     }
 
+    // === Private Methods ===
     private List<ToBuyManager> createToBuy(List<Long> memberIds, Space space, ToBuyItem toBuyItem) {
         Set<Long> setMemberIds = Set.copyOf(memberIds);
         return space.getMembers().stream()
