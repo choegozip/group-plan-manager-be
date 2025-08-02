@@ -8,7 +8,6 @@ import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @RequiredArgsConstructor
 public class SpaceComponent {
@@ -18,6 +17,11 @@ public class SpaceComponent {
 
     public Space getByIdAndUserId(Long spaceId, Long userId, ApiErrorCode errorCode) {
         return spaceRepository.findByIdAndUserId(spaceId, userId)
+                .orElseThrow(() -> new NotFoundException(errorCode));
+    }
+
+    public Space getByIdAndUserIdWithMember(Long spaceId, Long userId, ApiErrorCode errorCode) {
+        return spaceRepository.findByIdAndUserIdWithMember(spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(errorCode));
     }
 

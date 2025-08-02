@@ -40,16 +40,10 @@ public class SpaceMemberService {
     public static final String SPACE_BASE_PATH = "spaces";
     public static final int MAX_MEMBERS = 10;
 
-
     @Transactional
     public InviteSpaceMemberRes inviteMember(Long userId, Long spaceId) {
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
-
-        SpaceInvited invited = spaceInvitedRepository.findBySpaceId(spaceId)
-                .orElseGet(() -> {
-                    SpaceInvited newInvited = SpaceInvited.of(space);
-                    return spaceInvitedRepository.save(newInvited);
-                });
+        SpaceInvited invited = findOrCreateInvited(space, spaceId);
 
         String invitationUrl = generateInvitationUrl(invited.getInviteKey());
         return InviteSpaceMemberRes.of(invitationUrl);
@@ -57,21 +51,12 @@ public class SpaceMemberService {
 
     @Transactional
     public JoinSpaceRes joinSpace(Long userId, JoinSpaceReq request) {
-        SpaceInvited invited = spaceInvitedRepository.findByInviteKeyAndDeleted(request.inviteKey())
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
+        SpaceInvited invited = getValidInvitation(request.inviteKey());
         Space space = invited.getSpace();
 
-        if (space.getMembers().size() >= MAX_MEMBERS) {
-            throw new InvalidException(ApiErrorCode.SPACE_MEMBER_LIMIT_EXCEEDED);
-        }
-
+        validateSpaceCapacity(space);
         User invitedUser = userComponent.getByIdAndDeleteFalse(userId);
-        boolean alreadyJoined = space.getMembers().stream()
-                .anyMatch(member -> member.getUser().equals(invitedUser));
-
-        if (alreadyJoined) {
-            throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
-        }
+        validateUserNotAlreadyJoined(space, invitedUser);
 
         SpaceMember.of(invitedUser, space);
         String landingUrl = generateLandingUrl(space.getId());
@@ -83,21 +68,14 @@ public class SpaceMemberService {
     @Transactional
     public void deleteMember(Long ownerId, Long spaceId, Long targetMemberUserId) {
         Space space = spaceComponent.getByIdAndOwnerId(ownerId, spaceId, ApiErrorCode.PERMISSION_DENIED);
+        validateUserIsNotOwner(ownerId, targetMemberUserId);
 
-        if (ownerId.equals(targetMemberUserId)) {
-            throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
-        }
-
-        SpaceMember target = space.getMembers().stream()
-                .filter(m -> m.getUser().getId().equals(targetMemberUserId))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
-
+        SpaceMember target = findMemberByUserId(space, targetMemberUserId);
         space.removeMember(target);
     }
 
     public List<SpaceMembersRes> getSpaceMembers(Long userId, Long spaceId) {
-        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
+        Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
         List<SpaceMember> members = space.getMembers();
 
         return members.stream()
@@ -107,13 +85,56 @@ public class SpaceMemberService {
 
     @Transactional
     public void leaveSpace(Long userId, Long spaceId) {
-        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
+        Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.PERMISSION_DENIED);
         SpaceMember me = space.getMember(userId);
+
         if (me.isOwner()) {
             throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
         }
 
         space.removeMember(me);
+    }
+
+    // === Private Methods ===
+    private SpaceInvited findOrCreateInvited(Space space, Long spaceId) {
+        return spaceInvitedRepository.findBySpaceId(spaceId)
+                .orElseGet(() -> {
+                    SpaceInvited newInvited = SpaceInvited.of(space);
+                    return spaceInvitedRepository.save(newInvited);
+                });
+    }
+
+    private SpaceInvited getValidInvitation(String inviteKey) {
+        return spaceInvitedRepository.findByInviteKeyAndDeleted(inviteKey)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.INVITATION_NOT_FOUND));
+    }
+
+    private void validateSpaceCapacity(Space space) {
+        if (space.getMembers().size() >= MAX_MEMBERS) {
+            throw new InvalidException(ApiErrorCode.SPACE_MEMBER_LIMIT_EXCEEDED);
+        }
+    }
+
+    private void validateUserNotAlreadyJoined(Space space, User user) {
+        boolean alreadyJoined = space.getMembers().stream()
+                .anyMatch(member -> member.getUser().equals(user));
+
+        if (alreadyJoined) {
+            throw new ConflictException(ApiErrorCode.SPACE_MEMBER_ALREADY_JOINED);
+        }
+    }
+
+    private void validateUserIsNotOwner(Long ownerId, Long targetMemberUserId) {
+        if (ownerId.equals(targetMemberUserId)) {
+            throw new InvalidException(ApiErrorCode.OWNER_CANNOT_QUIT_SPACE);
+        }
+    }
+
+    private SpaceMember findMemberByUserId(Space space, Long userId) {
+        return space.getMembers().stream()
+                .filter(m -> m.getUser().getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.SPACE_MEMBER_NOT_FOUND));
     }
 
     private String generateLandingUrl(Long spaceId) {

@@ -44,21 +44,20 @@ public class SpaceService {
 
     @Transactional
     public void updateSpace(Long spaceId, UpdateSpaceReq request, Long userId) {
-        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
+        Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         checkIsOwner(space, userId);
         space.updateSpaceInfo(request.name(), request.profileImageKey());
     }
 
     @Transactional
     public void deleteSpace(Long spaceId, Long userId) {
-        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
+        Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         checkIsOwner(space, userId);
         space.softDelete();
     }
 
     public SpacesListRes getSpaces(Long userId) {
         List<Space> spaces = spaceRepository.findAllByUserId(userId);
-
         return SpacesListRes.of(spaces, userId);
     }
 

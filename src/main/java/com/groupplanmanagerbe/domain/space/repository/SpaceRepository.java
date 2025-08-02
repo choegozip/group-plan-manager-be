@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SpaceRepository extends JpaRepository<Space, Long>, SpaceRepositoryCustom {
-   @EntityGraph(attributePaths = {"members", "members.user"})
    @Query("SELECT s FROM Space s JOIN s.members m " +
            "WHERE s.id = :spaceId AND s.deleted = false " +
            "AND m.user.id = :userId AND m.user.deleted = false")
@@ -19,19 +18,19 @@ public interface SpaceRepository extends JpaRepository<Space, Long>, SpaceReposi
    @EntityGraph(attributePaths = {"members", "members.user"})
    @Query("SELECT s FROM Space s JOIN s.members m " +
            "WHERE s.id = :spaceId AND s.deleted = false " +
-           "AND m.user.id = :userId AND m.user.deleted = false " +
-           "AND m.isOwner = true")
-   Optional<Space> findByIdAndOwnerUserId(@Param("spaceId") Long spaceId, @Param("userId") Long userId);
-
-   @Query("SELECT EXISTS(SELECT 1 FROM Space s JOIN s.members m " +
-           "WHERE s.id = :spaceId " +
-           "AND m.user.id = :userId " +
-           "AND s.deleted = false)")
-   boolean existsByIdAndUserId(@Param("spaceId") Long spaceId, @Param("userId") Long userId);
+           "AND m.user.id = :userId AND m.user.deleted = false")
+   Optional<Space> findByIdAndUserIdWithMember(@Param("spaceId")Long spaceId, @Param("userId")Long userId);
 
    @EntityGraph(attributePaths = {"members", "members.user"})
    @Query("SELECT DISTINCT s FROM Space s JOIN s.members m " +
            "WHERE m.user.id = :userId AND s.deleted = false " +
            "ORDER BY s.createdAt DESC")
    List<Space> findAllByUserId(@Param("userId") Long userId);
+
+   @EntityGraph(attributePaths = {"members", "members.user"})
+   @Query("SELECT s FROM Space s JOIN s.members m " +
+           "WHERE s.id = :spaceId AND s.deleted = false " +
+           "AND m.user.id = :userId AND m.user.deleted = false " +
+           "AND m.isOwner = true")
+   Optional<Space> findByIdAndOwnerUserId(@Param("spaceId") Long spaceId, @Param("userId") Long userId);
 }
