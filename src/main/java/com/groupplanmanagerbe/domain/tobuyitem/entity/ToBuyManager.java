@@ -1,6 +1,5 @@
 package com.groupplanmanagerbe.domain.tobuyitem.entity;
 
-import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
@@ -46,9 +45,13 @@ public class ToBuyManager extends BaseEntity {
         ToBuyManager manager = ToBuyManager.builder()
                 .user(user)
                 .toBuyItem(toBuyItem)
-                .status(ManagerStatus.REQUESTED)
+                .status(ManagerStatus.HELP)
                 .build();
         toBuyItem.addManager(manager);
         return manager;
+    }
+
+    public void updateStatus(String status) {
+        this.status = ManagerStatus.of(status);
     }
 }

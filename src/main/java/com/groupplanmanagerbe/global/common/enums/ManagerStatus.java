@@ -1,11 +1,19 @@
 package com.groupplanmanagerbe.global.common.enums;
 
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import lombok.Getter;
+
+import java.util.Arrays;
 
 @Getter
 public enum ManagerStatus {
-    REQUESTED,  // 도움 요청
-    ACCEPTED,   // 수락
-    REJECTED,   // 거절
-    COMPLETED   // 완료
+
+    HELP, OK, SORRY, DONE;
+
+    public static ManagerStatus of(String status) {
+        return Arrays.stream(ManagerStatus.values())
+                .filter(u -> u.name().equalsIgnoreCase(status))
+                .findFirst()
+                .orElseThrow(() -> new InvalidException(ApiErrorCode.STATUS_INVALID));
+    }
 }

@@ -55,13 +55,17 @@ public enum ApiErrorCode {
     // 살 것
     URGENCY_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "urgency.invalid"),
     TO_BUY_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.buy.not.found"),
-    INVALID_SPACE_ID(HttpStatus.BAD_REQUEST, "ERROR", "invalid.space.id"),
+    INVALID_SPACE_ID(HttpStatus.BAD_REQUEST, "ERROR", "space.id.invalid"),
+    MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "manager.not.found"),
+    INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
+    STATUS_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "manager.status.invalid"),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
-    INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date");
+    INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
+   ;
 
     private final HttpStatus httpStatus;
     private final String code;
