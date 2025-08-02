@@ -8,11 +8,10 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
-import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
-import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpaceCreateRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.space.SpaceRes;
-import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacesRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacesListRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,18 +28,18 @@ public class SpaceService {
     private final UserComponent userComponent;
 
     @Transactional
-    public void createSpace(CreateSpaceReq request, Long userId) {
+    public SpaceCreateRes createSpace(CreateSpaceReq request, Long userId) {
         User user = userComponent.getByIdAndDeleteFalse(userId);
 
         if (spaceComponent.countSpacesBelongingToUser(userId) >= 10) {
             throw new InvalidException(ApiErrorCode.SPACE_LIMIT_EXCEEDED);
         }
-
         Space space = Space.of(request.name(), request.profileImageKey());
         SpaceMember spaceMember = SpaceMember.of(user, space);
         spaceMember.makeOwner();
-
         spaceRepository.save(space);
+
+        return SpaceCreateRes.of(space.getId());
     }
 
     @Transactional
@@ -57,9 +56,10 @@ public class SpaceService {
         space.softDelete();
     }
 
-    public SpacePageRes getSpaces(CursorPageRequest request, Long userId) {
-        List<SpacesRes> spaces = spaceRepository.findSpacesWithCursor(request, userId);
-        return SpacePageRes.of(spaces, request.size());
+    public SpacesListRes getSpaces(Long userId) {
+        List<Space> spaces = spaceRepository.findAllByUserId(userId);
+
+        return SpacesListRes.of(spaces, userId);
     }
 
     public SpaceRes getSpace(Long userId, Long spaceId) {

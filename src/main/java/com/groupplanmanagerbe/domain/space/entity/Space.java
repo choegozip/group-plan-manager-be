@@ -1,9 +1,6 @@
 package com.groupplanmanagerbe.domain.space.entity;
 
-import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
-import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
-import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -5,16 +5,17 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.space.dto.request.CreateSpaceReq;
-import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.presentation.space.dto.request.UpdateSpaceReq;
-import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacePageRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpaceCreateRes;
 import com.groupplanmanagerbe.presentation.space.dto.response.space.SpaceRes;
+import com.groupplanmanagerbe.presentation.space.dto.response.space.SpacesListRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.SortDirection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/spaces")
@@ -24,12 +25,12 @@ public class SpaceController {
     private final SpaceService spaceService;
 
     @PostMapping
-    public ResponseEntity<ApiSuccessRes<Void>> createSpace(
+    public ResponseEntity<ApiSuccessRes<SpaceCreateRes>> createSpace(
             @Valid @RequestBody CreateSpaceReq request,
             @AuthenticationPrincipal AuthUser authUser
     ) {
-        spaceService.createSpace(request, authUser.userId());
-        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_SPACE_CREATE);
+        SpaceCreateRes response = spaceService.createSpace(request, authUser.userId());
+        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_SPACE_CREATE, response);
     }
 
     @PatchMapping("/{spaceId}")
@@ -52,15 +53,10 @@ public class SpaceController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiSuccessRes<SpacePageRes>> getSpaces(
-            @AuthenticationPrincipal AuthUser authUser,
-            @RequestParam(required = false) String cursor,
-            @RequestParam int size,
-            @RequestParam(defaultValue = "DESCENDING") SortDirection direction
+    public ResponseEntity<ApiSuccessRes<SpacesListRes>> getSpaces(
+            @AuthenticationPrincipal AuthUser authUser
     ) {
-        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction);
-
-        SpacePageRes response = spaceService.getSpaces(request, authUser.userId());
+        SpacesListRes response = spaceService.getSpaces(authUser.userId());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SPACES_GET, response);
     }
 
