@@ -31,8 +31,12 @@ public class SpaceService {
     @Transactional
     public void createSpace(CreateSpaceReq request, Long userId) {
         User user = userComponent.getByIdAndDeleteFalse(userId);
-        Space space = Space.of(request.name(), request.profileImageKey());
 
+        if (spaceComponent.countSpacesBelongingToUser(userId) >= 10) {
+            throw new InvalidException(ApiErrorCode.SPACE_LIMIT_EXCEEDED);
+        }
+
+        Space space = Space.of(request.name(), request.profileImageKey());
         SpaceMember spaceMember = SpaceMember.of(user, space);
         spaceMember.makeOwner();
 
