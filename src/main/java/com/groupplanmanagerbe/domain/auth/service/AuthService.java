@@ -40,18 +40,12 @@ public class AuthService {
     @Transactional
     public TokenRes login(LoginReq request) {
         User savedUser = userComponent.getByEmail(request.email());
-        if (!passwordEncoder.matches(request.password(), savedUser.getPassword())) {
-            throw new InvalidException(ApiErrorCode.AUTH_INVALID_PASSWORD);
-        }
+        validatePassword(request, savedUser);
 
         String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
         String refreshToken = jwtUtil.createRefreshToken(savedUser.getId());
 
-        if (refreshTokenService.existTokenAtDb(savedUser.getId())) {
-            refreshTokenService.update(savedUser.getId(), refreshToken);
-        } else {
-            refreshTokenService.create(savedUser, refreshToken);
-        }
+        createOrUpdateRefreshToken(savedUser, refreshToken);
 
         return TokenRes.of(accessToken, refreshToken);
     }
@@ -74,16 +68,8 @@ public class AuthService {
         Long userId = Long.parseLong(claims.getSubject());
 
         String savedRefreshToken = refreshTokenService.getFromRedis(userId);
-
-        if (savedRefreshToken == null || savedRefreshToken.isBlank()) {
-            RefreshToken token = refreshTokenService.getFromDb(userId)
-                    .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
-            savedRefreshToken = token.getToken();
-        }
-
-        if (!request.refreshToken().equals(savedRefreshToken)) {
-            throw new UnAuthorizedException(ApiErrorCode.AUTH_UNAUTHORIZED_ACCESS);
-        }
+        savedRefreshToken = getOrLoadRefreshToken(userId, savedRefreshToken);
+        invalidRefreshToken(request, savedRefreshToken);
 
         String accessToken = jwtUtil.createAccessToken(userId, UserRole.USER);
         String refreshToken = jwtUtil.createRefreshToken(userId);
@@ -91,5 +77,35 @@ public class AuthService {
         refreshTokenService.update(userId, refreshToken);
 
         return TokenRes.of(accessToken, refreshToken);
+    }
+
+    // === Private Methods ===
+    private void createOrUpdateRefreshToken(User savedUser, String refreshToken) {
+        if (refreshTokenService.existTokenAtDb(savedUser.getId())) {
+            refreshTokenService.update(savedUser.getId(), refreshToken);
+        } else {
+            refreshTokenService.create(savedUser, refreshToken);
+        }
+    }
+
+    private void validatePassword(LoginReq request, User savedUser) {
+        if (!passwordEncoder.matches(request.password(), savedUser.getPassword())) {
+            throw new InvalidException(ApiErrorCode.AUTH_INVALID_PASSWORD);
+        }
+    }
+
+    private String getOrLoadRefreshToken(Long userId, String savedRefreshToken) {
+        if (savedRefreshToken == null || savedRefreshToken.isBlank()) {
+            RefreshToken token = refreshTokenService.getFromDb(userId)
+                    .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
+            return  token.getToken();
+        }
+        return savedRefreshToken;
+    }
+
+    private void invalidRefreshToken(RefreshTokenReq request, String savedRefreshToken) {
+        if (!request.refreshToken().equals(savedRefreshToken)) {
+            throw new UnAuthorizedException(ApiErrorCode.AUTH_UNAUTHORIZED_ACCESS);
+        }
     }
 }
