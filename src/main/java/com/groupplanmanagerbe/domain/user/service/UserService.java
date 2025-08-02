@@ -6,6 +6,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.response.UserCreateRes;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +23,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void create(CreateUserReq request) {
+    public UserCreateRes create(CreateUserReq request) {
         if (userComponent.isExist(request.email())) {
             throw new DuplicateException(ApiErrorCode.USER_DUPLICATED_EMAIL);
         }
@@ -31,6 +32,7 @@ public class UserService {
         User newUser = User.of(request.email(), request.nickname(), encodedPassword, request.profileImageKey());
 
         userRepository.save(newUser);
+        return UserCreateRes.of(newUser.getId());
     }
 
     public UserRes get(Long userId) {

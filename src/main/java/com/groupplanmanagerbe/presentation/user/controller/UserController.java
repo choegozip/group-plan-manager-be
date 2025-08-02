@@ -6,6 +6,7 @@ import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
+import com.groupplanmanagerbe.presentation.user.dto.response.UserCreateRes;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,11 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiSuccessRes<Void>> createUser(
+    public ResponseEntity<ApiSuccessRes<UserCreateRes>> createUser(
             @Valid @RequestBody CreateUserReq request
     ) {
-        userService.create(request);
-        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_SIGNUP);
+        UserCreateRes response = userService.create(request);
+        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_SIGNUP, response);
     }
 
     @GetMapping("/me")

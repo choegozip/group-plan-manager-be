@@ -18,6 +18,11 @@ public record ApiSuccessRes<T>(String code, String massage, T data) {
     }
 
     // 201 CREATED
+    public static <T> ResponseEntity<ApiSuccessRes<T>> created(ApiSuccessCode successCode, T data) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiSuccessRes<>(successCode.getCode(), successCode.getMessage(), data));
+    }
+
     public static <T> ResponseEntity<ApiSuccessRes<T>> created(ApiSuccessCode successCode) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiSuccessRes<>(successCode.getCode(), successCode.getMessage(), null));
