@@ -1,4 +1,4 @@
 package com.groupplanmanagerbe.presentation.tobuyitem.dto.response;
 
-public class ToBuyItemRes {
+public class ToBuyRes {
 }

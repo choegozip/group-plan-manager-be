@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "space_member")
+@Table(name = "space_members")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpaceMember extends BaseEntity {

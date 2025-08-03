@@ -3,17 +3,17 @@ package com.groupplanmanagerbe.global.common.enums;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import lombok.Getter;
 
-import java.util.Arrays;
-
 @Getter
 public enum Urgency {
 
-    RED, YELLO, GREEN;
+    RED, YELLOW, GREEN;
 
     public static Urgency of(String urgency) {
-        return Arrays.stream(Urgency.values())
-                .filter(u -> u.name().equalsIgnoreCase(urgency))
-                .findFirst()
-                .orElseThrow(() -> new InvalidException(ApiErrorCode.URGENCY_INVALID));
+        if (urgency == null) return null;
+        try {
+            return Urgency.valueOf(urgency.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidException(ApiErrorCode.URGENCY_INVALID);
+        }
     }
 }

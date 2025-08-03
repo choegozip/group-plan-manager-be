@@ -1,7 +1,7 @@
-package com.groupplanmanagerbe.domain.comment.entity;
+package com.groupplanmanagerbe.domain.tobuycomment.entity;
 
-import com.groupplanmanagerbe.domain.comment.enums.CommentParent;
 import com.groupplanmanagerbe.domain.space.entity.Space;
+import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -11,10 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "comments")
+@Table(name = "to_buy_comments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseEntity {
+public class ToBuyComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,22 +27,18 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "space_id")
     private Space space;
 
-    @Column(name = "parent_type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private CommentParent parent;
-
-    @Column(name = "parent_id", nullable = false)
-    private long parentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_buy_item_id")
+    private ToBuyItem toBuyItem;
 
     @Column(nullable = false)
     private String comment;
 
     @Builder
-    public Comment(User user, Space space, CommentParent parent, long parentId, String comment) {
+    public ToBuyComment(User user, Space space, ToBuyItem toBuyItem, String comment) {
         this.user = user;
         this.space = space;
-        this.parent = parent;
-        this.parentId = parentId;
+        this.toBuyItem = toBuyItem;
         this.comment =comment;
     }
 }

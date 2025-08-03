@@ -1,25 +1,26 @@
 package com.groupplanmanagerbe.global.common.response.page;
 
+import com.groupplanmanagerbe.global.common.enums.SortDirection;
+import com.groupplanmanagerbe.global.common.enums.Urgency;
 import lombok.Builder;
-import org.hibernate.query.SortDirection;
 
 @Builder
 public record CursorPageRequest(
-        String cursor,
+        Long cursor,
         int size,
         String sortBy,
-        SortDirection direction
+        String direction,
+        Long managerId,
+        String urgency
 ) {
-    public static CursorPageRequest of(String cursor, int size, SortDirection direction) {
-        return new CursorPageRequest(
-                cursor,
-                size,
-                "updatedAt",
-                direction != null ? direction : SortDirection.DESCENDING
-        );
-    }
-
-    public boolean isFirstPage() {
-        return cursor == null;
+    public static CursorPageRequest of(Long cursor, int size, String direction, Long managerId, String urgency) {
+        return CursorPageRequest.builder()
+                .cursor(cursor)
+                .size(size)
+                .sortBy("createdAt")
+                .direction(direction != null ? SortDirection.of(direction).toString() : null)
+                .managerId(managerId)
+                .urgency(urgency != null ? Urgency.of(urgency).toString() : null)
+                .build();
     }
 }

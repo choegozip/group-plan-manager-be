@@ -1,6 +1,6 @@
-package com.groupplanmanagerbe.domain.comment.service;
+package com.groupplanmanagerbe.domain.tobuycomment.service;
 
-import com.groupplanmanagerbe.domain.comment.repository.CommentRepository;
+import com.groupplanmanagerbe.domain.tobuycomment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

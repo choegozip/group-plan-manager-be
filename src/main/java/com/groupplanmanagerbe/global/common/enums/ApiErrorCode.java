@@ -53,6 +53,7 @@ public enum ApiErrorCode {
     OWNER_CANNOT_QUIT_SPACE(HttpStatus.BAD_REQUEST,"ERROR", "space.owner.cannot.remove.self"),
     SPACE_MEMBER_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST,"ERROR","space.member.limit.exceeded"),
     OWNER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "owner.not.found"),
+    SPACE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "space.limit.exceeded"),
 
     // 살 것
     URGENCY_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "urgency.invalid"),
@@ -61,12 +62,13 @@ public enum ApiErrorCode {
     MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "manager.not.found"),
     INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
     STATUS_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "manager.status.invalid"),
+
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
-    SPACE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "space.limit.exceeded");
+    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid");
 
     private final HttpStatus httpStatus;
     private final String code;

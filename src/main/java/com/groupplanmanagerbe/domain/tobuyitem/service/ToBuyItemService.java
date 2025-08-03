@@ -10,11 +10,15 @@ import com.groupplanmanagerbe.domain.tobuyitem.repository.ToBuyManagerRepository
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyListRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,14 +79,24 @@ public class ToBuyItemService {
     }
 
     @Transactional
-    public String updateManagerStatus(
+    public UpdateManagerStatusRes updateManagerStatus(
             Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyItemId, Long managerId
     ) {
         ToBuyManager manager = toBuyManagerRepository.findByIdAndUserIdWithToBuyAndSpace(managerId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
         validateToBuyManager(manager, spaceId, toBuyItemId);
         manager.updateStatus(request.managerStatus());
-        return request.managerStatus();
+        return UpdateManagerStatusRes.of(manager.getStatus());
+    }
+
+    public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
+        List<ToBuyItem> toBuyItems = toBuyItemRepository.findToBuyItemsNative(
+                spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
+                request.direction(), request.size());
+        List<ToBuyListRes> toBuyListRes = toBuyItems.stream()
+                .map(ToBuyListRes::of)
+                .toList();
+        return ToBuyPageRes.of(toBuyListRes, request.size());
     }
 
     // === Private Methods ===

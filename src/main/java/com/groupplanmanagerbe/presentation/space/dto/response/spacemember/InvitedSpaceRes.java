@@ -2,7 +2,6 @@ package com.groupplanmanagerbe.presentation.space.dto.response.spacemember;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
-import com.groupplanmanagerbe.domain.user.entity.User;
 import lombok.Builder;
 
 import java.util.List;
@@ -29,25 +28,14 @@ public record InvitedSpaceRes(
     @Builder
     public record MemberInfo(
             boolean isOwner,
-            UserInfo user
+            Long id,
+            String nickname
     ) {
         public static MemberInfo of(SpaceMember member) {
             return MemberInfo.builder()
                     .isOwner(member.isOwner())
-                    .user(UserInfo.of(member.getUser()))
-                    .build();
-        }
-    }
-
-    @Builder
-    public record UserInfo(
-            Long id,
-            String nickname
-    ) {
-        public static UserInfo of(User user) {
-            return UserInfo.builder()
-                    .id(user.getId())
-                    .nickname(user.getNickname())
+                    .id(member.getUser().getId())
+                    .nickname(member.getUser().getNickname())
                     .build();
         }
     }

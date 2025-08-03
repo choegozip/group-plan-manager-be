@@ -1,5 +1,6 @@
 package com.groupplanmanagerbe.domain.tobuyitem.entity;
 
+import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
@@ -52,6 +53,9 @@ public class ToBuyItem extends BaseEntity {
     private String referenceUrl;
 
     private String memo;
+
+    @OneToMany(mappedBy = "toBuyItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ToBuyComment> toBuyComments = new ArrayList<>();
 
     @OneToMany(mappedBy = "toBuyItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ToBuyManager> managers = new ArrayList<>();

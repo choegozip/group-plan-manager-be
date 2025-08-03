@@ -3,12 +3,16 @@ package com.groupplanmanagerbe.presentation.tobuyitem.controller;
 import com.groupplanmanagerbe.domain.tobuyitem.service.ToBuyItemService;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.query.SortDirection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -52,15 +56,30 @@ public class ToBuyItemController {
     }
 
     @PatchMapping("/{toBuyItemId}/managers/{managerId}")
-    public ResponseEntity<ApiSuccessRes<String>> updateManagerStatus(
+    public ResponseEntity<ApiSuccessRes<UpdateManagerStatusRes>> updateManagerStatus(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody UpdateManagerStatusReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId,
             @PathVariable Long managerId
     ) {
-        String status =
+        UpdateManagerStatusRes response =
                 toBuyItemService.updateManagerStatus(authUser.userId(), request, spaceId, toBuyItemId, managerId);
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, status);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, response);
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiSuccessRes<ToBuyPageRes>> getToBuyList(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @RequestParam int size,
+            @RequestParam(defaultValue = "DESC") String direction,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(required = false) Long managerId,
+            @RequestParam(required = false) String urgency
+    ) {
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, managerId, urgency);
+        ToBuyPageRes response = toBuyItemService.getToBuyList(authUser.userId(), spaceId, request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY_LIST, response);
     }
 }
