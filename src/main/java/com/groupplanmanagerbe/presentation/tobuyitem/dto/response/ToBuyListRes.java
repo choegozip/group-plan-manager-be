@@ -25,9 +25,9 @@ public record ToBuyListRes(
         AuthorInfo author,
         List<ManagerInfo> managers
 ) {
-    public static ToBuyListRes of(ToBuyItem toBuyItem) {
+    public static ToBuyListRes of(ToBuyItem toBuyItem, List<ToBuyManager> managers) {
         AuthorInfo author = AuthorInfo.of(toBuyItem.getUser());
-        List<ManagerInfo> manager = toBuyItem.getManagers().stream()
+        List<ManagerInfo> managerInfos = managers.stream()
                 .map(ManagerInfo::of)
                 .toList();
 
@@ -43,7 +43,7 @@ public record ToBuyListRes(
                 .createdAt(toBuyItem.getCreatedAt())
                 .updatedAt(toBuyItem.getUpdatedAt())
                 .author(author)
-                .managers(manager)
+                .managers(managerInfos)
                 .build();
     }
 

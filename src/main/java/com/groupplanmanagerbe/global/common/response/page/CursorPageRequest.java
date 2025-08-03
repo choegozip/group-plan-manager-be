@@ -18,7 +18,7 @@ public record CursorPageRequest(
                 .cursor(cursor)
                 .size(size)
                 .sortBy("createdAt")
-                .direction(direction != null ? SortDirection.of(direction).toString() : null)
+                .direction(direction)
                 .managerId(managerId)
                 .urgency(urgency != null ? Urgency.of(urgency).toString() : null)
                 .build();

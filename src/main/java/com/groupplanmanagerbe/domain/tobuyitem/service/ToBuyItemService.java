@@ -18,15 +18,22 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerSt
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyListRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -54,7 +61,7 @@ public class ToBuyItemService {
 
     @Transactional
     public void updateToBuy(Long userId, UpdateToBuyReq request, Long spaceId, Long toBuyItemId) {
-        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserIdWithSpace(toBuyItemId, userId)
+        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyItemId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
         validateSpaceId(toBuyItem, spaceId);
 
@@ -90,13 +97,34 @@ public class ToBuyItemService {
     }
 
     public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
+        log.debug("spaceId={}, userId={}, managerId={}, urgency={}, cursor={}, direction={}",
+                spaceId, userId, request.managerId(), request.urgency(), request.cursor(), request.direction());
+
         List<ToBuyItem> toBuyItems = toBuyItemRepository.findToBuyItemsNative(
                 spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
                 request.direction(), request.size());
-        List<ToBuyListRes> toBuyListRes = toBuyItems.stream()
-                .map(ToBuyListRes::of)
+        log.info("조회된 items 개수: {}", toBuyItems.size());
+        if (toBuyItems.isEmpty()) {
+            return ToBuyPageRes.of(List.of(), request.size());
+        }
+
+        List<Long> itemIds = toBuyItems.stream().map(ToBuyItem::getId).toList();
+        log.info("조회된 itemIds 개수: {}", itemIds.size());
+        List<ToBuyManager> allManagers = toBuyManagerRepository.findByToBuyItemIdsWithUser(itemIds);
+        log.info("조회된 매니저 개수: {}", allManagers.size());
+        Map<Long, List<ToBuyManager>> managerMap = allManagers.stream()
+                .collect(groupingBy(m -> m.getToBuyItem().getId()));
+
+        List<ToBuyListRes> toBuyListResList = toBuyItems.stream()
+                .map(item -> ToBuyListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
                 .toList();
-        return ToBuyPageRes.of(toBuyListRes, request.size());
+        log.info("그루핑된 맵 크기: {}", managerMap.size());
+        log.info("맵 내용: {}", managerMap.entrySet().stream()
+                .map(entry -> String.format("ItemId[%d] -> Managers[%d개]",
+                        entry.getKey(), entry.getValue().size()))
+                .collect(Collectors.toList()));
+
+        return ToBuyPageRes.of(toBuyListResList, request.size());
     }
 
     // === Private Methods ===
