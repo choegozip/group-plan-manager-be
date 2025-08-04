@@ -13,14 +13,19 @@ import com.groupplanmanagerbe.domain.todoitem.repository.ToDoManagerRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyListRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
+import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoListRes;
+import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoPageRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @RequiredArgsConstructor
@@ -96,6 +104,23 @@ public class ToDoItemService {
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
 
+    public ToDoPageRes getToDoList(Long userId, Long spaceId, CursorPageRequest request) {
+        List<ToDoItem> toDoList = toDoItemRepository.findToDoItemsNative(
+                spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
+                request.direction(), request.size());
+
+        if (toDoList.isEmpty()) {
+            return ToDoPageRes.of(List.of(), request.size());
+        }
+
+        Map<Long, List<ToDoManager>> managerMap = mapToDoManagersByItemId (toDoList);
+        List<ToDoListRes> toDoListResList = toDoList.stream()
+                .map(item -> ToDoListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
+                .toList();
+
+        return ToDoPageRes.of(toDoListResList, request.size());
+    }
+
     // === Private Methods ===
     private List<ToDoManager> createToBuy(List<Long> memberIds, Space space, ToDoItem toDoItem) {
         Set<Long> setMemberIds = Set.copyOf(memberIds);
@@ -119,5 +144,12 @@ public class ToDoItemService {
         if (!manager.getToDoItem().getId().equals(toDoId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_DO_ID);
         }
+    }
+
+    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoItem> toDoList) {
+        List<Long> toDoIds = toDoList.stream().map(ToDoItem::getId).toList();
+        List<ToDoManager> allManagers = toDoManagerRepository.findByToDoItemIdsWithUser(toDoIds);
+        return allManagers.stream()
+                .collect(groupingBy(m -> m.getToDoItem().getId()));
     }
 }
