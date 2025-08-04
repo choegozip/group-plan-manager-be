@@ -6,13 +6,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record CreateCommentReq(
+public record CommentReq(
         @NotNull(message = CommentValidation.COMMENT_BLANK_MESSAGE)
         @Size(max = CommentValidation.COMMENT_MAX, message = CommentValidation.COMMENT_RANGE_MESSAGE)
         String content
 ) {
-    public static CreateCommentReq of(String content) {
-        return CreateCommentReq.builder()
+    public static CommentReq of(String content) {
+        return CommentReq.builder()
                 .content(content)
                 .build();
     }

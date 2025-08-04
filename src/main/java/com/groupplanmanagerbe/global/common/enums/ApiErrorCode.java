@@ -65,6 +65,9 @@ public enum ApiErrorCode {
     TO_DO_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.do.not.found"),
     INVALID_TO_DO_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.do.id.invalid"),
 
+    // 코멘트
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "comment.not.found"),
+
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
