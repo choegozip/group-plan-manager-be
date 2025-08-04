@@ -15,13 +15,16 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
+import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -37,19 +40,40 @@ public class ToDoItemService {
     private final ToBuyCommentComponent commentComponent;
 
     @Transactional
-    public void createToDo(Long userId, CreateToDoReq request, Long spaceId) {
+    public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
         User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
 
-        ToDoItem toBuyItem = ToDoItem.of(
+        ToDoItem toDo = ToDoItem.of(
                 space, user, request.title(), request.detail(), request.dueDate(),
                 request.urgency(), request.imageUrl(), request.referenceUrl());
 
-        List<ToDoManager> managers = createToBuy(request.managerIds(), space, toBuyItem);
-        toBuyItem.setManagers(managers);
+        List<ToDoManager> managers = createToBuy(request.managerIds(), space, toDo);
+        toDo.setManagers(managers);
 
-        toDoItemRepository.save(toBuyItem);
+        toDoItemRepository.save(toDo);
+
+        return ToDoRes.of(toDo.getId());
     }
+
+    @Transactional
+    public ToDoRes updateToDo(Long userId, UpdateToDoReq request, Long spaceId, Long toDoId) {
+        ToDoItem toDo = toDoItemRepository.findByIdAndUserIdWithSpaceAndUser(toDoId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));
+        validateSpaceId(toDo, spaceId);
+
+        List<ToDoManager> managers = Collections.emptyList();
+        if (request.managerIds() != null && !request.managerIds().isEmpty()) {
+            managers = createToBuy(request.managerIds(), toDo.getSpace(), toDo);
+        }
+
+        toDo.updateToBuyItem(
+                request.title(), request.detail(), request.dueDate(), request.urgency(),
+                request.imageUrl(), request.referenceUrl(), managers);
+
+        return ToDoRes.of(toDo.getId());
+    }
+
 
     // === Private Methods ===
     private List<ToDoManager> createToBuy(List<Long> memberIds, Space space, ToDoItem toDoItem) {
@@ -59,4 +83,11 @@ public class ToDoItemService {
                 .map(member -> ToDoManager.of(member.getUser(), toDoItem))
                 .toList();
     }
+
+    private void validateSpaceId(ToDoItem item, Long spaceId) {
+        if (!item.getSpace().getId().equals(spaceId)) {
+            throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
+        }
+    }
+
 }
