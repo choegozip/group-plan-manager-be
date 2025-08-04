@@ -17,7 +17,7 @@ public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long
             "AND tm.user.deleted = false")
     Optional<ToBuyManager> findByIdAndUserIdWithToBuyAndSpace(@Param("managerId") Long managerId,
                                                                   @Param("userId") Long userId);
-
+    @EntityGraph(attributePaths = {"user"})
     @Query("""
         SELECT tm FROM ToBuyManager tm
         JOIN FETCH tm.user
