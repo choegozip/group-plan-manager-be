@@ -40,4 +40,14 @@ public class ToDoItemController {
         ToDoRes response = toDoItemService.updateToDo(authUser.userId(), request, spaceId, toDoItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_DO_UPDATE, response);
     }
+
+    @DeleteMapping("/{toDoItemId}")
+    public ResponseEntity<ApiSuccessRes<Void>> deleteToBuy(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @PathVariable Long toDoItemId
+    ) {
+        toDoItemService.deleteToDo(authUser.userId(), spaceId, toDoItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_DO_DELETE);
+    }
 }

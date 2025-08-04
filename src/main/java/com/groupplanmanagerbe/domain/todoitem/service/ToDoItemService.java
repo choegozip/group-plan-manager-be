@@ -74,6 +74,14 @@ public class ToDoItemService {
         return ToDoRes.of(toDo.getId());
     }
 
+    @Transactional
+    public void deleteToDo(Long userId, Long spaceId, Long toDoId) {
+        ToDoItem toDo = toDoItemRepository.findByIdAndUserId(toDoId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));
+        validateSpaceId(toDo, spaceId);
+
+        toDoItemRepository.delete(toDo);
+    }
 
     // === Private Methods ===
     private List<ToDoManager> createToBuy(List<Long> memberIds, Space space, ToDoItem toDoItem) {
@@ -89,5 +97,4 @@ public class ToDoItemService {
             throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
         }
     }
-
 }
