@@ -11,6 +11,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CreateCommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,7 +29,7 @@ public class ToDoCommentService {
     private final ToDoComponent toDoComponent;
 
     @Transactional
-    public void createComment(Long userId, CreateCommentReq request, Long spaceId, Long toDoId) {
+    public CommentRes createComment(Long userId, CreateCommentReq request, Long spaceId, Long toDoId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
@@ -37,6 +38,8 @@ public class ToDoCommentService {
             ToDoComment comment = ToDoComment.of(toDo, user, request.content());
 
             commentRepository.save(comment);
+
+            return CommentRes.of(comment.getId());
 
         } catch (EntityNotFoundException | DataIntegrityViolationException e) {
             throw new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND);

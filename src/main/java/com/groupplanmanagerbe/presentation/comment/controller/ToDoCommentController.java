@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CreateCommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,13 @@ public class ToDoCommentController {
     private final ToDoCommentService  commentService;
 
     @PostMapping
-    public ResponseEntity<ApiSuccessRes<Void>> createComment(
+    public ResponseEntity<ApiSuccessRes<CommentRes>> createComment(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody CreateCommentReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toDoItemId
     ) {
-        commentService.createComment(authUser.userId(), request, spaceId, toDoItemId);
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_COMMENT_CREATE);
+        CommentRes response = commentService.createComment(authUser.userId(), request, spaceId, toDoItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_COMMENT_CREATE, response);
     }
 }
