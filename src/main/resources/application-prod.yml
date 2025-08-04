@@ -5,8 +5,12 @@ spring:
     password: ${DB_PASSWORD}
     hikari:
       max-lifetime: 3600000
+      connection-init-sql: "DEALLOCATE ALL"
       data-source-properties:
         useServerPrepStmts: true
+        cachePrepStmts: true
+        prepStmtCacheSize: 128
+        reWriteBatchedInserts: true
   jpa:
     hibernate:
       ddl-auto: create
