@@ -22,13 +22,13 @@ public record ToBuyListRes(
         boolean hasComment,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        AuthorInfo author,
-        List<ManagerInfo> managers
+        AuthorInfoForList author,
+        List<ManagerInfoForList> managers
 ) {
     public static ToBuyListRes of(ToBuyItem toBuyItem, List<ToBuyManager> managers) {
-        AuthorInfo author = AuthorInfo.of(toBuyItem.getUser());
-        List<ManagerInfo> managerInfos = managers.stream()
-                .map(ManagerInfo::of)
+        AuthorInfoForList author = AuthorInfoForList.of(toBuyItem.getUser());
+        List<ManagerInfoForList> managerInfos = managers.stream()
+                .map(ManagerInfoForList::of)
                 .toList();
 
         return ToBuyListRes.builder()
@@ -48,13 +48,13 @@ public record ToBuyListRes(
     }
 
     @Builder
-    public record AuthorInfo(
+    public record AuthorInfoForList(
             Long id,
             String nickname,
             String profileImageKey
     ) {
-        public static AuthorInfo of(User user) {
-            return AuthorInfo.builder()
+        public static AuthorInfoForList of(User user) {
+            return AuthorInfoForList.builder()
                     .id(user.getId())
                     .nickname(user.getNickname())
                     .profileImageKey(user.getProfileImageKey())
@@ -63,17 +63,18 @@ public record ToBuyListRes(
     }
 
     @Builder
-    public record ManagerInfo(
+    public record ManagerInfoForList(
             Long id,
             String nickname,
             String profileImageKey,
             ManagerStatus status
     ) {
-        public static ManagerInfo of(ToBuyManager manager) {
-            return ManagerInfo.builder()
-                    .id(manager.getUser().getId())
-                    .nickname(manager.getUser().getNickname())
-                    .profileImageKey(manager.getUser().getProfileImageKey())
+        public static ManagerInfoForList of(ToBuyManager manager) {
+            User user = manager.getUser();
+            return ManagerInfoForList.builder()
+                    .id(user.getId())
+                    .nickname(user.getNickname())
+                    .profileImageKey(user.getProfileImageKey())
                     .status(manager.getStatus())
                     .build();
         }

@@ -3,6 +3,8 @@ package com.groupplanmanagerbe.domain.tobuyitem.service;
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.service.SpaceComponent;
+import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
+import com.groupplanmanagerbe.domain.tobuycomment.service.CommentComponent;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyManager;
 import com.groupplanmanagerbe.domain.tobuyitem.repository.ToBuyItemRepository;
@@ -43,6 +45,7 @@ public class ToBuyItemService {
     private final ToBuyManagerRepository toBuyManagerRepository;
     private final SpaceComponent spaceComponent;
     private final UserComponent userComponent;
+    private final CommentComponent commentComponent;
 
     @Transactional
     public void createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
@@ -97,32 +100,21 @@ public class ToBuyItemService {
     }
 
     public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
-        log.debug("spaceId={}, userId={}, managerId={}, urgency={}, cursor={}, direction={}",
-                spaceId, userId, request.managerId(), request.urgency(), request.cursor(), request.direction());
-
         List<ToBuyItem> toBuyItems = toBuyItemRepository.findToBuyItemsNative(
                 spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
                 request.direction(), request.size());
-        log.info("조회된 items 개수: {}", toBuyItems.size());
         if (toBuyItems.isEmpty()) {
             return ToBuyPageRes.of(List.of(), request.size());
         }
 
         List<Long> itemIds = toBuyItems.stream().map(ToBuyItem::getId).toList();
-        log.info("조회된 itemIds 개수: {}", itemIds.size());
         List<ToBuyManager> allManagers = toBuyManagerRepository.findByToBuyItemIdsWithUser(itemIds);
-        log.info("조회된 매니저 개수: {}", allManagers.size());
         Map<Long, List<ToBuyManager>> managerMap = allManagers.stream()
                 .collect(groupingBy(m -> m.getToBuyItem().getId()));
 
         List<ToBuyListRes> toBuyListResList = toBuyItems.stream()
                 .map(item -> ToBuyListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
                 .toList();
-        log.info("그루핑된 맵 크기: {}", managerMap.size());
-        log.info("맵 내용: {}", managerMap.entrySet().stream()
-                .map(entry -> String.format("ItemId[%d] -> Managers[%d개]",
-                        entry.getKey(), entry.getValue().size()))
-                .collect(Collectors.toList()));
 
         return ToBuyPageRes.of(toBuyListResList, request.size());
     }
@@ -150,5 +142,14 @@ public class ToBuyItemService {
         if (!manager.getToBuyItem().getId().equals(toBuyItemId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_BUY_ID);
         }
+    }
+
+    public ToBuyRes getToBuy(Long userId, Long spaceId, Long toBuyItemId) {
+        ToBuyItem item = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyItemId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
+        validateSpaceId(item, spaceId);
+        List<ToBuyComment> comments = commentComponent.getCommentList(toBuyItemId);
+        List<ToBuyManager> managers = toBuyManagerRepository.findAllByToBuyItemId(toBuyItemId);
+        return ToBuyRes.of(item, comments, managers);
     }
 }

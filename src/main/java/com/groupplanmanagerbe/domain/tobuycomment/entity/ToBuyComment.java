@@ -32,13 +32,13 @@ public class ToBuyComment extends BaseEntity {
     private ToBuyItem toBuyItem;
 
     @Column(nullable = false)
-    private String comment;
+    private String content;
 
     @Builder
-    public ToBuyComment(User user, Space space, ToBuyItem toBuyItem, String comment) {
+    public ToBuyComment(User user, Space space, ToBuyItem toBuyItem, String content) {
         this.user = user;
         this.space = space;
         this.toBuyItem = toBuyItem;
-        this.comment =comment;
+        this.content = content;
     }
 }

@@ -25,4 +25,7 @@ public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long
         ORDER BY tm.toBuyItem.id
         """)
     List<ToBuyManager> findByToBuyItemIdsWithUser(@Param("itemIds") List<Long> itemIds);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<ToBuyManager> findAllByToBuyItemId(Long toBuyItemId);
 }

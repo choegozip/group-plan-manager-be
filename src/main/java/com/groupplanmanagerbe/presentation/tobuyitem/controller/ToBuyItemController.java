@@ -9,6 +9,7 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +82,15 @@ public class ToBuyItemController {
         CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, managerId, urgency);
         ToBuyPageRes response = toBuyItemService.getToBuyList(authUser.userId(), spaceId, request);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY_LIST, response);
+    }
+
+    @GetMapping("/{toBuyItemId}")
+    public ResponseEntity<ApiSuccessRes<ToBuyRes>> getToBuy(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @PathVariable Long toBuyItemId
+    ) {
+        ToBuyRes response = toBuyItemService.getToBuy(authUser.userId(), spaceId, toBuyItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY, response);
     }
 }
