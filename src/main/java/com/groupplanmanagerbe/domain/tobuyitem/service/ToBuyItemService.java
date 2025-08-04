@@ -17,10 +17,8 @@ import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
-import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyListRes;
-import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
-import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
-import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.*;
+import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,41 +44,43 @@ public class ToBuyItemService {
     private final ToBuyCommentComponent commentComponent;
 
     @Transactional
-    public void createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
+    public ToBuyRes createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
         User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
 
-        ToBuyItem toBuyItem = ToBuyItem.of(
+        ToBuyItem toBuy = ToBuyItem.of(
                 space, user, request.title(), request.quantity(), request.dueDate(), request.urgency(),
                 request.imageUrl(), request.referenceUrl(), request.memo());
+        List<ToBuyManager> managers = createToBuy(request.managerIds(), space, toBuy);
+        toBuy.setManagers(managers);
 
-        List<ToBuyManager> managers = createToBuy(request.managerIds(), space, toBuyItem);
-        toBuyItem.setManagers(managers);
+        toBuyItemRepository.save(toBuy);
 
-        toBuyItemRepository.save(toBuyItem);
+        return ToBuyRes.of(toBuy.getId());
     }
 
     @Transactional
-    public void updateToBuy(Long userId, UpdateToBuyReq request, Long spaceId, Long toBuyItemId) {
-        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyItemId, userId)
+    public ToBuyRes updateToBuy(Long userId, UpdateToBuyReq request, Long spaceId, Long toBuyId) {
+        ToBuyItem toBuy = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
-        validateSpaceId(toBuyItem, spaceId);
+        validateSpaceId(toBuy, spaceId);
 
         List<ToBuyManager> managers = Collections.emptyList();
         if (request.managerIds() != null && !request.managerIds().isEmpty()) {
-            managers = createToBuy(request.managerIds(), toBuyItem.getSpace(), toBuyItem);
+            managers = createToBuy(request.managerIds(), toBuy.getSpace(), toBuy);
         }
 
-        toBuyItem.updateToBuyItem(
+        toBuy.updateToBuyItem(
                 request.title(), request.quantity(), request.dueDate(), request.urgency(),
                 request.imageUrl(), request.referenceUrl(), request.memo(), managers);
+
+        return ToBuyRes.of(toBuy.getId());
     }
 
     @Transactional
-    public void deleteToBuy(Long userId, Long spaceId, Long toBuyItemId) {
-        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserId(toBuyItemId, userId)
+    public void deleteToBuy(Long userId, Long spaceId, Long toBuyId) {
+        ToBuyItem toBuyItem = toBuyItemRepository.findByIdAndUserId(toBuyId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
-
         validateSpaceId(toBuyItem, spaceId);
 
         toBuyItemRepository.delete(toBuyItem);
@@ -88,42 +88,54 @@ public class ToBuyItemService {
 
     @Transactional
     public UpdateManagerStatusRes updateManagerStatus(
-            Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyItemId, Long managerId
+            Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyId, Long managerId
     ) {
         ToBuyManager manager = toBuyManagerRepository.findByIdAndUserIdWithToBuyAndSpace(managerId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
-        validateToBuyManager(manager, spaceId, toBuyItemId);
+        validateToBuyManager(manager, spaceId, toBuyId);
         manager.updateStatus(request.managerStatus());
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
 
     public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
-        List<ToBuyItem> toBuyItems = toBuyItemRepository.findToBuyItemsNative(
+        List<ToBuyItem> toBuy = toBuyItemRepository.findToBuyItemsNative(
                 spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
                 request.direction(), request.size());
-        if (toBuyItems.isEmpty()) {
+        if (toBuy.isEmpty()) {
             return ToBuyPageRes.of(List.of(), request.size());
         }
 
-        List<Long> itemIds = toBuyItems.stream().map(ToBuyItem::getId).toList();
-        List<ToBuyManager> allManagers = toBuyManagerRepository.findByToBuyItemIdsWithUser(itemIds);
-        Map<Long, List<ToBuyManager>> managerMap = allManagers.stream()
-                .collect(groupingBy(m -> m.getToBuyItem().getId()));
-
-        List<ToBuyListRes> toBuyListResList = toBuyItems.stream()
+        Map<Long, List<ToBuyManager>> managerMap = mapToBuyManagersByItemId(toBuy);
+        List<ToBuyListRes> toBuyListResList = toBuy.stream()
                 .map(item -> ToBuyListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
                 .toList();
 
         return ToBuyPageRes.of(toBuyListResList, request.size());
     }
 
+    public ToBuyDetailRes getToBuy(Long userId, Long spaceId, Long toBuyId) {
+        ToBuyItem toBuy = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
+        validateSpaceId(toBuy, spaceId);
+        List<ToBuyComment> comments = commentComponent.getCommentList(toBuyId);
+        List<ToBuyManager> managers = toBuyManagerRepository.findAllByToBuyItemId(toBuyId);
+        return ToBuyDetailRes.of(toBuy, comments, managers);
+    }
+
     // === Private Methods ===
-    private List<ToBuyManager> createToBuy(List<Long> memberIds, Space space, ToBuyItem toBuyItem) {
+    private List<ToBuyManager> createToBuy(List<Long> memberIds, Space space, ToBuyItem toBuyId) {
         Set<Long> setMemberIds = Set.copyOf(memberIds);
         return space.getMembers().stream()
                 .filter(member -> setMemberIds.contains(member.getUser().getId()))
-                .map(member -> ToBuyManager.of(member.getUser(), toBuyItem))
+                .map(member -> ToBuyManager.of(member.getUser(), toBuyId))
                 .toList();
+    }
+
+    private Map<Long, List<ToBuyManager>> mapToBuyManagersByItemId(List<ToBuyItem> toBuyList) {
+        List<Long> toBuyIds = toBuyList.stream().map(ToBuyItem::getId).toList();
+        List<ToBuyManager> allManagers = toBuyManagerRepository.findByToBuyItemIdsWithUser(toBuyIds);
+        return allManagers.stream()
+                .collect(groupingBy(m -> m.getToBuyItem().getId()));
     }
 
     private void validateSpaceId(ToBuyItem item, Long spaceId) {
@@ -132,22 +144,13 @@ public class ToBuyItemService {
         }
     }
 
-    private void validateToBuyManager(ToBuyManager manager, Long spaceId, Long toBuyItemId) {
+    private void validateToBuyManager(ToBuyManager manager, Long spaceId, Long toBuyId) {
         if (!manager.getToBuyItem().getSpace().getId().equals(spaceId)) {
             throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
         }
 
-        if (!manager.getToBuyItem().getId().equals(toBuyItemId)) {
+        if (!manager.getToBuyItem().getId().equals(toBuyId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_BUY_ID);
         }
-    }
-
-    public ToBuyRes getToBuy(Long userId, Long spaceId, Long toBuyItemId) {
-        ToBuyItem item = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyItemId, userId)
-                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
-        validateSpaceId(item, spaceId);
-        List<ToBuyComment> comments = commentComponent.getCommentList(toBuyItemId);
-        List<ToBuyManager> managers = toBuyManagerRepository.findAllByToBuyItemId(toBuyItemId);
-        return ToBuyRes.of(item, comments, managers);
     }
 }

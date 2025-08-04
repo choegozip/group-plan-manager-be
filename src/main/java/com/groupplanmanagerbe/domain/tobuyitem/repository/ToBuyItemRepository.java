@@ -64,6 +64,4 @@ public interface ToBuyItemRepository extends JpaRepository<ToBuyItem, Long> {
             @Param("direction") String direction,
             @Param("size") int size
     );
-
-
 }

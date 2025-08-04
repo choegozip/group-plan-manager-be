@@ -9,11 +9,11 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyDetailRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.query.SortDirection;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -26,24 +26,24 @@ public class ToBuyItemController {
     private final ToBuyItemService toBuyItemService;
 
     @PostMapping
-    public ResponseEntity<ApiSuccessRes<Void>> createToBuy(
+    public ResponseEntity<ApiSuccessRes<ToBuyRes>> createToBuy(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody CreateToBuyReq request,
             @PathVariable Long spaceId
     ) {
-        toBuyItemService.createToBuy(authUser.userId(), request, spaceId);
-        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_TO_BUY_CREATE);
+        ToBuyRes response = toBuyItemService.createToBuy(authUser.userId(), request, spaceId);
+        return ApiSuccessRes.created(ApiSuccessCode.SUCCESS_TO_BUY_CREATE, response);
     }
 
     @PatchMapping("/{toBuyItemId}")
-    public ResponseEntity<ApiSuccessRes<Void>> updateToBuy(
+    public ResponseEntity<ApiSuccessRes<ToBuyRes>> updateToBuy(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody UpdateToBuyReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId
     ) {
-        toBuyItemService.updateToBuy(authUser.userId(), request, spaceId, toBuyItemId);
-        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_UPDATE);
+        ToBuyRes response = toBuyItemService.updateToBuy(authUser.userId(), request, spaceId, toBuyItemId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_UPDATE, response);
     }
 
     @DeleteMapping("/{toBuyItemId}")
@@ -85,12 +85,12 @@ public class ToBuyItemController {
     }
 
     @GetMapping("/{toBuyItemId}")
-    public ResponseEntity<ApiSuccessRes<ToBuyRes>> getToBuy(
+    public ResponseEntity<ApiSuccessRes<ToBuyDetailRes>> getToBuy(
             @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId
     ) {
-        ToBuyRes response = toBuyItemService.getToBuy(authUser.userId(), spaceId, toBuyItemId);
+        ToBuyDetailRes response = toBuyItemService.getToBuy(authUser.userId(), spaceId, toBuyItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY, response);
     }
 }
