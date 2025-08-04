@@ -43,4 +43,8 @@ public class ToBuyComment extends BaseEntity {
                 .content(content)
                 .build();
     }
+
+    public void update(String content) {
+        this.content = content;
+    }
 }

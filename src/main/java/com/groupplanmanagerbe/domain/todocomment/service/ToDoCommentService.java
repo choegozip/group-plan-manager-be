@@ -10,7 +10,7 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
-import com.groupplanmanagerbe.presentation.comment.dto.request.CreateCommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class ToDoCommentService {
     private final ToDoComponent toDoComponent;
 
     @Transactional
-    public CommentRes createComment(Long userId, CreateCommentReq request, Long spaceId, Long toDoId) {
+    public CommentRes createComment(Long userId, CommentReq request, Long spaceId, Long toDoId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
@@ -46,9 +46,36 @@ public class ToDoCommentService {
         }
     }
 
+    @Transactional
+    public CommentRes updateComment(Long userId, CommentReq request, Long toDoId, Long commentId) {
+        ToDoComment comment = getComment(userId, commentId);
+        validateCommentByToBuyId(comment, toDoId);
+        comment.update(request.content());
+        return CommentRes.of(comment.getId());
+    }
+
+    @Transactional
+    public void deleteComment(Long userId, Long toBuyId, Long commentId) {
+        ToDoComment comment = getComment(userId, commentId);
+        validateCommentByToBuyId(comment, toBuyId);
+
+        commentRepository.delete(comment);
+    }
+
+    private ToDoComment getComment(Long userId, Long commentId) {
+        return commentRepository.findByIdAndUserId(userId, commentId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));
+    }
+
     private void validateSpaceMembership(Long userId, Long spaceId) {
         if (!spaceComponent.isSpaceMember(userId, spaceId)) {
             throw new InvalidException(ApiErrorCode.SPACE_NOT_FOUND);
+        }
+    }
+
+    private void validateCommentByToBuyId(ToDoComment comment, Long toBuyId) {
+        if (!comment.getToDoItem().getId().equals(toBuyId)) {
+            throw new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND);
         }
     }
 }

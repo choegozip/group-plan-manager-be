@@ -4,6 +4,8 @@ import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,5 +44,9 @@ public class ToDoComment extends BaseEntity {
                 .user(user)
                 .content(content)
                 .build();
+    }
+
+    public void update(String content) {
+        this.content = content;
     }
 }

@@ -10,9 +10,10 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
-import com.groupplanmanagerbe.presentation.comment.dto.request.CreateCommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class ToBuyCommentService {
     private final ToBuyComponent toBuyComponent;
 
     @Transactional
-    public CommentRes createComment(Long userId, CreateCommentReq request, Long spaceId, Long toBuyId) {
+    public CommentRes createComment(Long userId, CommentReq request, Long spaceId, Long toBuyId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
@@ -46,9 +47,36 @@ public class ToBuyCommentService {
         }
     }
 
+    @Transactional
+    public CommentRes updateComment(Long userId, CommentReq request, Long toBuyId, Long commentId) {
+        ToBuyComment comment = getComment(userId, commentId);
+        validateCommentByToBuyId(comment, toBuyId);
+        comment.update(request.content());
+        return CommentRes.of(comment.getId());
+    }
+
+    @Transactional
+    public void deleteComment(Long userId, Long toBuyId, Long commentId) {
+        ToBuyComment comment = getComment(userId, commentId);
+        validateCommentByToBuyId(comment, toBuyId);
+
+        commentRepository.delete(comment);
+    }
+
+    private ToBuyComment getComment(Long userId, Long commentId) {
+        return commentRepository.findByIdAndUserId(userId, commentId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));
+    }
+
     private void validateSpaceMembership(Long userId, Long spaceId) {
         if (!spaceComponent.isSpaceMember(userId, spaceId)) {
             throw new InvalidException(ApiErrorCode.SPACE_NOT_FOUND);
+        }
+    }
+
+    private void validateCommentByToBuyId(ToBuyComment comment, Long toBuyId) {
+        if (!comment.getToBuyItem().getId().equals(toBuyId)) {
+            throw new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND);
         }
     }
 }
