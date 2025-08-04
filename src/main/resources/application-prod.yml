@@ -4,8 +4,9 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 5
-      minimum-idle: 1
+      max-lifetime: 3600000
+      data-source-properties:
+        useServerPrepStmts: true
   jpa:
     hibernate:
       ddl-auto: create
