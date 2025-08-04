@@ -4,17 +4,11 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      data-source-properties:
-        prepareThreshold: 5
       maximum-pool-size: 5
       minimum-idle: 1
   jpa:
     hibernate:
-      ddl-auto: none
-    properties:
-      hibernate:
-        connection.provider_disables_autocommit: true
-        statement_cache.size: 16
+      ddl-auto: create
   data:
     redis:
       url: ${REDIS_URL}
@@ -35,13 +29,7 @@ app:
 logging:
   level:
     root: debug
-    org:
-      postgresql: DEBUG
-      hibernate:
-        SQL: DEBUG
-        type:
-          descriptor:
-            sql: TRACE
+
 jwt:
   secret:
     key: "${JWT_SECRET_KEY}"
