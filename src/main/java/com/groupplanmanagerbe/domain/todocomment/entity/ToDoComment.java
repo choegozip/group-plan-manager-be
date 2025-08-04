@@ -3,6 +3,7 @@ package com.groupplanmanagerbe.domain.todocomment.entity;
 import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
+import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "to_do_comments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ToDoComment {
+public class ToDoComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

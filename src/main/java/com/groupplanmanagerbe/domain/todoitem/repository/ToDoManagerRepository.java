@@ -27,4 +27,7 @@ public interface ToDoManagerRepository extends JpaRepository<ToDoManager, Long> 
         ORDER BY tm.toDoItem.id
         """)
     List<ToDoManager> findByToDoItemIdsWithUser(@Param("itemIds") List<Long> itemIds);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<ToDoManager> findAllByToDoItemId(Long toDoItemId);
 }
