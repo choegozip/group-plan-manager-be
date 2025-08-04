@@ -1,19 +1,19 @@
 package com.groupplanmanagerbe.presentation.tobuyitem.dto.request;
 
-import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyValidationConst;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.ItemValidationConst;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
 
 public record UpdateToBuyReq(
-        @NotBlank(message = ToBuyValidationConst.TITLE_BLANK_MESSAGE)
+        @NotBlank(message = ItemValidationConst.TITLE_BLANK_MESSAGE)
         String title,
 
-        @Min(value = ToBuyValidationConst.QUANTITY_MIN, message = ToBuyValidationConst.QUANTITY_RANGE_MESSAGE)
-        @Max(value = ToBuyValidationConst.QUANTITY_MAX, message = ToBuyValidationConst.QUANTITY_RANGE_MESSAGE)
+        @Min(value = ItemValidationConst.QUANTITY_MIN, message = ItemValidationConst.QUANTITY_RANGE_MESSAGE)
+        @Max(value = ItemValidationConst.QUANTITY_MAX, message = ItemValidationConst.QUANTITY_RANGE_MESSAGE)
         Short quantity,
 
-        @Pattern(regexp = ToBuyValidationConst.DUE_DATE_REG, message = ToBuyValidationConst.DUE_DATE_INVALID_MESSAGE)
+        @Pattern(regexp = ItemValidationConst.DUE_DATE_REG, message = ItemValidationConst.DUE_DATE_INVALID_MESSAGE)
         String dueDate,
 
         String urgency,
