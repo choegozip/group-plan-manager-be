@@ -1,18 +1,15 @@
-package com.groupplanmanagerbe.presentation.tobuyitem.dto.request;
+package com.groupplanmanagerbe.presentation.todoitem.dto.request;
 
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.ItemValidationConst;
 import jakarta.validation.constraints.*;
 
 import java.util.List;
 
-public record CreateToBuyReq(
+public record CreateToDoReq(
         @NotBlank(message = ItemValidationConst.TITLE_BLANK_MESSAGE)
         String title,
 
-        @NotNull(message = ItemValidationConst.QUANTITY_NOT_NULL_MESSAGE)
-        @Min(value = ItemValidationConst.QUANTITY_MIN, message = ItemValidationConst.QUANTITY_RANGE_MESSAGE)
-        @Max(value = ItemValidationConst.QUANTITY_MAX, message = ItemValidationConst.QUANTITY_RANGE_MESSAGE)
-        Short quantity,
+        String detail,
 
         @NotBlank(message = ItemValidationConst.DUE_DATE_INVALID_MESSAGE)
         @Pattern(regexp = ItemValidationConst.DUE_DATE_REG, message = ItemValidationConst.DUE_DATE_INVALID_MESSAGE)
@@ -21,7 +18,6 @@ public record CreateToBuyReq(
         @NotNull(message = ItemValidationConst.URGENCY_BLANK_MESSAGE)
         String urgency,
 
-        String memo,
         String imageUrl,
         String referenceUrl,
 

@@ -1,10 +1,9 @@
 package com.groupplanmanagerbe.domain.tobuyitem.service;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
-import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.service.SpaceComponent;
 import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
-import com.groupplanmanagerbe.domain.tobuycomment.service.CommentComponent;
+import com.groupplanmanagerbe.domain.tobuycomment.service.ToBuyCommentComponent;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyManager;
 import com.groupplanmanagerbe.domain.tobuyitem.repository.ToBuyItemRepository;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -45,7 +43,7 @@ public class ToBuyItemService {
     private final ToBuyManagerRepository toBuyManagerRepository;
     private final SpaceComponent spaceComponent;
     private final UserComponent userComponent;
-    private final CommentComponent commentComponent;
+    private final ToBuyCommentComponent commentComponent;
 
     @Transactional
     public void createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {

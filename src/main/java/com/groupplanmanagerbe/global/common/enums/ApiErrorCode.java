@@ -55,13 +55,15 @@ public enum ApiErrorCode {
     OWNER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "owner.not.found"),
     SPACE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "space.limit.exceeded"),
 
-    // 살 것
+    // 살 것 & 할 것
     URGENCY_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "urgency.invalid"),
-    TO_BUY_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.buy.not.found"),
     INVALID_SPACE_ID(HttpStatus.BAD_REQUEST, "ERROR", "space.id.invalid"),
     MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "manager.not.found"),
-    INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
     STATUS_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "manager.status.invalid"),
+    TO_BUY_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.buy.not.found"),
+    INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
+    TO_DO_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.do.not.found"),
+    INVALID_TO_DO_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.do.id.invalid"),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),

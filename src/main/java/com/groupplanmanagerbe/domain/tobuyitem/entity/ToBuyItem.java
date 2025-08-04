@@ -42,8 +42,8 @@ public class ToBuyItem extends BaseEntity {
     @Column(nullable = false, name = "due_date")
     private LocalDateTime dueDate;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Urgency urgency;
 
     @Column(name = "image_url")
@@ -101,7 +101,7 @@ public class ToBuyItem extends BaseEntity {
     public void setManagers(List<ToBuyManager> managers) {
         this.managers.clear();
 
-        for (ToBuyManager  manager : managers ) {
+        for (ToBuyManager manager : managers ) {
             addManager(manager);
         }
     }

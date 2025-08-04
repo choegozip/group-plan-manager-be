@@ -1,6 +1,6 @@
 package com.groupplanmanagerbe.presentation.tobuyitem.dto;
 
-public class ToBuyValidationConst {
+public class ItemValidationConst {
 
     public static final short QUANTITY_MIN = 1;
     public static final short QUANTITY_MAX = 32767; // short의 최대값

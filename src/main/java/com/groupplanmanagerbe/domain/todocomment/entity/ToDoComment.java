@@ -1,8 +1,8 @@
-package com.groupplanmanagerbe.domain.todoitem.entity;
+package com.groupplanmanagerbe.domain.todocomment.entity;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
+import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
-import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,10 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "to_do_managers")
+@Table(name = "to_do_comments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TodoManager extends BaseEntity {
+public class ToDoComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,10 +30,14 @@ public class TodoManager extends BaseEntity {
     @JoinColumn(name = "to_do_item_id")
     private ToDoItem toDoItem;
 
+    @Column(nullable = false)
+    private String content;
+
     @Builder
-    public TodoManager(User user, Space space, ToDoItem toDoItem) {
+    public ToDoComment(User user, Space space, ToDoItem toDoItem, String content) {
         this.user = user;
         this.space = space;
         this.toDoItem = toDoItem;
+        this.content = content;
     }
 }
