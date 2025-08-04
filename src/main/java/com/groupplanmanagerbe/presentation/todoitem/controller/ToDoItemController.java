@@ -4,6 +4,8 @@ import com.groupplanmanagerbe.domain.todoitem.service.ToDoItemService;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
@@ -49,5 +51,18 @@ public class ToDoItemController {
     ) {
         toDoItemService.deleteToDo(authUser.userId(), spaceId, toDoItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_DO_DELETE);
+    }
+
+    @PatchMapping("/{toDoItemId}/managers/{managerId}")
+    public ResponseEntity<ApiSuccessRes<UpdateManagerStatusRes>> updateManagerStatus(
+            @AuthenticationPrincipal AuthUser authUser,
+            @Valid @RequestBody UpdateManagerStatusReq request,
+            @PathVariable Long spaceId,
+            @PathVariable Long toDoItemId,
+            @PathVariable Long managerId
+    ) {
+        UpdateManagerStatusRes response =
+                toDoItemService.updateManagerStatus(authUser.userId(), request, spaceId, toDoItemId, managerId);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, response);
     }
 }

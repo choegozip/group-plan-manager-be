@@ -17,4 +17,7 @@ public class ItemValidationConst {
     public static final String URGENCY_BLANK_MESSAGE = "urgency.blank";
 
     public static final String MANAGER_IDS_BLANK_MESSAGE = "managerIds.blank";
+
+    public static final String MANAGER_STATUS_BLANK_MESSAGE = "manager.status.blank";
+
 }

@@ -15,8 +15,10 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
@@ -83,6 +85,17 @@ public class ToDoItemService {
         toDoItemRepository.delete(toDo);
     }
 
+    @Transactional
+    public UpdateManagerStatusRes updateManagerStatus(
+            Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyItemId, Long managerId
+    ) {
+        ToDoManager manager = toDoManagerRepository.findByIdAndUserIdWithToDoAndSpace(managerId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
+        validateToDoManager(manager, spaceId, toBuyItemId);
+        manager.updateStatus(request.managerStatus());
+        return UpdateManagerStatusRes.of(manager.getStatus());
+    }
+
     // === Private Methods ===
     private List<ToDoManager> createToBuy(List<Long> memberIds, Space space, ToDoItem toDoItem) {
         Set<Long> setMemberIds = Set.copyOf(memberIds);
@@ -95,6 +108,16 @@ public class ToDoItemService {
     private void validateSpaceId(ToDoItem item, Long spaceId) {
         if (!item.getSpace().getId().equals(spaceId)) {
             throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
+        }
+    }
+
+    private void validateToDoManager(ToDoManager manager, Long spaceId, Long toDoId) {
+        if (!manager.getToDoItem().getSpace().getId().equals(spaceId)) {
+            throw new InvalidException(ApiErrorCode.INVALID_SPACE_ID);
+        }
+
+        if (!manager.getToDoItem().getId().equals(toDoId)) {
+            throw new InvalidException(ApiErrorCode.INVALID_TO_DO_ID);
         }
     }
 }
