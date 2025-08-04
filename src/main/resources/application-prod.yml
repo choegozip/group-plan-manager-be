@@ -8,7 +8,7 @@ spring:
       minimum-idle: 1
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
   data:
     redis:
       url: ${REDIS_URL}
