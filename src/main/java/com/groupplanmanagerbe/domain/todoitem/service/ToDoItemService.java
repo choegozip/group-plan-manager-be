@@ -6,6 +6,8 @@ import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
 import com.groupplanmanagerbe.domain.tobuycomment.service.ToBuyCommentComponent;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyManager;
+import com.groupplanmanagerbe.domain.todocomment.entity.ToDoComment;
+import com.groupplanmanagerbe.domain.todocomment.service.ToDoCommentComponent;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoManager;
 import com.groupplanmanagerbe.domain.todoitem.repository.ToDoItemRepository;
@@ -24,6 +26,7 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyRes;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
+import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoDetailRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoListRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoPageRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
@@ -47,7 +50,7 @@ public class ToDoItemService {
     private final ToDoManagerRepository toDoManagerRepository;
     private final SpaceComponent spaceComponent;
     private final UserComponent userComponent;
-    private final ToBuyCommentComponent commentComponent;
+    private final ToDoCommentComponent commentComponent;
 
     @Transactional
     public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
@@ -121,6 +124,15 @@ public class ToDoItemService {
         return ToDoPageRes.of(toDoListResList, request.size());
     }
 
+    public ToDoDetailRes getToDo(Long userId, Long spaceId, Long toDoId) {
+        ToDoItem toDo = toDoItemRepository.findByIdAndUserIdWithSpaceAndUser(toDoId, userId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));
+        validateSpaceId(toDo, spaceId);
+        List<ToDoComment> comments = commentComponent.getCommentList(toDoId);
+        List<ToDoManager> managers = toDoManagerRepository.findAllByToDoItemId(toDoId);
+        return ToDoDetailRes.of(toDo, comments, managers);
+    }
+
     // === Private Methods ===
     private List<ToDoManager> createToBuy(List<Long> memberIds, Space space, ToDoItem toDoItem) {
         Set<Long> setMemberIds = Set.copyOf(memberIds);
@@ -128,6 +140,13 @@ public class ToDoItemService {
                 .filter(member -> setMemberIds.contains(member.getUser().getId()))
                 .map(member -> ToDoManager.of(member.getUser(), toDoItem))
                 .toList();
+    }
+
+    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoItem> toDoList) {
+        List<Long> toDoIds = toDoList.stream().map(ToDoItem::getId).toList();
+        List<ToDoManager> allManagers = toDoManagerRepository.findByToDoItemIdsWithUser(toDoIds);
+        return allManagers.stream()
+                .collect(groupingBy(m -> m.getToDoItem().getId()));
     }
 
     private void validateSpaceId(ToDoItem item, Long spaceId) {
@@ -144,12 +163,5 @@ public class ToDoItemService {
         if (!manager.getToDoItem().getId().equals(toDoId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_DO_ID);
         }
-    }
-
-    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoItem> toDoList) {
-        List<Long> toDoIds = toDoList.stream().map(ToDoItem::getId).toList();
-        List<ToDoManager> allManagers = toDoManagerRepository.findByToDoItemIdsWithUser(toDoIds);
-        return allManagers.stream()
-                .collect(groupingBy(m -> m.getToDoItem().getId()));
     }
 }
