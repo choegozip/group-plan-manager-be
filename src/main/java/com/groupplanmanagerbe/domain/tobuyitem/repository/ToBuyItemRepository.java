@@ -16,6 +16,7 @@ public interface ToBuyItemRepository extends JpaRepository<ToBuyItem, Long> {
 
     @Query("SELECT t FROM ToBuyItem t " +
             "WHERE t.id = :toBuyItemId " +
+            "AND t.space.deleted = false " +
             "AND t.user.id = :userId " +
             "AND t.user.deleted = false")
     Optional<ToBuyItem> findByIdAndUserId(@Param("toBuyItemId") Long toBuyItemId,
@@ -24,6 +25,7 @@ public interface ToBuyItemRepository extends JpaRepository<ToBuyItem, Long> {
     @EntityGraph(attributePaths = {"user", "space"})
     @Query("SELECT t FROM ToBuyItem t " +
             "WHERE t.id = :toBuyItemId " +
+            "AND t.space.deleted = false " +
             "AND t.user.id = :userId " +
             "AND t.user.deleted = false")
     Optional<ToBuyItem> findByIdAndUserIdWithSpaceAndUser(@Param("toBuyItemId") Long toBuyItemId,

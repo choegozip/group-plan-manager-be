@@ -33,4 +33,8 @@ public class SpaceComponent {
     public int countSpacesBelongingToUser(Long userId) {
         return spaceMemberRepository.countByUserId(userId);
     }
+
+    public boolean isSpaceMember(Long userId, Long spaceId) {
+        return spaceMemberRepository.isSpaceMember(userId, spaceId);
+    }
 }
