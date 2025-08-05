@@ -61,5 +61,4 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
             @Param("direction") String direction,
             @Param("size") int size
     );
-
 }

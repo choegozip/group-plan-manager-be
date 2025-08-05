@@ -1,6 +1,5 @@
 package com.groupplanmanagerbe.global.common.response.page;
 
-import com.groupplanmanagerbe.global.common.enums.SortDirection;
 import com.groupplanmanagerbe.global.common.enums.Urgency;
 import lombok.Builder;
 
@@ -8,7 +7,6 @@ import lombok.Builder;
 public record CursorPageRequest(
         Long cursor,
         int size,
-        String sortBy,
         String direction,
         Long managerId,
         String urgency
@@ -17,7 +15,6 @@ public record CursorPageRequest(
         return CursorPageRequest.builder()
                 .cursor(cursor)
                 .size(size)
-                .sortBy("createdAt")
                 .direction(direction)
                 .managerId(managerId)
                 .urgency(urgency != null ? Urgency.of(urgency).toString() : null)

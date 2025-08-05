@@ -1,6 +1,7 @@
 package com.groupplanmanagerbe.domain.todocomment.repository;
 
 import com.groupplanmanagerbe.domain.todocomment.entity.ToDoComment;
+import com.groupplanmanagerbe.presentation.comment.dto.CommentListProjection;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,34 @@ public interface ToDoCommentRepository extends JpaRepository<ToDoComment, Long> 
             "AND c.user.deleted = false")
     Optional<ToDoComment> findByIdAndUserId(@Param("userId") Long userId,
                                              @Param("commentId") Long commentId);
+
+    @Query(value = """
+                SELECT
+                    c.id AS comment_id,
+                    c.content,
+                    c.created_at,
+                    c.updated_at,
+                    u.id AS user_id,
+                    u.nickname,
+                    u.profile_image_key
+                FROM to_do_comments c
+                JOIN to_do_items t ON c.to_do_item_id = t.id
+                JOIN users u ON c.user_id = u.id
+                WHERE t.id = :toDoId
+                  AND (
+                        :cursor IS NULL
+                        OR (:direction = 'DESC' AND c.id < :cursor)
+                        OR (:direction = 'ASC' AND c.id > :cursor)
+                    )
+                ORDER BY
+                  CASE WHEN :direction = 'DESC' THEN c.id END DESC,
+                  CASE WHEN :direction = 'ASC' THEN c.id END ASC
+                LIMIT :size
+            """, nativeQuery = true)
+    List<CommentListProjection> findCommentListNative(
+            @Param("toDoId") Long toDoId,
+            @Param("cursor") Long cursor,
+            @Param("direction") String direction,
+            @Param("size") int size
+    );
 }

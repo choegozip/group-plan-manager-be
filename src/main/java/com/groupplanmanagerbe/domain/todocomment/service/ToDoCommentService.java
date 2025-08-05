@@ -8,15 +8,21 @@ import com.groupplanmanagerbe.domain.todoitem.service.ToDoComponent;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.presentation.comment.dto.CommentListProjection;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.response.CommentListRes;
+import com.groupplanmanagerbe.presentation.comment.dto.response.CommentPageRes;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +66,17 @@ public class ToDoCommentService {
         validateCommentByToBuyId(comment, toBuyId);
 
         commentRepository.delete(comment);
+    }
+
+    public CommentPageRes getComments(Long userId, Long spaceId,  Long toDoId, CursorPageRequest request) {
+        validateSpaceMembership(userId, spaceId);
+
+        List<CommentListProjection> commentList = commentRepository.findCommentListNative(
+                toDoId, request.cursor(), request.direction(), request.size());
+        List<CommentListRes> commentListRes = commentList.stream()
+                .map(CommentListRes::from)
+                .toList();
+        return CommentPageRes.of(commentListRes, request.size());
     }
 
     private ToDoComment getComment(Long userId, Long commentId) {

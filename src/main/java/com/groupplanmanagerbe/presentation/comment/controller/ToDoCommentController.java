@@ -3,8 +3,10 @@ package com.groupplanmanagerbe.presentation.comment.controller;
 import com.groupplanmanagerbe.domain.todocomment.service.ToDoCommentService;
 import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
+import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
+import com.groupplanmanagerbe.presentation.comment.dto.response.CommentPageRes;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +51,19 @@ public class ToDoCommentController {
     ) {
         commentService.deleteComment(authUser.userId(), toDoItemId, commentId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_COMMENT_DELETE);
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiSuccessRes<CommentPageRes>> getComments(
+            @AuthenticationPrincipal AuthUser authUser,
+            @PathVariable Long spaceId,
+            @PathVariable Long toDoItemId,
+            @RequestParam int size,
+            @RequestParam(defaultValue = "DESC") String direction,
+            @RequestParam(required = false) Long cursor
+    ) {
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, null, null);
+        CommentPageRes response = commentService.getComments(authUser.userId(), spaceId, toDoItemId, request);
+        return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_COMMENT_GET, response);
     }
 }
