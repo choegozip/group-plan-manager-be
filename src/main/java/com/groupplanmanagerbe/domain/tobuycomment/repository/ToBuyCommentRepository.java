@@ -33,6 +33,13 @@ public interface ToBuyCommentRepository extends JpaRepository<ToBuyComment, Long
                 FROM to_buy_comments c
                 JOIN to_buy_items t ON c.to_buy_item_id = t.id
                 JOIN users u ON c.user_id = u.id
+                AND EXISTS (
+                    SELECT 1 FROM space_members sm
+                    JOIN users u ON sm.user_id = u.id
+                    WHERE sm.space_id = :spaceId
+                    AND sm.user_id = :userId
+                    AND u.deleted = false
+                )
                 WHERE t.id = :toBuyId
                   AND (
                         :cursor IS NULL
@@ -45,6 +52,8 @@ public interface ToBuyCommentRepository extends JpaRepository<ToBuyComment, Long
                 LIMIT :size
             """, nativeQuery = true)
     List<CommentListProjection> findCommentListNative(
+            @Param("userId") Long userId,
+            @Param("spaceId") Long spaceId,
             @Param("toBuyId") Long toBuyId,
             @Param("cursor") Long cursor,
             @Param("direction") String direction,

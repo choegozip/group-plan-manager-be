@@ -69,10 +69,8 @@ public class ToBuyCommentService {
     }
 
     public CommentPageRes getComments(Long userId, Long spaceId, Long toBuyId, CursorPageRequest request) {
-        validateSpaceMembership(userId, spaceId);
-
         List<CommentListProjection> commentList = commentRepository.findCommentListNative(
-                toBuyId, request.cursor(), request.direction(), request.size());
+                userId, spaceId, toBuyId, request.cursor(), request.direction(), request.size());
         List<CommentListRes> commentListRes = commentList.stream()
                 .map(CommentListRes::from)
                 .toList();

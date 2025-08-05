@@ -69,10 +69,8 @@ public class ToDoCommentService {
     }
 
     public CommentPageRes getComments(Long userId, Long spaceId,  Long toDoId, CursorPageRequest request) {
-        validateSpaceMembership(userId, spaceId);
-
         List<CommentListProjection> commentList = commentRepository.findCommentListNative(
-                toDoId, request.cursor(), request.direction(), request.size());
+                userId, spaceId, toDoId, request.cursor(), request.direction(), request.size());
         List<CommentListRes> commentListRes = commentList.stream()
                 .map(CommentListRes::from)
                 .toList();

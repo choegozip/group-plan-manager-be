@@ -33,6 +33,13 @@ public interface ToDoCommentRepository extends JpaRepository<ToDoComment, Long> 
                 FROM to_do_comments c
                 JOIN to_do_items t ON c.to_do_item_id = t.id
                 JOIN users u ON c.user_id = u.id
+                    AND EXISTS (
+                    SELECT 1 FROM space_members sm
+                    JOIN users u ON sm.user_id = u.id
+                    WHERE sm.space_id = :spaceId
+                    AND sm.user_id = :userId
+                    AND u.deleted = false
+                )
                 WHERE t.id = :toDoId
                   AND (
                         :cursor IS NULL
@@ -45,6 +52,8 @@ public interface ToDoCommentRepository extends JpaRepository<ToDoComment, Long> 
                 LIMIT :size
             """, nativeQuery = true)
     List<CommentListProjection> findCommentListNative(
+            @Param("userId") Long userId,
+            @Param("spaceId") Long spaceId,
             @Param("toDoId") Long toDoId,
             @Param("cursor") Long cursor,
             @Param("direction") String direction,
