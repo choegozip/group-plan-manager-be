@@ -1,10 +1,10 @@
 package com.groupplanmanagerbe.presentation.tobuyitem.dto.response;
 
-import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyManager;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
 import com.groupplanmanagerbe.global.common.enums.Urgency;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyListProjection;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -25,23 +25,23 @@ public record ToBuyListRes(
         AuthorInfoForList author,
         List<ManagerInfoForList> managers
 ) {
-    public static ToBuyListRes of(ToBuyItem toBuyItem, List<ToBuyManager> managers) {
-        AuthorInfoForList author = AuthorInfoForList.of(toBuyItem.getUser());
+    public static ToBuyListRes of(ToBuyListProjection projection, List<ToBuyManager> managers) {
+        AuthorInfoForList author = AuthorInfoForList.of(projection);
         List<ManagerInfoForList> managerInfos = managers.stream()
                 .map(ManagerInfoForList::of)
                 .toList();
 
         return ToBuyListRes.builder()
-                .id(toBuyItem.getId())
-                .title(toBuyItem.getTitle())
-                .quantity(toBuyItem.getQuantity())
-                .duDate(toBuyItem.getDueDate())
-                .urgency(toBuyItem.getUrgency())
-                .hasMamo(toBuyItem.getMemo() != null)
-                .hasLink(toBuyItem.getReferenceUrl() != null)
-                .hasComment(!toBuyItem.getToBuyComments().isEmpty())
-                .createdAt(toBuyItem.getCreatedAt())
-                .updatedAt(toBuyItem.getUpdatedAt())
+                .id(projection.getToBuyId())
+                .title(projection.getTitle())
+                .quantity(projection.getQuantity())
+                .duDate(projection.getDueDate())
+                .urgency(Urgency.of(projection.getUrgency()))
+                .hasMamo(projection.getHasMemo())
+                .hasLink(projection.getHasLink())
+                .hasComment(projection.getHasComment())
+                .createdAt(projection.getCreatedAt())
+                .updatedAt(projection.getUpdatedAt())
                 .author(author)
                 .managers(managerInfos)
                 .build();
@@ -53,11 +53,11 @@ public record ToBuyListRes(
             String nickname,
             String profileImageKey
     ) {
-        public static AuthorInfoForList of(User user) {
+        public static AuthorInfoForList of(ToBuyListProjection projection) {
             return AuthorInfoForList.builder()
-                    .id(user.getId())
-                    .nickname(user.getNickname())
-                    .profileImageKey(user.getProfileImageKey())
+                    .id(projection.getUserId())
+                    .nickname(projection.getNickname())
+                    .profileImageKey(projection.getProfileImageKey())
                     .build();
         }
     }

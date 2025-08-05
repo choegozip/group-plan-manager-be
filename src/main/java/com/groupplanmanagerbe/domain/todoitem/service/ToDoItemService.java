@@ -16,6 +16,7 @@ import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
+import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.UpdateToDoReq;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoDetailRes;
@@ -100,17 +101,13 @@ public class ToDoItemService {
     }
 
     public ToDoPageRes getToDoList(Long userId, Long spaceId, CursorPageRequest request) {
-        List<ToDoItem> toDoList = toDoItemRepository.findToDoItemsNative(
+        List<ToDoListProjection> toDoList = toDoItemRepository.findToDoItemsNative(
                 spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
                 request.direction(), request.size());
 
-        if (toDoList.isEmpty()) {
-            return ToDoPageRes.of(List.of(), request.size());
-        }
-
         Map<Long, List<ToDoManager>> managerMap = mapToDoManagersByItemId (toDoList);
         List<ToDoListRes> toDoListResList = toDoList.stream()
-                .map(item -> ToDoListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
+                .map(item -> ToDoListRes.of(item, managerMap.getOrDefault(item.getToDoId(), List.of())))
                 .toList();
 
         return ToDoPageRes.of(toDoListResList, request.size());
@@ -134,8 +131,8 @@ public class ToDoItemService {
                 .toList();
     }
 
-    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoItem> toDoList) {
-        List<Long> toDoIds = toDoList.stream().map(ToDoItem::getId).toList();
+    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoListProjection> toDoList) {
+        List<Long> toDoIds = toDoList.stream().map(ToDoListProjection::getToDoId).toList();
         List<ToDoManager> allManagers = toDoManagerRepository.findByToDoItemIdsWithUser(toDoIds);
         return allManagers.stream()
                 .collect(groupingBy(m -> m.getToDoItem().getId()));

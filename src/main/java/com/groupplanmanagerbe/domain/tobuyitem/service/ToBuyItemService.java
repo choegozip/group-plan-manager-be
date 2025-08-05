@@ -14,6 +14,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyListProjection;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
@@ -97,16 +98,13 @@ public class ToBuyItemService {
     }
 
     public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
-        List<ToBuyItem> toBuy = toBuyItemRepository.findToBuyItemsNative(
+        List<ToBuyListProjection> toBuy = toBuyItemRepository.findToBuyItemsNative(
                 spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
                 request.direction(), request.size());
-        if (toBuy.isEmpty()) {
-            return ToBuyPageRes.of(List.of(), request.size());
-        }
 
         Map<Long, List<ToBuyManager>> managerMap = mapToBuyManagersByItemId(toBuy);
         List<ToBuyListRes> toBuyListResList = toBuy.stream()
-                .map(item -> ToBuyListRes.of(item, managerMap.getOrDefault(item.getId(), List.of())))
+                .map(item -> ToBuyListRes.of(item, managerMap.getOrDefault(item.getToBuyId(), List.of())))
                 .toList();
 
         return ToBuyPageRes.of(toBuyListResList, request.size());
@@ -130,8 +128,8 @@ public class ToBuyItemService {
                 .toList();
     }
 
-    private Map<Long, List<ToBuyManager>> mapToBuyManagersByItemId(List<ToBuyItem> toBuyList) {
-        List<Long> toBuyIds = toBuyList.stream().map(ToBuyItem::getId).toList();
+    private Map<Long, List<ToBuyManager>> mapToBuyManagersByItemId(List<ToBuyListProjection> toBuyList) {
+        List<Long> toBuyIds = toBuyList.stream().map(ToBuyListProjection::getToBuyId).toList();
         List<ToBuyManager> allManagers = toBuyManagerRepository.findByToBuyItemIdsWithUser(toBuyIds);
         return allManagers.stream()
                 .collect(groupingBy(m -> m.getToBuyItem().getId()));

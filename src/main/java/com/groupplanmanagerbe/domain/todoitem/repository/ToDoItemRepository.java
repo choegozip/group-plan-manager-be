@@ -2,6 +2,7 @@ package com.groupplanmanagerbe.domain.todoitem.repository;
 
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
+import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,8 +28,23 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
                                           @Param("userId") Long userId);
 
     @Query(value = """
-        SELECT t.* FROM to_do_items t
+        SELECT
+            t.id AS to_do_id,
+            t.title,
+            t.detail,
+            t.due_date,
+            t.urgency,
+            t.created_at,
+            t.updated_at,
+            u.id AS user_id,
+            u.nickname,
+            (t.reference_url IS NOT NULL AND t.reference_url != '') AS hasLink,
+            EXISTS (
+                SELECT 1 FROM to_buy_comments c WHERE c.to_buy_item_id = t.id
+            ) AS hasComment
+        FROM to_do_items t
         JOIN spaces s ON t.space_id = s.id
+        JOIN users u ON t.user_id = u.id
         WHERE s.id = :spaceId
         AND s.deleted = false
         AND EXISTS (
@@ -52,7 +68,7 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
             CASE WHEN :direction = 'ASC' THEN t.id END ASC
         LIMIT :size
         """, nativeQuery = true)
-    List<ToDoItem> findToDoItemsNative(
+    List<ToDoListProjection> findToDoItemsNative(
             @Param("spaceId") Long spaceId,
             @Param("userId") Long userId,
             @Param("managerId") Long managerId,

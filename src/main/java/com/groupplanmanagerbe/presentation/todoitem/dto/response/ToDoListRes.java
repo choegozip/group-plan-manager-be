@@ -1,10 +1,10 @@
 package com.groupplanmanagerbe.presentation.todoitem.dto.response;
 
-import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoManager;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
 import com.groupplanmanagerbe.global.common.enums.Urgency;
+import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -24,21 +24,21 @@ public record ToDoListRes(
         AuthorInfoForList author,
         List<ManagerInfoForList> managers
 ) {
-    public static ToDoListRes of(ToDoItem toDo, List<ToDoManager> managers) {
-        AuthorInfoForList author = AuthorInfoForList.of(toDo.getUser());
+    public static ToDoListRes of(ToDoListProjection projection, List<ToDoManager> managers) {
+        AuthorInfoForList author = AuthorInfoForList.of(projection);
         List<ManagerInfoForList> managerInfos = managers.stream()
                 .map(ManagerInfoForList::of)
                 .toList();
         return ToDoListRes.builder()
-                .id(toDo.getId())
-                .title(toDo.getTitle())
-                .detail(toDo.getDetail())
-                .duDate(toDo.getDueDate())
-                .urgency(toDo.getUrgency())
-                .hasLink(toDo.getReferenceUrl() != null)
-                .hasComment(!toDo.getToDoComments().isEmpty())
-                .createdAt(toDo.getCreatedAt())
-                .updatedAt(toDo.getUpdatedAt())
+                .id(projection.getToDoId())
+                .title(projection.getTitle())
+                .detail(projection.getDetail())
+                .duDate(projection.getDueDate())
+                .urgency(Urgency.of(projection.getUrgency()))
+                .hasLink(projection.getHasLink())
+                .hasComment(projection.getHasComment())
+                .createdAt(projection.getCreatedAt())
+                .updatedAt(projection.getUpdatedAt())
                 .author(author)
                 .managers(managerInfos)
                 .build();
@@ -50,11 +50,11 @@ public record ToDoListRes(
             String nickname,
             String profileImageKey
     ) {
-        public static AuthorInfoForList of(User user) {
+        public static AuthorInfoForList of(ToDoListProjection projection) {
             return AuthorInfoForList.builder()
-                    .id(user.getId())
-                    .nickname(user.getNickname())
-                    .profileImageKey(user.getProfileImageKey())
+                    .id(projection.getUserId())
+                    .nickname(projection.getNickname())
+                    .profileImageKey(projection.getProfileImageKey())
                     .build();
         }
     }
