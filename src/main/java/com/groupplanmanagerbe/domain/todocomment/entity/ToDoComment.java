@@ -1,10 +1,11 @@
 package com.groupplanmanagerbe.domain.todocomment.entity;
 
-import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,10 +25,6 @@ public class ToDoComment extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "space_id")
-    private Space space;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_do_item_id")
     private ToDoItem toDoItem;
 
@@ -35,10 +32,21 @@ public class ToDoComment extends BaseEntity {
     private String content;
 
     @Builder
-    public ToDoComment(User user, Space space, ToDoItem toDoItem, String content) {
+    public ToDoComment(User user, ToDoItem toDoItem, String content) {
         this.user = user;
-        this.space = space;
         this.toDoItem = toDoItem;
+        this.content = content;
+    }
+
+    public static ToDoComment of(ToDoItem toDo, User user, String content) {
+        return ToDoComment.builder()
+                .toDoItem(toDo)
+                .user(user)
+                .content(content)
+                .build();
+    }
+
+    public void update(String content) {
         this.content = content;
     }
 }

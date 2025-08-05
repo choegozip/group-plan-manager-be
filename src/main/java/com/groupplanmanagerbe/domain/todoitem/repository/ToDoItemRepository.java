@@ -15,14 +15,14 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
     @Query("SELECT t FROM ToDoItem t " +
             "WHERE t.id = :toDoItemId " +
             "AND t.user.id = :userId " +
-            "AND t.user.deleted = false")
+            "AND t.user.deleted = false ")
     Optional<ToDoItem> findByIdAndUserIdWithSpaceAndUser(@Param("toDoItemId") Long toDoItemId,
                                                           @Param("userId") Long userId);
 
     @Query("SELECT t FROM ToDoItem t " +
             "WHERE t.id = :toDoItemId " +
             "AND t.user.id = :userId " +
-            "AND t.user.deleted = false")
+            "AND t.user.deleted = false ")
     Optional<ToDoItem> findByIdAndUserId(@Param("toDoItemId") Long toDoItemId,
                                           @Param("userId") Long userId);
 
@@ -61,5 +61,4 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
             @Param("direction") String direction,
             @Param("size") int size
     );
-
 }

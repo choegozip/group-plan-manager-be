@@ -39,7 +39,11 @@ public enum ApiSuccessCode {
     SUCCESS_TO_DO_UPDATE("SUCCESS", "to.do.update.success"),
     SUCCESS_TO_DO_DELETE("SUCCESS", "to.do.delete.success"),
     SUCCESS_GET_TO_DO_LIST("SUCCESS", "to.do.list.get.success"),
-    SUCCESS_GET_TO_DO("SUCCESS", "to.do.get.success")
+    SUCCESS_GET_TO_DO("SUCCESS", "to.do.get.success"),
+    SUCCESS_COMMENT_CREATE("SUCCESS", "comment.create.success"),
+    SUCCESS_COMMENT_UPDATE("SUCCESS","comment.update.success"),
+    SUCCESS_COMMENT_DELETE("SUCCESS","comment.delete.success"),
+    SUCCESS_COMMENT_GET("SUCCESS","comment.get.success")
     ;
 
     private final String code;

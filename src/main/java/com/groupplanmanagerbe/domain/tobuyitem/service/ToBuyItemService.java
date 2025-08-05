@@ -18,7 +18,6 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.*;
-import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

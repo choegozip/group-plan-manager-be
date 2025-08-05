@@ -1,6 +1,5 @@
 package com.groupplanmanagerbe.domain.tobuycomment.entity;
 
-import com.groupplanmanagerbe.domain.space.entity.Space;
 import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
@@ -24,10 +23,6 @@ public class ToBuyComment extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "space_id")
-    private Space space;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_buy_item_id")
     private ToBuyItem toBuyItem;
 
@@ -35,10 +30,21 @@ public class ToBuyComment extends BaseEntity {
     private String content;
 
     @Builder
-    public ToBuyComment(User user, Space space, ToBuyItem toBuyItem, String content) {
+    public ToBuyComment(User user, ToBuyItem toBuyItem, String content) {
         this.user = user;
-        this.space = space;
         this.toBuyItem = toBuyItem;
+        this.content = content;
+    }
+
+    public static ToBuyComment of(ToBuyItem toBuyItem, User user, String content) {
+        return ToBuyComment.builder()
+                .user(user)
+                .toBuyItem(toBuyItem)
+                .content(content)
+                .build();
+    }
+
+    public void update(String content) {
         this.content = content;
     }
 }
