@@ -21,7 +21,7 @@ bin/
 .DS_Store
 
 # 환경설정, 민감정보
-application-*.yml
+application-dev.yml
 .env
 
 # Git
