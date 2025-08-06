@@ -7,16 +7,16 @@ import java.time.LocalDateTime;
 
 @Builder
 public record SpaceRes(
-        Long spaceId,
-        String name,
+        Long id,
+        String nickname,
         String profileImageKey,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
     public static SpaceRes from(Space space) {
         return SpaceRes.builder()
-                .spaceId(space.getId())
-                .name(space.getName())
+                .id(space.getId())
+                .nickname(space.getName())
                 .profileImageKey(space.getProfileImageKey())
                 .createdAt(space.getCreatedAt())
                 .updatedAt(space.getUpdatedAt())

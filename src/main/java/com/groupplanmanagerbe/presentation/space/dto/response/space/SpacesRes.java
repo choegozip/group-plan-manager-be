@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public record SpacesRes(
         Long id,
-        String name,
+        String nickname,
         String profileImageKey,
         boolean isOwner,
         LocalDateTime createdAt,
@@ -26,7 +26,7 @@ public record SpacesRes(
                 .toList();
         return SpacesRes.builder()
                 .id(space.getId())
-                .name(space.getName())
+                .nickname(space.getName())
                 .profileImageKey(space.getProfileImageKey())
                 .isOwner(isOwner)
                 .createdAt(space.getCreatedAt())
