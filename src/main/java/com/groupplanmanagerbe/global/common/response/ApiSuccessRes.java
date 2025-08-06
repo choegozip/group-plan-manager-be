@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ApiSuccessRes<T>(String code, String massage, T data) {
+public record ApiSuccessRes<T>(String code, String message, T data) {
 
     // 200 OK
     public static <T> ResponseEntity<ApiSuccessRes<T>> success(ApiSuccessCode successCode, T data) {

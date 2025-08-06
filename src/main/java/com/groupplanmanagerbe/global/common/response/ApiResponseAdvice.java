@@ -30,7 +30,7 @@ public class ApiResponseAdvice implements ResponseBodyAdvice<Object> {
             ServerHttpRequest request, ServerHttpResponse response
     ) {
         if (body instanceof ApiSuccessRes<?> res) {
-            String localizedMessage = messageResolver.get(res.massage());
+            String localizedMessage = messageResolver.get(res.message());
             return new ApiSuccessRes<>(res.code(), localizedMessage, res.data());
         }
 
