@@ -1,9 +1,11 @@
 spring:
   datasource:
+    # URL에서 prepared statement 비활성화
     url: ${DB_URL}?prepareThreshold=0&reWriteBatchedInserts=true
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
+      # 짧은 커넥션 라이프사이클로 안정성 확보
       max-lifetime: 900000   # 15분
       idle-timeout: 300000   # 5분
       maximum-pool-size: 10
@@ -64,7 +66,35 @@ spring:
           max-wait: 2000ms
         shutdown-timeout: 100ms
 
+
+
+app:
+  base-url: https://goo3oo.online
+  invitation-path: invite
+
 logging:
   level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: INFO
+    com.groupplanmanagerbe: DEBUG
     org.postgresql.core: WARN
     com.zaxxer.hikari: WARN
+
+jwt:
+  secret:
+    key: "${JWT_SECRET_KEY}"
+    whiteList:
+      - /api/users/signup
+      - /api/auth/login
+      - /api/invite
+      - /actuator/health
+      - /actuator/prometheus
+      - /api/auth/refresh
+  token:
+    prefix: "Bearer "
+    refreshPrefix: "Refresh:"
+    blackListPrefix: "BlackList:"
+    expiration: 1800000
+    refreshExpiration: 1209600000
+
