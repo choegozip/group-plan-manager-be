@@ -8,7 +8,7 @@ spring:
       # 짧은 커넥션 라이프사이클로 안정성 확보
       max-lifetime: 900000   # 15분
       idle-timeout: 300000   # 5분
-      maximum-pool-size: 3
+      maximum-pool-size: 5
       minimum-idle: 2
       connection-timeout: 15000
       validation-timeout: 3000
