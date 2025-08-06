@@ -11,7 +11,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "space_invited")
+@Table(
+        name = "space_invited",
+        indexes = @Index(name = "idx_space_invited_space_id", columnList = "space_id")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpaceInvited extends BaseEntity {

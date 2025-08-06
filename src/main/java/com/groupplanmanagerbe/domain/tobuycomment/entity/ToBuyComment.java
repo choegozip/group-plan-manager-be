@@ -7,7 +7,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "to_buy_comments")
+@Table(
+        name = "to_buy_comments",
+        indexes = {
+                @Index(name = "idx_comment_to_buy_item", columnList = "to_buy_item_id"),
+                @Index(name = "idx_comment_user", columnList = "user_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToBuyComment extends BaseEntity {

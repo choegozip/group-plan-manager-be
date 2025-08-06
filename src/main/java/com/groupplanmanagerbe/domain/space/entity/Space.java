@@ -11,7 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "spaces")
+@Table(
+        name = "spaces",
+        indexes = @Index(name = "idx_space_deleted", columnList = "deleted")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Space extends BaseEntity {

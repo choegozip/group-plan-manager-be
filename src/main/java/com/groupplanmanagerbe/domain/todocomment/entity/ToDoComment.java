@@ -10,7 +10,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "to_do_comments")
+@Table(
+        name = "to_do_comments",
+        indexes = {
+                @Index(name = "idx_comment_to_do_item", columnList = "to_do_item_id"),
+                @Index(name = "idx_comment_user", columnList = "user_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToDoComment extends BaseEntity {

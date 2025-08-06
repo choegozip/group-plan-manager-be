@@ -17,7 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "to_buy_items")
+@Table(
+        name = "to_buy_items",
+        indexes = {
+                @Index(name = "idx_to_buy_space_id", columnList = "space_id"),
+                @Index(name = "idx_to_buy_user_id", columnList = "user_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToBuyItem extends BaseEntity {
@@ -101,7 +107,7 @@ public class ToBuyItem extends BaseEntity {
     public void setManagers(List<ToBuyManager> managers) {
         this.managers.clear();
 
-        for (ToBuyManager manager : managers ) {
+        for (ToBuyManager manager : managers) {
             addManager(manager);
         }
     }
@@ -127,7 +133,7 @@ public class ToBuyItem extends BaseEntity {
         }
 
         if (imageUrl != null && !imageUrl.isBlank()) {
-            this.imageUrl= imageUrl;
+            this.imageUrl = imageUrl;
         }
 
         if (referenceUrl != null && !referenceUrl.isBlank()) {
@@ -135,7 +141,7 @@ public class ToBuyItem extends BaseEntity {
         }
 
         if (memo != null && !memo.isBlank()) {
-            this.memo =  memo;
+            this.memo = memo;
         }
 
         if (!managers.isEmpty()) {

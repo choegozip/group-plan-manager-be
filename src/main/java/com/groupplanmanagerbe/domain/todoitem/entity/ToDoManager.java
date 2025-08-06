@@ -7,7 +7,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "to_do_managers")
+@Table(
+        name = "to_do_managers",
+        indexes = @Index(name = "idx_manager_to_do_user", columnList = "to_do_item_id, user_id")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToDoManager extends BaseEntity {

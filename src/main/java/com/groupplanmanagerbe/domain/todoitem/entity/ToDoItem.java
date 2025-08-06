@@ -17,7 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "to_do_items")
+@Table(
+        name = "to_do_items",
+        indexes = {
+                @Index(name = "idx_to_do_space_id", columnList = "space_id"),
+                @Index(name = "idx_to_do_user_id", columnList = "user_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ToDoItem extends BaseEntity {

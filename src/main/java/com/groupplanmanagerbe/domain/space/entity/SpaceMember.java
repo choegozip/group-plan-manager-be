@@ -6,7 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "space_members")
+@Table(
+        name = "space_members",
+        indexes = {
+                @Index(name = "idx_space_member_user_space", columnList = "user_id, space_id, deleted"),
+                @Index(name = "idx_space_member_owner", columnList = "space_id, user_id, is_owner, deleted")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpaceMember extends BaseEntity {

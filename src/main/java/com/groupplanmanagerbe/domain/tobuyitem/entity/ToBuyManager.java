@@ -9,10 +9,7 @@ import lombok.*;
 @Entity
 @Table(
         name = "to_buy_managers",
-        indexes = {
-                @Index(name = "idx_to_buy_manager_to_buy_item_id", columnList = "to_buy_item_id"),
-                @Index(name = "idx_to_buy_manager_user_id", columnList = "user_id")
-        }
+        indexes = @Index(name = "idx_manager_to_buy_user", columnList = "to_buy_item_id, user_id")
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
