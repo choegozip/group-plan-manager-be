@@ -1,50 +1,52 @@
 spring:
   datasource:
-    # URL에서 prepared statement 비활성화
-    url: ${DB_URL}?prepareThreshold=0&reWriteBatchedInserts=true
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
-      # 짧은 커넥션 라이프사이클로 안정성 확보
-      max-lifetime: 900000   # 15분
-      idle-timeout: 300000   # 5분
+      # 풀링 환경에서 적절한 크기
       maximum-pool-size: 5
       minimum-idle: 2
-      connection-timeout: 15000
-      validation-timeout: 3000
-      leak-detection-threshold: 60000
 
-      # 커넥션 정리
-      connection-init-sql: "DEALLOCATE ALL"
+      # 적당한 생명주기
+      max-lifetime: 600000        # 10분
+      idle-timeout: 300000        # 5분
+
+      # 타임아웃 설정
+      connection-timeout: 8000
+      validation-timeout: 3000
+      leak-detection-threshold: 30000
+
+      # 단순한 헬스체크만
       connection-test-query: "SELECT 1"
 
       data-source-properties:
-        # Prepared Statement 완전 비활성화
+        # 수파베이스 핵심 권장사항
         useServerPrepStmts: false
         cachePrepStmts: false
         prepareThreshold: 0
 
-        # 대신 다른 성능 최적화 활성화
+        # 성능 최적화
         reWriteBatchedInserts: true
-        defaultRowFetchSize: 100
+        defaultRowFetchSize: 50
 
-        # 네트워크 최적화
-        socketTimeout: 30000
-        connectTimeout: 15000
-        loginTimeout: 8000
+        # 네트워크 설정
+        socketTimeout: 20000
+        connectTimeout: 8000
         tcpKeepAlive: true
 
-        # PostgreSQL 심플 쿼리 모드 강제
-        preferQueryMode: "simple"
+        # 필수 보안 설정
+        ssl: true
+        sslmode: require
 
   jpa:
     hibernate:
       ddl-auto: none
     properties:
       hibernate:
-        # 대신 JPA/Hibernate 레벨에서 최적화
-        jdbc.batch_size: 30
-        jdbc.fetch_size: 100
+        # 풀링 환경에 최적화된 배치 설정
+        jdbc.batch_size: 20
+        jdbc.fetch_size: 50
         order_inserts: true
         order_updates: true
         batch_versioned_data: true
@@ -66,8 +68,6 @@ spring:
           max-wait: 2000ms
         shutdown-timeout: 100ms
 
-
-
 app:
   base-url: https://goo3oo.online
   invitation-path: invite
@@ -79,7 +79,8 @@ logging:
     org.hibernate.SQL: INFO
     com.groupplanmanagerbe: DEBUG
     org.postgresql.core: WARN
-    com.zaxxer.hikari: WARN
+    com.zaxxer.hikari: INFO
+    com.zaxxer.hikari.pool.HikariPool: INFO
 
 jwt:
   secret:
@@ -97,4 +98,3 @@ jwt:
     blackListPrefix: "BlackList:"
     expiration: 1800000
     refreshExpiration: 1209600000
-
