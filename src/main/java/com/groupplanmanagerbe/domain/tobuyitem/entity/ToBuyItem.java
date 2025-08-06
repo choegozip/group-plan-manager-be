@@ -142,4 +142,9 @@ public class ToBuyItem extends BaseEntity {
             setManagers(managers);
         }
     }
+
+    public void addComment(ToBuyComment comment) {
+        toBuyComments.add(comment);
+        comment.setToBuyItem(this);
+    }
 }

@@ -6,10 +6,8 @@ import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
-import com.groupplanmanagerbe.global.exception.custom.JwtTokenException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.global.exception.custom.UnAuthorizedException;
-import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import com.groupplanmanagerbe.global.security.token.JwtUtil;
 import com.groupplanmanagerbe.presentation.auth.dto.request.LoginReq;
 import com.groupplanmanagerbe.presentation.auth.dto.request.RefreshTokenReq;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,11 +27,10 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class AuthService {
 
-    private final BlackListTokenService blackListTokenService;
-    private final RefreshTokenService refreshTokenService;
+    private final BlackListTokenService blackListService;
+    private final RefreshTokenService refreshService;
     private final UserComponent userComponent;
     private final JwtUtil jwtUtil;
-    private final JwtSecurityProperties jwtSecurityProperties;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -44,7 +40,6 @@ public class AuthService {
 
         String accessToken = jwtUtil.createAccessToken(savedUser.getId(), savedUser.getRole());
         String refreshToken = jwtUtil.createRefreshToken(savedUser.getId());
-
         createOrUpdateRefreshToken(savedUser, refreshToken);
 
         return TokenRes.of(accessToken, refreshToken);
@@ -57,8 +52,8 @@ public class AuthService {
         long mills = remaining.toMillis();
 
         if (mills > 0) {
-            blackListTokenService.save(token, mills);
-            refreshTokenService.delete(Long.valueOf(claims.getSubject()));
+            blackListService.save(token, mills);
+            refreshService.delete(Long.valueOf(claims.getSubject()));
         }
     }
 
@@ -67,24 +62,23 @@ public class AuthService {
         Claims  claims = jwtUtil.parseRefreshToken(request.refreshToken());
         Long userId = Long.parseLong(claims.getSubject());
 
-        String savedRefreshToken = refreshTokenService.getFromRedis(userId);
+        String savedRefreshToken = refreshService.getFromRedis(userId);
         savedRefreshToken = getOrLoadRefreshToken(userId, savedRefreshToken);
         invalidRefreshToken(request, savedRefreshToken);
 
         String accessToken = jwtUtil.createAccessToken(userId, UserRole.USER);
         String refreshToken = jwtUtil.createRefreshToken(userId);
-
-        refreshTokenService.update(userId, refreshToken);
+        refreshService.update(userId, refreshToken);
 
         return TokenRes.of(accessToken, refreshToken);
     }
 
     // === Private Methods ===
     private void createOrUpdateRefreshToken(User savedUser, String refreshToken) {
-        if (refreshTokenService.existTokenAtDb(savedUser.getId())) {
-            refreshTokenService.update(savedUser.getId(), refreshToken);
+        if (refreshService.existTokenAtDb(savedUser.getId())) {
+            refreshService.update(savedUser.getId(), refreshToken);
         } else {
-            refreshTokenService.create(savedUser, refreshToken);
+            refreshService.create(savedUser, refreshToken);
         }
     }
 
@@ -96,7 +90,7 @@ public class AuthService {
 
     private String getOrLoadRefreshToken(Long userId, String savedRefreshToken) {
         if (savedRefreshToken == null || savedRefreshToken.isBlank()) {
-            RefreshToken token = refreshTokenService.getFromDb(userId)
+            RefreshToken token = refreshService.getFromDb(userId)
                     .orElseThrow(() -> new NotFoundException(ApiErrorCode.TOKEN_NOT_FOUND));
             return  token.getToken();
         }

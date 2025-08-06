@@ -4,10 +4,7 @@ import com.groupplanmanagerbe.domain.tobuyitem.entity.ToBuyItem;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "to_buy_comments")
@@ -22,6 +19,7 @@ public class ToBuyComment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_buy_item_id")
     private ToBuyItem toBuyItem;
@@ -37,11 +35,13 @@ public class ToBuyComment extends BaseEntity {
     }
 
     public static ToBuyComment of(ToBuyItem toBuyItem, User user, String content) {
-        return ToBuyComment.builder()
+        ToBuyComment comment = ToBuyComment.builder()
                 .user(user)
                 .toBuyItem(toBuyItem)
                 .content(content)
                 .build();
+        toBuyItem.addComment(comment);
+        return comment;
     }
 
     public void update(String content) {

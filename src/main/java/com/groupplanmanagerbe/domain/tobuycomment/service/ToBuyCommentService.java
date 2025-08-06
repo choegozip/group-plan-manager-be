@@ -41,6 +41,7 @@ public class ToBuyCommentService {
         try {
             User user = userComponent.getByIdAndDeleteFalse(userId);
             ToBuyItem toBuyItem = toBuyComponent.getReferenceById(toBuyId);
+            toBuyItem.addComment(ToBuyComment.of(toBuyItem, user, request.content()));
             ToBuyComment comment = ToBuyComment.of(toBuyItem, user, request.content());
 
             commentRepository.save(comment);

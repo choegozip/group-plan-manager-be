@@ -133,4 +133,8 @@ public class ToDoItem extends BaseEntity {
             setManagers(managers);
         }
     }
+
+    public void addComment(ToDoComment comment) {
+        toDoComments.add(comment);
+    }
 }

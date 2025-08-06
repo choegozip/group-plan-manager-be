@@ -3,8 +3,6 @@ package com.groupplanmanagerbe.domain.auth.service;
 import com.groupplanmanagerbe.domain.auth.entity.RefreshToken;
 import com.groupplanmanagerbe.domain.auth.repository.RefreshTokenRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
-import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
-import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.global.security.model.JwtSecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +22,6 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshRepository;
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtSecurityProperties jwtSecurityProperties;
-
 
     public void create(User user, String refreshToken) {
         long expiration = jwtSecurityProperties.token().refreshExpiration();
@@ -58,6 +55,7 @@ public class RefreshTokenService {
         return refreshRepository.existsByUserId(userId);
     }
 
+    // === Private Methods ===
     private void saveToRedis(Long userId, String refreshToken, long expiration) {
         String key = getKey(userId);
         redisTemplate.opsForValue().set(key, refreshToken, expiration, TimeUnit.MILLISECONDS);
