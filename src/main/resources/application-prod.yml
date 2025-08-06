@@ -1,57 +1,70 @@
 spring:
   datasource:
-    url: ${DB_URL}
+    url: ${DB_URL}?prepareThreshold=0&reWriteBatchedInserts=true
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      max-lifetime: 3600000
+      max-lifetime: 900000   # 15분
+      idle-timeout: 300000   # 5분
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 15000
+      validation-timeout: 3000
+      leak-detection-threshold: 60000
+
+      # 커넥션 정리
       connection-init-sql: "DEALLOCATE ALL"
+      connection-test-query: "SELECT 1"
+
       data-source-properties:
-        useServerPrepStmts: true
-        cachePrepStmts: true
-        prepStmtCacheSize: 128
+        # Prepared Statement 완전 비활성화
+        useServerPrepStmts: false
+        cachePrepStmts: false
+        prepareThreshold: 0
+
+        # 대신 다른 성능 최적화 활성화
         reWriteBatchedInserts: true
+        defaultRowFetchSize: 100
+
+        # 네트워크 최적화
+        socketTimeout: 30000
+        connectTimeout: 15000
+        loginTimeout: 8000
+        tcpKeepAlive: true
+
+        # PostgreSQL 심플 쿼리 모드 강제
+        preferQueryMode: "simple"
+
   jpa:
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        # 대신 JPA/Hibernate 레벨에서 최적화
+        jdbc.batch_size: 30
+        jdbc.fetch_size: 100
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+        # 불필요한 쿼리 최소화
+        enable_lazy_load_no_trans: false
+
   data:
     redis:
       url: ${REDIS_URL}
       ssl:
         enabled: true
-      timeout: 10s
+      timeout: 8s
       lettuce:
         pool:
           max-active: 8
-          max-idle: 8
-          min-idle: 0
+          max-idle: 4
+          min-idle: 1
+          max-wait: 2000ms
         shutdown-timeout: 100ms
-
-app:
-  base-url: https://goo3oo.online
-  invitation-path: invite
 
 logging:
   level:
-    root: INFO
-    org.springframework.web: INFO
-    org.hibernate.SQL: INFO
-    com.groupplanmanagerbe: DEBUG
-
-jwt:
-  secret:
-    key: "${JWT_SECRET_KEY}"
-    whiteList:
-      - /api/users/signup
-      - /api/auth/login
-      - /api/invite
-      - /actuator/health
-      - /actuator/prometheus
-      - /api/auth/refresh
-  token:
-    prefix: "Bearer "
-    refreshPrefix: "Refresh:"
-    blackListPrefix: "BlackList:"
-    expiration: 1800000
-    refreshExpiration: 1209600000
-
+    org.postgresql.core: WARN
+    com.zaxxer.hikari: WARN
