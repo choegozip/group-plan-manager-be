@@ -38,28 +38,12 @@ public record SpacesRes(
     @Builder
     public record SpaceMemberInfo(
         Long id,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        MemberUserInfo user
+        String nickname,
+        String profileImageKey
     ) {
         public static SpaceMemberInfo of(SpaceMember member) {
+            User user = member.getUser();
             return SpaceMemberInfo.builder()
-                    .id(member.getId())
-                    .createdAt(member.getCreatedAt())
-                    .updatedAt(member.getUpdatedAt())
-                    .user(MemberUserInfo.of(member.getUser()))
-                    .build();
-        }
-    }
-
-    @Builder
-    public record MemberUserInfo(
-            Long id,
-            String nickname,
-            String profileImageKey
-    ) {
-        public static MemberUserInfo of(User user) {
-            return MemberUserInfo.builder()
                     .id(user.getId())
                     .nickname(user.getNickname())
                     .profileImageKey(user.getProfileImageKey())
