@@ -62,7 +62,7 @@ public class SpaceService {
     }
 
     public SpaceRes getSpace(Long userId, Long spaceId) {
-        Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
+        Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         return SpaceRes.from(space);
     }
 
