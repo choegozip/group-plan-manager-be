@@ -12,7 +12,6 @@ import java.util.List;
 public record SpaceRes(
         Long id,
         String nickname,
-        String profileImageKey,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         List<SpaceMemberInfo> member
@@ -25,7 +24,6 @@ public record SpaceRes(
         return SpaceRes.builder()
                 .id(space.getId())
                 .nickname(space.getName())
-                .profileImageKey(space.getProfileImageKey())
                 .createdAt(space.getCreatedAt())
                 .updatedAt(space.getUpdatedAt())
                 .member(members)

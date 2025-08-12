@@ -1,7 +1,6 @@
 package com.groupplanmanagerbe.presentation.space.dto.request;
 
 public record UpdateSpaceReq(
-        String name,
-        String profileImageKey
+        String name
 ) {
 }

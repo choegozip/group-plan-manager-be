@@ -14,7 +14,6 @@ import java.util.List;
 public record SpacesRes(
         Long id,
         String nickname,
-        String profileImageKey,
         boolean isOwner,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
@@ -27,7 +26,6 @@ public record SpacesRes(
         return SpacesRes.builder()
                 .id(space.getId())
                 .nickname(space.getName())
-                .profileImageKey(space.getProfileImageKey())
                 .isOwner(isOwner)
                 .createdAt(space.getCreatedAt())
                 .updatedAt(space.getUpdatedAt())

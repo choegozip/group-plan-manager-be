@@ -6,14 +6,12 @@ import lombok.Builder;
 @Builder
 public record JoinSpaceRes(
         Long id,
-        String name,
-        String profileImageKey
+        String name
 ) {
     public static JoinSpaceRes of(Space space) {
         return JoinSpaceRes.builder()
                 .id(space.getId())
                 .name(space.getName())
-                .profileImageKey(space.getProfileImageKey())
                 .build();
     }
 }

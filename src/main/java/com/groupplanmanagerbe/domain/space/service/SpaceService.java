@@ -34,7 +34,7 @@ public class SpaceService {
         if (spaceComponent.countSpacesBelongingToUser(userId) >= 10) {
             throw new InvalidException(ApiErrorCode.SPACE_LIMIT_EXCEEDED);
         }
-        Space space = Space.of(request.name(), request.profileImageKey());
+        Space space = Space.of(request.name());
         SpaceMember spaceMember = SpaceMember.of(user, space);
         spaceMember.makeOwner();
         spaceRepository.save(space);
@@ -46,7 +46,7 @@ public class SpaceService {
     public void updateSpace(Long spaceId, UpdateSpaceReq request, Long userId) {
         Space space = spaceComponent.getByIdAndUserIdWithMember(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         checkIsOwner(space, userId);
-        space.updateSpaceInfo(request.name(), request.profileImageKey());
+        space.updateSpaceInfo(request.name());
     }
 
     @Transactional

@@ -25,9 +25,6 @@ public class Space extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "profile_image_key")
-    private String profileImageKey;
-
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
@@ -37,13 +34,11 @@ public class Space extends BaseEntity {
     @Builder
     public Space(String name, String profileImageKey) {
         this.name = name;
-        this.profileImageKey = profileImageKey;
     }
 
-    public static Space of(String name, String profileImageKey) {
+    public static Space of(String name) {
         return Space.builder()
                 .name(name)
-                .profileImageKey(profileImageKey)
                 .build();
     }
 
@@ -52,13 +47,9 @@ public class Space extends BaseEntity {
         member.setSpace(this);
     }
 
-    public void updateSpaceInfo(String name, String profileImageKey) {
+    public void updateSpaceInfo(String name) {
         if (name != null && !name.isBlank()) {
             updateName(name);
-        }
-
-        if (profileImageKey != null && !profileImageKey.isBlank()) {
-            updateProfileImageKey(profileImageKey);
         }
     }
 
@@ -81,9 +72,5 @@ public class Space extends BaseEntity {
 
     private void updateName(String name) {
         this.name = name;
-    }
-
-    private void updateProfileImageKey(String profileImageKey) {
-        this.profileImageKey = profileImageKey;
     }
 }
