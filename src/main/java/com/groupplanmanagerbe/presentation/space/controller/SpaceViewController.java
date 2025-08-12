@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/api/spaces")
+@RequestMapping("invite")
 @RequiredArgsConstructor
 public class SpaceViewController {
 
-    @GetMapping("/spacemember")
+    @GetMapping
     public String invite() {
         return "invite";
     }
