@@ -19,11 +19,12 @@
     </div>
 
     <div class="content-bottom">
-        <a href="https://play.google.com/store/apps/details?id=com.example.app" class="button primary">
+        <a href="https://play.google.com/store/apps/details?id=com.choegozip.groupplanmanager" class="button primary">
             📱 앱 설치하기
         </a>
 
-        <a href="myapp://open" class="button secondary">
+        <a th:href="'choegozip://gpm?landing=join_workspace&inviteCode=' + ${inviteCode}"
+           class="button secondary">
             🚀 앱 열기
         </a>
     </div>
