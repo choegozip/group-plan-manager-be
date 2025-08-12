@@ -10,7 +10,7 @@ import java.util.List;
 public record InvitedSpaceRes(
         Long id,
         String nickname,
-        List<MemberInfo> members
+        List<MemberInfo> member
 ) {
     public static InvitedSpaceRes of(Space space) {
         List<MemberInfo> members = space.getMembers().stream()
@@ -21,7 +21,7 @@ public record InvitedSpaceRes(
         return InvitedSpaceRes.builder()
                 .id(space.getId())
                 .nickname(space.getName())
-                .members(members)
+                .member(members)
                 .build();
     }
 
