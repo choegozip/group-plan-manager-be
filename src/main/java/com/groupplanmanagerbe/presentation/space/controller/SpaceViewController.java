@@ -12,6 +12,6 @@ public class SpaceViewController {
 
     @GetMapping("/spacemember")
     public String invite() {
-        return "spacemember";
+        return "invite";
     }
 }
