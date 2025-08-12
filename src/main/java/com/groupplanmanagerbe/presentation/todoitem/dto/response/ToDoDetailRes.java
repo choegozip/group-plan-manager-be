@@ -17,7 +17,7 @@ public record ToDoDetailRes(
         Long id,
         String title,
         String detail,
-        LocalDateTime duDate,
+        LocalDateTime dueDate,
         Urgency urgency,
         String imageUrl,
         String referenceUrl,
@@ -40,7 +40,7 @@ public record ToDoDetailRes(
                 .id(item.getId())
                 .title(item.getTitle())
                 .detail(item.getDetail())
-                .duDate(item.getDueDate())
+                .dueDate(item.getDueDate())
                 .urgency(item.getUrgency())
                 .imageUrl(item.getImageUrl())
                 .referenceUrl(item.getReferenceUrl())

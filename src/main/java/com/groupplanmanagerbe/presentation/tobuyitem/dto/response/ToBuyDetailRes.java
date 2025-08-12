@@ -16,7 +16,7 @@ public record ToBuyDetailRes(
         Long id,
         String title,
         Short quantity,
-        LocalDateTime duDate,
+        LocalDateTime dueDate,
         Urgency urgency,
         String memo,
         String imageUrl,
@@ -40,7 +40,7 @@ public record ToBuyDetailRes(
                 .id(item.getId())
                 .title(item.getTitle())
                 .quantity(item.getQuantity())
-                .duDate(item.getDueDate())
+                .dueDate(item.getDueDate())
                 .urgency(item.getUrgency())
                 .memo(item.getMemo())
                 .imageUrl(item.getImageUrl())

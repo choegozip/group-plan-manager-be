@@ -15,7 +15,7 @@ public record ToDoListRes(
         Long id,
         String title,
         String detail,
-        LocalDateTime duDate,
+        LocalDateTime dueDate,
         Urgency urgency,
         boolean hasLink,
         boolean hasComment,
@@ -33,7 +33,7 @@ public record ToDoListRes(
                 .id(projection.getToDoId())
                 .title(projection.getTitle())
                 .detail(projection.getDetail())
-                .duDate(projection.getDueDate())
+                .dueDate(projection.getDueDate())
                 .urgency(Urgency.of(projection.getUrgency()))
                 .hasLink(projection.getHasLink())
                 .hasComment(projection.getHasComment())
