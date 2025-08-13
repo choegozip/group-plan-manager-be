@@ -92,7 +92,7 @@ public class ToBuyItemService {
             Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyId, Long managerId
     ) {
         validateMatchUserId(userId, managerId);
-        ToBuyManager manager = toBuyManagerRepository.findByIddWithToBuyAndSpace(managerId)
+        ToBuyManager manager = toBuyManagerRepository.findByIdAndToBuyIdWithToBuyAndSpace(managerId, toBuyId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
         validateToBuyManager(manager, spaceId, toBuyId);
         manager.updateStatus(request.managerStatus());
