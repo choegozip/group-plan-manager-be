@@ -42,7 +42,7 @@ public class ToDoManager extends BaseEntity {
         ToDoManager manager = ToDoManager.builder()
                 .user(user)
                 .toDoItem(toDoItem)
-                .status(ManagerStatus.HELP)
+                .status(ManagerStatus.PENDING)
                 .build();
         toDoItem.addManager(manager);
         return manager;

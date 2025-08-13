@@ -91,7 +91,8 @@ public class ToBuyItemService {
     public UpdateManagerStatusRes updateManagerStatus(
             Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyId, Long managerId
     ) {
-        ToBuyManager manager = toBuyManagerRepository.findByIdAndUserIdWithToBuyAndSpace(managerId, userId)
+        validateMatchUserId(userId, managerId);
+        ToBuyManager manager = toBuyManagerRepository.findByIddWithToBuyAndSpace(managerId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
         validateToBuyManager(manager, spaceId, toBuyId);
         manager.updateStatus(request.managerStatus());
@@ -159,6 +160,12 @@ public class ToBuyItemService {
                 .anyMatch(member -> member.getUser().getId().equals(userId));
         if (!isMember) {
             throw new InvalidException(ApiErrorCode.TO_BUY_NOT_FOUND);
+        }
+    }
+
+    private void validateMatchUserId(Long userId, Long managerId) {
+        if (!userId.equals(managerId)) {
+            throw new InvalidException(ApiErrorCode.MANAGER_NOT_FOUND);
         }
     }
 }

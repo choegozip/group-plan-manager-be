@@ -56,16 +56,16 @@ public class ToBuyItemController {
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_BUY_DELETE);
     }
 
-    @PatchMapping("/{toBuyItemId}/managers/{managerId}")
+    @PatchMapping("/{toBuyItemId}/managers/{userId}")
     public ResponseEntity<ApiSuccessRes<UpdateManagerStatusRes>> updateManagerStatus(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody UpdateManagerStatusReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId,
-            @PathVariable Long managerId
+            @PathVariable Long userId
     ) {
         UpdateManagerStatusRes response =
-                toBuyItemService.updateManagerStatus(authUser.userId(), request, spaceId, toBuyItemId, managerId);
+                toBuyItemService.updateManagerStatus(authUser.userId(), request, spaceId, toBuyItemId, userId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, response);
     }
 

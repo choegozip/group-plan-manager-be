@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public enum ManagerStatus {
 
-    HELP, OK, SORRY, DONE;
+    PENDING, ACCEPT, DENY, DONE;
 
     public static ManagerStatus of(String status) {
         if (status == null) return null;

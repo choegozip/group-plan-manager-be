@@ -93,7 +93,8 @@ public class ToDoItemService {
     public UpdateManagerStatusRes updateManagerStatus(
             Long userId, UpdateManagerStatusReq request, Long spaceId, Long toBuyItemId, Long managerId
     ) {
-        ToDoManager manager = toDoManagerRepository.findByIdAndUserIdWithToDoAndSpace(managerId, userId)
+        validateMatchUserId(userId, managerId);
+        ToDoManager manager = toDoManagerRepository.findByIdAndWithToDoAndSpace(managerId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
         validateToDoManager(manager, spaceId, toBuyItemId);
         manager.updateStatus(request.managerStatus());
@@ -161,6 +162,12 @@ public class ToDoItemService {
                 .anyMatch(member -> member.getUser().getId().equals(userId));
         if (!isMember) {
             throw new InvalidException(ApiErrorCode.TO_BUY_NOT_FOUND);
+        }
+    }
+
+    private void validateMatchUserId(Long userId, Long managerId) {
+        if (!userId.equals(managerId)) {
+            throw new InvalidException(ApiErrorCode.MANAGER_NOT_FOUND);
         }
     }
 }

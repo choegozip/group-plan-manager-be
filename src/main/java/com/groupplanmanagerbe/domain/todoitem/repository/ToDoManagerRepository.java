@@ -13,11 +13,9 @@ import java.util.Optional;
 public interface ToDoManagerRepository extends JpaRepository<ToDoManager, Long> {
     @EntityGraph(attributePaths = {"toDoItem", "toDoItem.space"})
     @Query("SELECT tm FROM ToDoManager tm " +
-            "WHERE tm.id = :managerId " +
-            "AND tm.user.id = :userId " +
+            "WHERE tm.user.id = :managerId " +
             "AND tm.user.deleted = false")
-    Optional<ToDoManager> findByIdAndUserIdWithToDoAndSpace(@Param("managerId") Long managerId,
-                                                              @Param("userId") Long userId);
+    Optional<ToDoManager> findByIdAndWithToDoAndSpace(@Param("managerId") Long managerId);
 
     @EntityGraph(attributePaths = {"user"})
     @Query("""

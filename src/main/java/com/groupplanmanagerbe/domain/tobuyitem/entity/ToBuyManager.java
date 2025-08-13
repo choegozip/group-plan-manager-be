@@ -42,7 +42,7 @@ public class ToBuyManager extends BaseEntity {
         ToBuyManager manager = ToBuyManager.builder()
                 .user(user)
                 .toBuyItem(toBuyItem)
-                .status(ManagerStatus.HELP)
+                .status(ManagerStatus.PENDING)
                 .build();
         toBuyItem.addManager(manager);
         return manager;

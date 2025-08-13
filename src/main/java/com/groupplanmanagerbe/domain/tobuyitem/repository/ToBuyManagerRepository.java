@@ -12,11 +12,10 @@ import java.util.Optional;
 public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long> {
     @EntityGraph(attributePaths = {"toBuyItem", "toBuyItem.space"})
     @Query("SELECT tm FROM ToBuyManager tm " +
-            "WHERE tm.id = :managerId " +
-            "AND tm.user.id = :userId " +
+            "WHERE tm.user.id = :managerId " +
             "AND tm.user.deleted = false")
-    Optional<ToBuyManager> findByIdAndUserIdWithToBuyAndSpace(@Param("managerId") Long managerId,
-                                                                  @Param("userId") Long userId);
+    Optional<ToBuyManager> findByIddWithToBuyAndSpace(@Param("managerId") Long managerId);
+
     @EntityGraph(attributePaths = {"user"})
     @Query("""
         SELECT tm FROM ToBuyManager tm

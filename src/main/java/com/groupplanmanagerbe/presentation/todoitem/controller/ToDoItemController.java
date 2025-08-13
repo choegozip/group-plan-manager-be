@@ -56,16 +56,16 @@ public class ToDoItemController {
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_TO_DO_DELETE);
     }
 
-    @PatchMapping("/{toDoItemId}/managers/{managerId}")
+    @PatchMapping("/{toDoItemId}/managers/{userId}")
     public ResponseEntity<ApiSuccessRes<UpdateManagerStatusRes>> updateManagerStatus(
             @AuthenticationPrincipal AuthUser authUser,
             @Valid @RequestBody UpdateManagerStatusReq request,
             @PathVariable Long spaceId,
             @PathVariable Long toDoItemId,
-            @PathVariable Long managerId
+            @PathVariable Long userId
     ) {
         UpdateManagerStatusRes response =
-                toDoItemService.updateManagerStatus(authUser.userId(), request, spaceId, toDoItemId, managerId);
+                toDoItemService.updateManagerStatus(authUser.userId(), request, spaceId, toDoItemId, userId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_UPDATE_MANAGER_STATUS, response);
     }
 
