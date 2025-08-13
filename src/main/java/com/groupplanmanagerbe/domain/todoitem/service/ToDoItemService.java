@@ -114,9 +114,11 @@ public class ToDoItemService {
     }
 
     public ToDoDetailRes getToDo(Long userId, Long spaceId, Long toDoId) {
-        ToDoItem toDo = toDoItemRepository.findByIdAndUserIdWithSpaceAndUser(toDoId, userId)
+        ToDoItem toDo = toDoItemRepository.findByIdWithSpaceAndUser(toDoId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));
         validateSpaceId(toDo, spaceId);
+        validateMemberId(toDo, userId);
+
         List<ToDoComment> comments = commentComponent.getCommentList(toDoId);
         List<ToDoManager> managers = toDoManagerRepository.findAllByToDoItemId(toDoId);
         return ToDoDetailRes.of(toDo, comments, managers);
@@ -151,6 +153,14 @@ public class ToDoItemService {
 
         if (!manager.getToDoItem().getId().equals(toDoId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_DO_ID);
+        }
+    }
+
+    private void validateMemberId(ToDoItem toDo, Long userId) {
+        boolean isMember = toDo.getSpace().getMembers().stream()
+                .anyMatch(member -> member.getUser().getId().equals(userId));
+        if (!isMember) {
+            throw new InvalidException(ApiErrorCode.TO_BUY_NOT_FOUND);
         }
     }
 }

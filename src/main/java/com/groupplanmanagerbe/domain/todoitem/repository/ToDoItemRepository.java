@@ -12,20 +12,29 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
-    @EntityGraph(attributePaths = {"user", "space"})
-    @Query("SELECT t FROM ToDoItem t " +
-            "WHERE t.id = :toDoItemId " +
-            "AND t.user.id = :userId " +
-            "AND t.user.deleted = false ")
-    Optional<ToDoItem> findByIdAndUserIdWithSpaceAndUser(@Param("toDoItemId") Long toDoItemId,
-                                                          @Param("userId") Long userId);
 
     @Query("SELECT t FROM ToDoItem t " +
             "WHERE t.id = :toDoItemId " +
+            "AND t.space.deleted = false " +
             "AND t.user.id = :userId " +
-            "AND t.user.deleted = false ")
+            "AND t.user.deleted = false")
     Optional<ToDoItem> findByIdAndUserId(@Param("toDoItemId") Long toDoItemId,
-                                          @Param("userId") Long userId);
+                                         @Param("userId") Long userId);
+
+    @EntityGraph(attributePaths = {"user", "space"})
+    @Query("SELECT t FROM ToDoItem t " +
+            "WHERE t.id = :toDoItemId " +
+            "AND t.space.deleted = false " +
+            "AND t.user.id = :userId " +
+            "AND t.user.deleted = false")
+    Optional<ToDoItem> findByIdAndUserIdWithSpaceAndUser(@Param("toDoItemId") Long toDoItemId,
+                                                          @Param("userId") Long userId);
+
+    @EntityGraph(attributePaths = {"user", "space", "space.members", "space.members.user"})
+    @Query("SELECT t FROM ToDoItem t " +
+            "WHERE t.id = :toDoItemId " +
+            "AND t.space.deleted = false")
+    Optional<ToDoItem> findByIdWithSpaceAndUser(@Param("toDoItemId") Long toDoItemId);
 
     @Query(value = """
         SELECT

@@ -1,6 +1,7 @@
 package com.groupplanmanagerbe.domain.tobuyitem.service;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
+import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.service.SpaceComponent;
 import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
 import com.groupplanmanagerbe.domain.tobuycomment.service.ToBuyCommentComponent;
@@ -111,9 +112,11 @@ public class ToBuyItemService {
     }
 
     public ToBuyDetailRes getToBuy(Long userId, Long spaceId, Long toBuyId) {
-        ToBuyItem toBuy = toBuyItemRepository.findByIdAndUserIdWithSpaceAndUser(toBuyId, userId)
+        ToBuyItem toBuy = toBuyItemRepository.findByIdWithSpaceAndUser(toBuyId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
         validateSpaceId(toBuy, spaceId);
+        validateMemberId(toBuy, userId);
+
         List<ToBuyComment> comments = commentComponent.getCommentList(toBuyId);
         List<ToBuyManager> managers = toBuyManagerRepository.findAllByToBuyItemId(toBuyId);
         return ToBuyDetailRes.of(toBuy, comments, managers);
@@ -148,6 +151,14 @@ public class ToBuyItemService {
 
         if (!manager.getToBuyItem().getId().equals(toBuyId)) {
             throw new InvalidException(ApiErrorCode.INVALID_TO_BUY_ID);
+        }
+    }
+
+    private void validateMemberId(ToBuyItem toBuy, Long userId) {
+        boolean isMember = toBuy.getSpace().getMembers().stream()
+                .anyMatch(member -> member.getUser().getId().equals(userId));
+        if (!isMember) {
+            throw new InvalidException(ApiErrorCode.TO_BUY_NOT_FOUND);
         }
     }
 }
