@@ -33,13 +33,14 @@ public class DateUtil {
         throw new InvalidException(ApiErrorCode.INVALID_DATE_FORMAT);
     }
 
-    public static boolean isAfterToday(LocalDateTime dateTime) {
+    public static boolean isAfterOrEqualsToday(LocalDateTime dateTime) {
         LocalDate today = LocalDate.now();
-        return dateTime.toLocalDate().isAfter(today);    }
+        return !dateTime.toLocalDate().isBefore(today);
+    }
 
     public static LocalDateTime isValidFutureDate(String dateStr) {
         LocalDateTime dateTime = parseDateTime(dateStr);
-        if (isAfterToday(dateTime)) {
+        if (isAfterOrEqualsToday(dateTime)) {
             return dateTime;
         }
         throw new InvalidException(ApiErrorCode.INVALID_DATE);

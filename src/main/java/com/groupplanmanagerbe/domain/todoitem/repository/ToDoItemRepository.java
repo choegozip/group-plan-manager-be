@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,6 +69,7 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
             WHERE tm.to_do_item_id = t.id AND tm.user_id = :managerId
         ))
         AND (:urgency IS NULL OR t.urgency = :urgency)
+        AND (:includeExpired = TRUE OR t.due_date >= :now)
         AND (:cursor IS NULL OR (
             CASE WHEN :direction = 'DESC' THEN t.id < :cursor
                  ELSE t.id > :cursor END
@@ -84,6 +86,8 @@ public interface ToDoItemRepository extends JpaRepository<ToDoItem, Long> {
             @Param("urgency") String urgency,
             @Param("cursor") Long cursor,
             @Param("direction") String direction,
-            @Param("size") int size
-    );
+            @Param("size") int size,
+            @Param("includeExpired") boolean includeExpired,
+            @Param("now")LocalDateTime now
+            );
 }

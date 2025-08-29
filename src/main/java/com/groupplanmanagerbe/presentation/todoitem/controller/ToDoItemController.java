@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.request.CreateToDoReq;
@@ -77,10 +78,12 @@ public class ToDoItemController {
             @RequestParam(defaultValue = "DESC") String direction,
             @RequestParam(required = false) Long cursor,
             @RequestParam(required = false) Long managerId,
-            @RequestParam(required = false) String urgency
+            @RequestParam(required = false) String urgency,
+            @RequestParam(defaultValue = "false") boolean includeExpired
     ) {
-        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, managerId, urgency);
-        ToDoPageRes response = toDoItemService.getToDoList(authUser.userId(), spaceId, request);
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction);
+        ParamReq params = ParamReq.of(managerId, urgency, includeExpired);
+        ToDoPageRes response = toDoItemService.getToDoList(authUser.userId(), spaceId, request, params);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_DO_LIST, response);
     }
 

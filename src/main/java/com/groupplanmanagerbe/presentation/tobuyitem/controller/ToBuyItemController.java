@@ -6,6 +6,7 @@ import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.security.model.AuthUser;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.ToBuyPageRes;
@@ -77,10 +78,12 @@ public class ToBuyItemController {
             @RequestParam(defaultValue = "DESC") String direction,
             @RequestParam(required = false) Long cursor,
             @RequestParam(required = false) Long managerId,
-            @RequestParam(required = false) String urgency
+            @RequestParam(required = false) String urgency,
+            @RequestParam(defaultValue = "false") boolean includeExpired
     ) {
-        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, managerId, urgency);
-        ToBuyPageRes response = toBuyItemService.getToBuyList(authUser.userId(), spaceId, request);
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction);
+        ParamReq params = ParamReq.of(managerId, urgency, includeExpired);
+        ToBuyPageRes response = toBuyItemService.getToBuyList(authUser.userId(), spaceId, request, params);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY_LIST, response);
     }
 

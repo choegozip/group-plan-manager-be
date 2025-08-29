@@ -14,6 +14,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
@@ -23,10 +24,12 @@ import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoDetailRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoListRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoPageRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
+import io.lettuce.core.dynamic.annotation.Param;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -101,10 +104,10 @@ public class ToDoItemService {
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
 
-    public ToDoPageRes getToDoList(Long userId, Long spaceId, CursorPageRequest request) {
+    public ToDoPageRes getToDoList(Long userId, Long spaceId, CursorPageRequest request, ParamReq params) {
         List<ToDoListProjection> toDoList = toDoItemRepository.findToDoItemsNative(
-                spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
-                request.direction(), request.size());
+                spaceId, userId, params.managerId(), params.urgency(), request.cursor(),
+                request.direction(), request.size(), params.includeExpired(), LocalDateTime.now());
 
         Map<Long, List<ToDoManager>> managerMap = mapToDoManagersByItemId (toDoList);
         List<ToDoListRes> toDoListResList = toDoList.stream()

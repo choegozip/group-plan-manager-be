@@ -1,7 +1,6 @@
 package com.groupplanmanagerbe.domain.tobuyitem.service;
 
 import com.groupplanmanagerbe.domain.space.entity.Space;
-import com.groupplanmanagerbe.domain.space.entity.SpaceMember;
 import com.groupplanmanagerbe.domain.space.service.SpaceComponent;
 import com.groupplanmanagerbe.domain.tobuycomment.entity.ToBuyComment;
 import com.groupplanmanagerbe.domain.tobuycomment.service.ToBuyCommentComponent;
@@ -17,6 +16,7 @@ import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyListProjection;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
+import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.*;
@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -99,10 +100,10 @@ public class ToBuyItemService {
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
 
-    public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request) {
+    public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request, ParamReq params) {
         List<ToBuyListProjection> toBuy = toBuyItemRepository.findToBuyItemsNative(
-                spaceId, userId, request.managerId(), request.urgency(), request.cursor(),
-                request.direction(), request.size());
+                spaceId, userId, params.managerId(), params.urgency(), request.cursor(),
+                request.direction(), request.size(), params.includeExpired(), LocalDateTime.now());
 
         Map<Long, List<ToBuyManager>> managerMap = mapToBuyManagersByItemId(toBuy);
         List<ToBuyListRes> toBuyListResList = toBuy.stream()

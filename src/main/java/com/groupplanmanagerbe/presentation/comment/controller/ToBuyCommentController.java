@@ -62,7 +62,7 @@ public class ToBuyCommentController {
             @RequestParam(defaultValue = "DESC") String direction,
             @RequestParam(required = false) Long cursor
     ) {
-        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction, null, null);
+        CursorPageRequest request = CursorPageRequest.of(cursor, size, direction);
         CommentPageRes response = commentService.getComments(authUser.userId(), spaceId, toBuyItemId, request);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_COMMENT_GET, response);
     }
