@@ -28,10 +28,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomRuntimeException.class)
     protected ResponseEntity<ApiErrorRes> handleCustomException(
             final CustomRuntimeException e) {
-        log.warn("예외 발생: {}", e.getMessage());
+        log.warn("예외 발생: {}", e.getErrorCode().getMessage());
         String localeMessage = messageResolver.get(e.getErrorCode().getMessage());
         return createResponseEntity(
-                e.getErrorCode().getHttpStatus(), ApiErrorRes.of(e.getErrorCode().getCode(),localeMessage));
+                e.getErrorCode().getHttpStatus(),
+                ApiErrorRes.of(e.getErrorCode().getCode(), localeMessage));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
