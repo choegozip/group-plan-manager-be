@@ -3,14 +3,8 @@ services:
   app:
     image: ${DOCKER_IMAGE}
     container_name: group-pm
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      REDIS_URL: ${REDIS_URL}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      GOOGLE_SERVICE_ACCOUNT: ${GOOGLE_SERVICE_ACCOUNT}
+    env_file:
+      - /home/ec2-user/.env
     expose:
       - "8080"
     ports:
