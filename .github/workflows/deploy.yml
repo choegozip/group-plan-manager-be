@@ -97,7 +97,7 @@ jobs:
             --parameters 'commands=["cat <<EOF > /home/ec2-user/.env
             '"$(cat .env)"'
             EOF"]' \
-            --comment "Copy .env safely"
+            --comment "Copy .env safely" \
             --timeout-seconds 60
 
       - name: Debug environment variables
