@@ -3,8 +3,6 @@ services:
   app:
     image: ${DOCKER_IMAGE}
     container_name: group-pm
-    volumes:
-      - /home/ec2-user/config/gpm-service-account.json:/app/config/gpm-service-account.json:ro
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
