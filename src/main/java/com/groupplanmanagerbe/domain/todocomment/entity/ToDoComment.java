@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
         name = "to_do_comments",
         indexes = {
                 @Index(name = "idx_comment_to_do_item", columnList = "to_do_item_id"),
-                @Index(name = "idx_comment_user", columnList = "user_id")
         }
 )
 @Getter
