@@ -107,4 +107,4 @@ jwt:
     refreshExpiration: 1209600000
 
 firebase:
-  service-account-path: /app/config/gpm-service-account.json
+  use-application-default: true

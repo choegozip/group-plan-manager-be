@@ -9,6 +9,10 @@ env:
   AWS_REGION: ap-northeast-2
   DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE}}
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -31,10 +35,11 @@ jobs:
           echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
-      - name: Create service account file
-        run: |
-          mkdir -p config
-          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT}}" > config/gpm-service-account.json
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: projects/917369320282/locations/global/workloadIdentityPools/yena/providers/github-actions
+          service_account: 'firebase-adminsdk-fbsvc@group-plan-manager.iam.gserviceaccount.com'
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -98,16 +103,6 @@ jobs:
             --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
             --comment "Copy .env file" \
             --timeout-seconds 60
-
-      - name: Copy service account file to EC2 via SSM
-        run: |
-          SERVICE_ACCOUNT_CONTENT=$(base64 -w 0 ./config/gpm-service-account.json)
-          aws ssm send-command \
-            --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $SERVICE_ACCOUNT_CONTENT | base64 -d > /home/ec2-user/config/gpm-service-account.json"] \
-            --comment "Copy gpm-service-account.json" \
-            --timeout-seconds 60 
 
       - name: Debug environment variables
         run: |
