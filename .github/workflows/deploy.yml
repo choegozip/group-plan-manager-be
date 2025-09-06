@@ -93,7 +93,7 @@ jobs:
         run: |
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
-            --targets "Key=instanceIds,Values=$EC2_INSTANCE_ID" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=["cat <<EOF > /home/ec2-user/.env
             '"$(cat .env)"'
             EOF"]' \
