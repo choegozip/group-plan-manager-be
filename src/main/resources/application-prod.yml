@@ -107,4 +107,4 @@ jwt:
     refreshExpiration: 1209600000
 
 firebase:
-  use-application-default: true
+  service-account-json: ${GOOGLE_SERVICE_ACCOUNT}
