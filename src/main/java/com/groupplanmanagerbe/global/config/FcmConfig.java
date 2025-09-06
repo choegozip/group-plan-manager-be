@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 
 @Configuration
 public class FcmConfig {
@@ -24,7 +27,14 @@ public class FcmConfig {
         FirebaseOptions.Builder builder = FirebaseOptions.builder();
 
         if (useApplicationDefault) {
-            builder.setCredentials(GoogleCredentials.getApplicationDefault());
+            String credentialsJson = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
+            if (credentialsJson != null && !credentialsJson.isEmpty()) {
+                byte[] decodedKey = Base64.getDecoder().decode(credentialsJson);
+                InputStream serviceAccount = new ByteArrayInputStream(decodedKey);
+                builder.setCredentials(GoogleCredentials.fromStream(serviceAccount));
+            } else {
+                builder.setCredentials(GoogleCredentials.getApplicationDefault());
+            }
         } else if (!serviceAccountPath.isEmpty()) {
         try (FileInputStream serviceAccount = new FileInputStream(serviceAccountPath)) {
             builder.setCredentials(GoogleCredentials.fromStream(serviceAccount));
