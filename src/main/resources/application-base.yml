@@ -1,4 +1,4 @@
-server:
+Fserver:
   port: 8080
 
 spring:
@@ -16,3 +16,6 @@ spring:
 logging:
   level:
     root: INFO
+
+firebase:
+  service-account-path: /app/config/gpm-service-account.json
