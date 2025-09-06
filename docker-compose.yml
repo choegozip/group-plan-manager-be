@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - C:/Users/goo3o/Documents/fcm/gpm-service-account.json:/app/config/gpm-service-account.json
     depends_on:
       - db
       - redis

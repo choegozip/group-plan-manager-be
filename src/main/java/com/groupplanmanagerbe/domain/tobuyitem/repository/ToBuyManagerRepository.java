@@ -10,21 +10,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long> {
-    @EntityGraph(attributePaths = {"toBuyItem", "toBuyItem.space"})
+    @EntityGraph(attributePaths = {"toBuyItem", "toBuyItem.user"})
     @Query("SELECT tm FROM ToBuyManager tm " +
             "WHERE tm.toBuyItem.id = :toBuyId " +
+            "AND tm.toBuyItem.space.id = :spaceId " +
+            "AND tm.toBuyItem.space.deleted = false " +
             "AND tm.user.id = :managerId " +
             "AND tm.user.deleted = false")
-    Optional<ToBuyManager> findByIdAndToBuyIdWithToBuyAndSpace(@Param("managerId") Long managerId,
-                                                               @Param("toBuyId") Long toBuyId);
+    Optional<ToBuyManager> findByIdAndSpaceIdAndToBuyIdWithToBuy(@Param("managerId") Long managerId,
+                                                                 @Param("spaceId") Long spaceId,
+                                                                 @Param("toBuyId") Long toBuyId);
 
     @EntityGraph(attributePaths = {"user"})
     @Query("""
-        SELECT tm FROM ToBuyManager tm
-        JOIN FETCH tm.user
-        WHERE tm.toBuyItem.id IN :itemIds
-        ORDER BY tm.toBuyItem.id
-        """)
+            SELECT tm FROM ToBuyManager tm
+            JOIN FETCH tm.user
+            WHERE tm.toBuyItem.id IN :itemIds
+            ORDER BY tm.toBuyItem.id
+            """)
     List<ToBuyManager> findByToBuyItemIdsWithUser(@Param("itemIds") List<Long> itemIds);
 
     @EntityGraph(attributePaths = {"user"})

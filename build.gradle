@@ -53,7 +53,7 @@ dependencies {
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'io.lettuce:lettuce-core'
-    implementation 'redis.clients:jedis:4.3.1'
+    implementation 'redis.clients:jedis:5.1.0'
 
     // lombok
     implementation 'org.projectlombok:lombok'
@@ -61,6 +61,9 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // firebase
+    implementation 'com.google.firebase:firebase-admin:9.5.0'
 }
 
 test {
