@@ -106,6 +106,14 @@ jobs:
         env:
           DOCKER_IMAGE: ${{ secrets.DOCKER_IMAGE }}
 
+      - name: Debug GOOGLE_SERVICE_ACCOUNT
+        run: |
+          echo "GOOGLE_SERVICE_ACCOUNT length: ${#GOOGLE_SERVICE_ACCOUNT}"
+          echo "First 50 chars: ${GOOGLE_SERVICE_ACCOUNT:0:50}"
+          echo "Last 50 chars: ${GOOGLE_SERVICE_ACCOUNT: -50}"
+        env:
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+
       - name: Run deployment commands via SSM
         id: ssm-deploy
         run: |
