@@ -41,6 +41,12 @@ jobs:
           workload_identity_provider: projects/917369320282/locations/global/workloadIdentityPools/yena/providers/github-actions
           service_account: 'firebase-adminsdk-fbsvc@group-plan-manager.iam.gserviceaccount.com'
 
+      - name: Get service account key
+        run: |
+          gcloud iam service-accounts keys create temp-key.json \
+          --iam-account=firebase-adminsdk-fbsvc@group-plan-manager.iam.gserviceaccount.com
+          echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$(cat temp-key.json | base64 -w 0)" >> .env
+
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
