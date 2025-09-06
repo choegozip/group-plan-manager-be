@@ -8,8 +8,8 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       # 연결 풀 크기 조정 (에러 방지)
-      maximum-pool-size: 10      # 5 → 10으로 증가
-      minimum-idle: 3            # 2 → 3으로 증가
+      maximum-pool-size: 5
+      minimum-idle: 1
 
       # 적당한 생명주기
       max-lifetime: 600000        # 10분
