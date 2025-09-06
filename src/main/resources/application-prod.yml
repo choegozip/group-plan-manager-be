@@ -8,17 +8,17 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       # 연결 풀 크기 조정 (에러 방지)
-      maximum-pool-size: 2
+      maximum-pool-size: 1
       minimum-idle: 1
 
       # 적당한 생명주기
-      max-lifetime: 600000        # 10분
-      idle-timeout: 300000        # 5분
+      idle-timeout: 10000  # 10초
+      max-lifetime: 30000  # 30초
 
       # 타임아웃 설정
-      connection-timeout: 5000
+      connection-timeout: 5000  #5초
       validation-timeout: 3000
-      leak-detection-threshold: 30000
+      leak-detection-threshold: 8000
 
       # 단순한 헬스체크만
       connection-test-query: "SELECT 1"
