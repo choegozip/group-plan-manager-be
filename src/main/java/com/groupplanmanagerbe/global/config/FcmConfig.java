@@ -20,10 +20,9 @@ public class FcmConfig {
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
-        FirebaseOptions.Builder builder = FirebaseOptions.builder();
-
-        byte[] decodedKey = Base64.getDecoder().decode(serviceAccountJson);
-        InputStream serviceAccount = new ByteArrayInputStream(decodedKey);
+        byte[] firstDecode = Base64.getDecoder().decode(serviceAccountJson);
+        byte[] secondDecode = Base64.getDecoder().decode(firstDecode);
+        InputStream serviceAccount = new ByteArrayInputStream(secondDecode);
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
