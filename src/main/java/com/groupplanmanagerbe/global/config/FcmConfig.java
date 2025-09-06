@@ -7,33 +7,27 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
 
 @Configuration
 public class FcmConfig {
 
-    @Value("${firebase.service-account-path:}")
-    private String serviceAccountPath;
-
-    @Value("${firebase.use-application-default:false}")
-    private boolean useApplicationDefault;
+    @Value("${firebase.service-account-json}")
+    private String serviceAccountJson;
 
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
         FirebaseOptions.Builder builder = FirebaseOptions.builder();
 
-        if (useApplicationDefault) {
-            builder.setCredentials(GoogleCredentials.getApplicationDefault());
-        } else if (!serviceAccountPath.isEmpty()) {
-            try (FileInputStream serviceAccount = new FileInputStream(serviceAccountPath)) {
-                builder.setCredentials(GoogleCredentials.fromStream(serviceAccount));
-            } catch (IOException e) {
-                throw new IllegalStateException("해당 경로에서 파이어베이스 어카운트 불러오기 실패: " + serviceAccountPath, e);
-            }
-        } else {
-            throw new IllegalStateException("파이어베이스 credential 구성 실패");
-        }
-        return FirebaseApp.initializeApp(builder.build());
+        byte[] decodedKey = Base64.getDecoder().decode(serviceAccountJson);
+        InputStream serviceAccount = new ByteArrayInputStream(decodedKey);
+
+        FirebaseOptions options = FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                .build();
+        return FirebaseApp.initializeApp(options);
     }
 }
