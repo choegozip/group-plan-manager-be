@@ -13,7 +13,7 @@ import java.io.IOException;
 @Configuration
 public class FcmConfig {
 
-    @Value("${firebase.service-account-path}")
+    @Value("${firebase.service-account-path:}")
     private String serviceAccountPath;
 
     @Value("${firebase.use-application-default:false}")
