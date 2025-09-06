@@ -64,11 +64,13 @@ jobs:
           workload_identity_provider: projects/917369320282/locations/global/workloadIdentityPools/yena/providers/github-actions
           service_account: 'firebase-adminsdk-fbsvc@group-plan-manager.iam.gserviceaccount.com'
 
-      - name: Get service account key
+      - name: Send token to EC2 via SSM
         run: |
-          gcloud iam service-accounts keys create temp-key.json \
-          --iam-account=firebase-adminsdk-fbsvc@group-plan-manager.iam.gserviceaccount.com
-          echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$(cat temp-key.json | base64 -w 0)" >> .env
+          aws ssm send-command \
+            --targets "Key=instanceIds,Values=$EC2_INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Inject GCP token" \
+            --parameters 'commands=["echo $GCP_TOKEN > /tmp/gcp_token.json"]'
 
       - name: Copy nginx config files to EC2 via SSM
         run: |
