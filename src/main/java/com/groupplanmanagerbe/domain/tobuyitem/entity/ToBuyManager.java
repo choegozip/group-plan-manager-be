@@ -3,6 +3,8 @@ package com.groupplanmanagerbe.domain.tobuyitem.entity;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
+import com.groupplanmanagerbe.global.notification.listener.ItemManager;
+import com.groupplanmanagerbe.global.notification.listener.ItemNotificationListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +15,7 @@ import lombok.*;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ToBuyManager extends BaseEntity {
+public class ToBuyManager extends BaseEntity implements ItemManager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

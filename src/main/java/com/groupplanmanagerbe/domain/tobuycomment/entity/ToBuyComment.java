@@ -11,7 +11,6 @@ import lombok.*;
         name = "to_buy_comments",
         indexes = {
                 @Index(name = "idx_comment_to_buy_item", columnList = "to_buy_item_id"),
-                @Index(name = "idx_comment_user", columnList = "user_id")
         }
 )
 @Getter
