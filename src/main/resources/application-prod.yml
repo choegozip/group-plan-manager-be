@@ -24,20 +24,12 @@ spring:
       connection-test-query: "SELECT 1"
 
       data-source-properties:
-        # 수파베이스 핵심 권장사항
-        useServerPrepStmts: false
-        cachePrepStmts: false
-        prepareThreshold: 0
-
         # 성능 최적화
         reWriteBatchedInserts: true
         defaultRowFetchSize: 50
-
         # 네트워크 설정
-        socketTimeout: 20000
-        connectTimeout: 8000
+        socketTimeout: 15000
         tcpKeepAlive: true
-
         # 필수 보안 설정
         ssl: true
         sslmode: require
@@ -47,7 +39,6 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        # 올바른 위치로 이동
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
