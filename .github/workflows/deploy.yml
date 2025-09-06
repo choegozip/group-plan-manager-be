@@ -67,10 +67,11 @@ jobs:
       - name: Send token to EC2 via SSM
         run: |
           aws ssm send-command \
-            --targets "Key=instanceIds,Values=$EC2_INSTANCE_ID" \
+            --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
             --comment "Inject GCP token" \
             --parameters 'commands=["echo $GCP_TOKEN > /tmp/gcp_token.json"]'
+      
 
       - name: Copy nginx config files to EC2 via SSM
         run: |
