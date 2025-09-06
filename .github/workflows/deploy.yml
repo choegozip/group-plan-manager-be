@@ -91,11 +91,10 @@ jobs:
 
       - name: Copy .env to EC2 via SSM
         run: |
-          ENV_CONTENT=$(base64 -w 0 ./.env)
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d > /home/ec2-user/.env"] \
+            --parameters 'commands=["bash","-c","cat <<'"'"'EOF'"'"' > /home/ec2-user/.env\n'"$(cat .env)"'\nEOF"]' \
             --comment "Copy .env file" \
             --timeout-seconds 60
 
