@@ -4,6 +4,7 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class FcmService {
                 .build();
 
         String response = FirebaseMessaging.getInstance(firebaseApp).send(message);
-        log.info("메시지 전송 성공:{}", response);
+        log.info("메시지 전송 성공: {}", response);
+        log.info("보낼 메시지 JSON: {}", new Gson().toJson(message));
     }
 }
