@@ -1,5 +1,8 @@
 spring:
+  message:
+    encoding: UTF-8
   datasource:
+    driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
@@ -41,6 +44,8 @@ spring:
 
   jpa:
     hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
       ddl-auto: none
     properties:
       hibernate:
@@ -98,3 +103,6 @@ jwt:
     blackListPrefix: "BlackList:"
     expiration: 1800000
     refreshExpiration: 1209600000
+
+firebase:
+  service-account-path: /app/config/gpm-service-account.json
