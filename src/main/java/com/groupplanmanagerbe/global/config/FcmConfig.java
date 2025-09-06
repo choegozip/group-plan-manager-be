@@ -3,6 +3,7 @@ package com.groupplanmanagerbe.global.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.groupplanmanagerbe.global.util.WorkloadIdentityCredentialWrapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +30,7 @@ public class FcmConfig {
         if (useApplicationDefault) {
             String credentialsJson = System.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON");
             if (credentialsJson != null && !credentialsJson.isEmpty()) {
-                byte[] decodedKey = Base64.getDecoder().decode(credentialsJson);
-                InputStream serviceAccount = new ByteArrayInputStream(decodedKey);
+                InputStream serviceAccount = WorkloadIdentityCredentialWrapper.toJsonStream(credentialsJson);
                 builder.setCredentials(GoogleCredentials.fromStream(serviceAccount));
             } else {
                 builder.setCredentials(GoogleCredentials.getApplicationDefault());
