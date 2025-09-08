@@ -89,11 +89,10 @@ public class ToBuyItemController {
 
     @GetMapping("/{toBuyItemId}")
     public ResponseEntity<ApiSuccessRes<ToBuyDetailRes>> getToBuy(
-            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long spaceId,
             @PathVariable Long toBuyItemId
     ) {
-        ToBuyDetailRes response = toBuyItemService.getToBuy(authUser.userId(), spaceId, toBuyItemId);
+        ToBuyDetailRes response = toBuyItemService.getToBuy(spaceId, toBuyItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_BUY, response);
     }
 }

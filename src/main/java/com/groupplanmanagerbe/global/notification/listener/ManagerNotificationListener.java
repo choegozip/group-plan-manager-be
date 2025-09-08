@@ -34,7 +34,7 @@ public class ManagerNotificationListener {
             String status) throws FirebaseMessagingException {
         fcmService.sendToUser(
                 prefix + authorId,
-                managerNickname + "님이 " + item + "요청에 " + "응답했어요!",
+                managerNickname + "님이 '" + item + "' 요청에 " + "응답했어요!",
                 ManagerStatus.of(status).getMessage());
     }
 }

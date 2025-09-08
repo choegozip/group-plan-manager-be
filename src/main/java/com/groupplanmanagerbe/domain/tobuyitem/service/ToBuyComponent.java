@@ -26,6 +26,11 @@ public class ToBuyComponent {
         return toBuyItemRepository.getReferenceById(toBuyId);
     }
 
+    public ToBuyItem getByIdAndSpaceId(Long toBuyId, Long spaceId) {
+        return toBuyItemRepository.findByIdAndSpaceIdWithUser(toBuyId, spaceId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
+    }
+
     public ToBuyItem getByIdAndSpaceIdAndUserId(Long toBuyId, Long spaceId, Long userId) {
         return toBuyItemRepository.findByIdAndSpaceIdAndUserId(toBuyId, spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_BUY_NOT_FOUND));
