@@ -13,6 +13,14 @@ import java.util.Optional;
 
 public interface ToBuyItemRepository extends JpaRepository<ToBuyItem, Long> {
 
+    @EntityGraph(attributePaths = {"user"})
+    @Query("SELECT t FROM ToBuyItem t " +
+            "WHERE t.id = :toBuyItemId " +
+            "AND t.space.id = :spaceId " +
+            "AND t.space.deleted = false")
+    Optional<ToBuyItem> findByIdAndSpaceIdWithUser(@Param("toBuyItemId") Long toBuyItemId,
+                                                    @Param("spaceId") Long spaceId);
+
     @Query("SELECT t FROM ToBuyItem t " +
             "WHERE t.id = :toBuyItemId " +
             "AND t.space.id = :spaceId " +

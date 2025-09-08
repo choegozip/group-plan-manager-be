@@ -26,6 +26,11 @@ public class ToDoComponent {
         return toDoItemRepository.getReferenceById(toDoId);
     }
 
+    public ToDoItem getByIdAndSpaceIdWithUser(Long toDoId, Long spaceId) {
+        return toDoItemRepository.findByIdAndSpaceIdWithUser(toDoId, spaceId)
+                .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));
+    }
+
     public ToDoItem getByIdAndSpaceIdAndUserId(Long toDoId, Long spaceId, Long userId) {
         return toDoItemRepository.findByIdAndSpaceIdAndUserId(toDoId, spaceId, userId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.TO_DO_NOT_FOUND));

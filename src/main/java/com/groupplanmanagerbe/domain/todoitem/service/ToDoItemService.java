@@ -101,8 +101,8 @@ public class ToDoItemService {
         return ToDoPageRes.of(toDoListResList, request.size());
     }
 
-    public ToDoDetailRes getToDo(Long userId, Long spaceId, Long toDoId) {
-        ToDoItem toDo = toDoComponent.getByIdAndSpaceIdAndUserId(toDoId, spaceId, userId);
+    public ToDoDetailRes getToDo(Long spaceId, Long toDoId) {
+        ToDoItem toDo = toDoComponent.getByIdAndSpaceIdWithUser(toDoId, spaceId);
         List<ToDoComment> comments = commentComponent.getCommentList(toDoId);
         List<ToDoManager> managers = toDoComponent.getAllByToDoItemId(toDoId);
         return ToDoDetailRes.of(toDo, comments, managers);
