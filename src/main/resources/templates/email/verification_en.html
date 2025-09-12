@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333333;
+            margin-bottom: 6px;
+        }
+        h3 {
+            color: #6b6b6b;
+            margin-top: 0;
+            font-weight: normal;
+        }
+        p {
+            color: #555555;
+            line-height: 1.5;
+            margin: 12px 0;
+        }
+        .code-box {
+            display: inline-block;
+            margin-top: 18px;
+            padding: 18px 26px;
+            border-radius: 8px;
+            background-color: #f1f7ff;
+            border: 1px dashed #c7defa;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 26px;
+            letter-spacing: 6px;
+            color: #1b4f9c;
+            user-select: all; /* helps users copy if supported */
+        }
+        .note {
+            margin-top: 18px;
+            font-size: 14px;
+            color: #888888;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888888;
+        }
+        @media (max-width: 420px) {
+            .code-box { font-size: 22px; padding: 14px 18px; letter-spacing: 4px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📨 Email Verification</h1>
+    <br>
+    <h3><b>"Faster and more fun, together"</b></h3>
+
+    <p>Hello! This is <strong>Together</strong> 🙂🩷</p>
+
+    <p>Please enter the verification <b>code</b> below on the verification page</p>
+    <p>to complete your email verification.</p>
+
+    <!-- Server-generated verification code -->
+    <div class="code-box" th:text="${verificationCode}"></div>
+
+    <p class="footer">This code is valid for <strong><span th:text="${expirationMinutes}">30</span> minutes</strong>.</p>
+</div>
+</body>
+</html>

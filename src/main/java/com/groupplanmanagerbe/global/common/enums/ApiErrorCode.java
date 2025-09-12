@@ -68,13 +68,18 @@ public enum ApiErrorCode {
     // 코멘트
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "comment.not.found"),
 
+    // 메일 전송
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.create.fail") ,
+    EMAIL_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.send.fail"),
+    EMAIL_SEND_TOO_FREQUENT(HttpStatus.BAD_REQUEST, "ERROR", "email.send.too.frequent"),
+
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
-    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid");
-
+    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid"),
+    ;
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

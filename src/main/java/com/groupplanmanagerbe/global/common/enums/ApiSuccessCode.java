@@ -43,7 +43,10 @@ public enum ApiSuccessCode {
     SUCCESS_COMMENT_CREATE("SUCCESS", "comment.create.success"),
     SUCCESS_COMMENT_UPDATE("SUCCESS","comment.update.success"),
     SUCCESS_COMMENT_DELETE("SUCCESS","comment.delete.success"),
-    SUCCESS_COMMENT_GET("SUCCESS","comment.get.success")
+    SUCCESS_COMMENT_GET("SUCCESS","comment.get.success"),
+
+    SUCCESS_SEND_EMAIL("SUCCESS", "email.send.success"),
+    SUCCESS_VERIFY_EMAIL("SUCCESS", "email.verify.success")
     ;
 
     private final String code;
