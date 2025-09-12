@@ -99,12 +99,15 @@ jwt:
   secret:
     key: "${JWT_SECRET_KEY}"
     whiteList:
+      - /api/users/send-email
+      - /api/users/verify-email
       - /api/users/signup
       - /api/auth/login
-      - /invite
+      - /api/invite
       - /actuator/health
       - /actuator/prometheus
       - /api/auth/refresh
+
   token:
     prefix: "Bearer "
     refreshPrefix: "Refresh:"

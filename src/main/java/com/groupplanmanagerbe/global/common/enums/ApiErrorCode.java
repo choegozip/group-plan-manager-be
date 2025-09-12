@@ -72,6 +72,7 @@ public enum ApiErrorCode {
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.create.fail") ,
     EMAIL_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.send.fail"),
     EMAIL_SEND_TOO_FREQUENT(HttpStatus.BAD_REQUEST, "ERROR", "email.send.too.frequent"),
+    EMAIL_VALID_FAIL(HttpStatus.BAD_REQUEST, "ERROR", "email.verification.failed"),
 
     // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),

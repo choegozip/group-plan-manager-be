@@ -23,8 +23,9 @@
         h1 {
             color: #333333;
             margin-bottom: 6px;
+            font-size: 3rem;
         }
-        h3 {
+        h2 {
             color: #6b6b6b;
             margin-top: 0;
             font-weight: normal;
@@ -33,6 +34,8 @@
             color: #555555;
             line-height: 1.5;
             margin: 12px 0;
+            font-size: 1.1rem;
+
         }
         .code-box {
             display: inline-block;
@@ -42,7 +45,8 @@
             background-color: #f1f7ff;
             border: 1px dashed #c7defa;
             font-family: "Courier New", Courier, monospace;
-            font-size: 26px;
+            font-size: 30px;
+            font-weight: bold;
             letter-spacing: 6px;
             color: #1b4f9c;
             user-select: all; /* 이메일 클라이언트가 지원하면 복사 쉬움 */
@@ -67,14 +71,14 @@
 <div class="container">
     <h1>📨이메일 인증</h1>
     <br>
-    <h3><b>"함께 하면 더 빠르고, 즐겁게"</b></h3>
-
+    <h2><b>"함께 하면 더 빠르고, 즐겁게"</b></h2>
+    <br>
     <p>안녕하세요! <strong>투게두</strong>입니다 🙂🩷</p>
 
     <p>아래 <b>코드</b>를 인증 화면에 입력하여 이메일 인증을 완료해주세요.</p>
 
     <!-- 서버에서 생성하여 전달하는 코드 표시 -->
-    <div class="code-box" th:text="${verificationCode}"></div>
+    <div class="code-box" th:text="${verificationCode}">12345</div>
 
     <p class="footer">이 코드는 <strong><span th:text="${expirationMinutes}"></span>분</strong> 동안 유효합니다.</p>
 </div>

@@ -47,8 +47,15 @@ public class EmailService {
 
     @Transactional
     public void verifyCode(String email, String code) {
-        //작성예정
+        String codeKey = "email:code:" + email;
+        String savedCode = redisTemplate.opsForValue().get(codeKey);
+
+        if (savedCode == null || !savedCode.equals(code)) {
+            throw new EmailException(ApiErrorCode.EMAIL_VALID_FAIL);
+        }
     }
+
+    // === private ===
 
     private String generateCode() {
         SecureRandom random = new SecureRandom();
@@ -72,27 +79,6 @@ public class EmailService {
 
         sendEmail(email, title, htmlContent);
     }
-
-//    private void sendEmail(String toEmail, String title, String content) {
-//        try {
-//            MimeMessage message = javaMailSender.createMimeMessage();
-//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//            helper.setTo(toEmail);
-//            helper.setFrom(userMail);
-//            helper.setSubject(title);
-//            helper.setText(content, true);
-//            helper.setReplyTo(userMail);
-//
-//            javaMailSender.send(message);
-//        } catch (MessagingException e) {
-//            log.error("메일 메시지 생성 실패", e);
-//            throw new EmailException(ApiErrorCode.EMAIL_CREATION_FAILED);
-//        } catch (RuntimeException e) {
-//            log.error("메일 전송 실패: {}", e.getMessage());
-//            throw new EmailException(ApiErrorCode.EMAIL_SEND_FAILED);
-//        }
-//    }
-
 
     private void sendEmail(String toEmail, String title, String content) {
         try {
@@ -131,7 +117,6 @@ public class EmailService {
             throw new EmailException(ApiErrorCode.EMAIL_SEND_TOO_FREQUENT);
         }
         redisTemplate.opsForValue().set(resendKey, "LOCK", Duration.ofMinutes(1));
-
         redisTemplate.opsForValue().set(codeKey, code, Duration.ofMinutes(CODE_EXPIRATION_MINUTE));
     }
 }
