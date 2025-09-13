@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.security.SecureRandom;
 import java.time.Duration;
 
@@ -37,12 +35,13 @@ public class EmailService {
 
     private static final int CODE_LENGTH = 6;
     private static final int CODE_EXPIRATION_MINUTE = 30;
+    private static final int VERIFIED_EXPIRATION_MINUTE = 30;
 
     @Transactional
     public void sendCodeToEmail(String email) {
         String code = generateCode();
         createAndSendMail(email, code);
-        saveInfoToRedis(email, code);
+        setEmailCode(email, code);
     }
 
     @Transactional
@@ -50,9 +49,10 @@ public class EmailService {
         String codeKey = "email:code:" + email;
         String savedCode = redisTemplate.opsForValue().get(codeKey);
 
-        if (savedCode == null || !savedCode.equals(code)) {
-            throw new EmailException(ApiErrorCode.EMAIL_VALID_FAIL);
+        if (!code.equals(savedCode)) {
+            throw new EmailException(ApiErrorCode.INVALID_VERIFICATION_CODE);
         }
+        setEmailVerified(email);
     }
 
     // === private ===
@@ -109,7 +109,7 @@ public class EmailService {
         }
     }
 
-    private void saveInfoToRedis(String email, String code) {
+    private void setEmailCode(String email, String code) {
         String codeKey = "email:code:" + email;
         String resendKey = "email:resend:" + email;
 
@@ -118,5 +118,10 @@ public class EmailService {
         }
         redisTemplate.opsForValue().set(resendKey, "LOCK", Duration.ofMinutes(1));
         redisTemplate.opsForValue().set(codeKey, code, Duration.ofMinutes(CODE_EXPIRATION_MINUTE));
+    }
+
+    private void setEmailVerified(String email) {
+        String codeKey = "email:verified" + email;
+        redisTemplate.opsForValue().set(codeKey, "success", Duration.ofMinutes(VERIFIED_EXPIRATION_MINUTE));
     }
 }

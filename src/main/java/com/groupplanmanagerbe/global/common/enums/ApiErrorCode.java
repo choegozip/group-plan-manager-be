@@ -72,9 +72,10 @@ public enum ApiErrorCode {
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.create.fail") ,
     EMAIL_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR", "email.send.fail"),
     EMAIL_SEND_TOO_FREQUENT(HttpStatus.BAD_REQUEST, "ERROR", "email.send.too.frequent"),
-    EMAIL_VALID_FAIL(HttpStatus.BAD_REQUEST, "ERROR", "email.verification.failed"),
+    UNVERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "ERROR", "email.unverified"),
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "ERROR", "email.verification.failed"),
 
-    // 공통
+            // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),

@@ -5,6 +5,7 @@ import com.groupplanmanagerbe.global.common.enums.ApiSuccessCode;
 import com.groupplanmanagerbe.global.common.response.ApiSuccessRes;
 import com.groupplanmanagerbe.presentation.email.dto.request.MailSendReq;
 import com.groupplanmanagerbe.presentation.email.dto.request.MailVerifyReq;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class EmailController {
 
     @PostMapping("/send-email")
     public ResponseEntity<ApiSuccessRes<Void>> sendEmail(
-            @RequestBody MailSendReq request
+            @Valid @RequestBody MailSendReq request
     ) {
         emailService.sendCodeToEmail(request.email());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_SEND_EMAIL);
@@ -29,7 +30,7 @@ public class EmailController {
 
     @PostMapping("/verify-email")
     public ResponseEntity<ApiSuccessRes<Void>> verifyCode(
-            @RequestBody MailVerifyReq request
+            @Valid @RequestBody MailVerifyReq request
     ) {
         emailService.verifyCode(request.email(), request.code());
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_VERIFY_EMAIL);
