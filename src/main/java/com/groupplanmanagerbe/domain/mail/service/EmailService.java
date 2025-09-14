@@ -55,6 +55,17 @@ public class EmailService {
         setEmailVerified(email);
     }
 
+    public void checkEmailVerified(String email) {
+        String codeKey = "email:verified" + email;
+        String savedCode = redisTemplate.opsForValue().get(codeKey);
+
+        if (!"success".equals(savedCode)) {
+            throw new EmailException(ApiErrorCode.UNVERIFIED_EMAIL);
+        }
+
+        redisTemplate.delete(codeKey);
+    }
+
     // === private ===
 
     private String generateCode() {

@@ -1,16 +1,15 @@
 package com.groupplanmanagerbe.domain.user.service;
 
+import com.groupplanmanagerbe.domain.mail.service.EmailService;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.repository.UserRepository;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
-import com.groupplanmanagerbe.global.exception.custom.EmailException;
 import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserCreateRes;
 import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +22,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserComponent userComponent;
     private final PasswordEncoder passwordEncoder;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final EmailService emailService;
 
     @Transactional
     public UserCreateRes create(CreateUserReq request) {
-        confirmEmailVerified(request.email());
+        emailService.checkEmailVerified(request.email());
 
         if (userComponent.isExist(request.email())) {
             throw new DuplicateException(ApiErrorCode.USER_DUPLICATED_EMAIL);
@@ -61,14 +60,5 @@ public class UserService {
     public void delete(Long userId) {
         User savedUser = userComponent.getByIdAndDeleteFalse(userId);
         savedUser.delete();
-    }
-
-    private void confirmEmailVerified(String email) {
-        String codeKey = "email:verified" + email;
-        String savedCode = redisTemplate.opsForValue().get(codeKey);
-
-        if (!"success".equals(savedCode)) {
-            throw new EmailException(ApiErrorCode.UNVERIFIED_EMAIL);
-        }
     }
 }

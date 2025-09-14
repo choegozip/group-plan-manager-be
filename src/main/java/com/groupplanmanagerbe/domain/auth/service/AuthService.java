@@ -1,6 +1,7 @@
 package com.groupplanmanagerbe.domain.auth.service;
 
 import com.groupplanmanagerbe.domain.auth.entity.RefreshToken;
+import com.groupplanmanagerbe.domain.mail.service.EmailService;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.enums.UserRole;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
@@ -10,6 +11,7 @@ import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.global.exception.custom.UnAuthorizedException;
 import com.groupplanmanagerbe.global.security.token.JwtUtil;
 import com.groupplanmanagerbe.presentation.auth.dto.request.LoginReq;
+import com.groupplanmanagerbe.presentation.auth.dto.request.PasswordResetReq;
 import com.groupplanmanagerbe.presentation.auth.dto.request.RefreshTokenReq;
 import com.groupplanmanagerbe.presentation.auth.dto.response.TokenRes;
 import io.jsonwebtoken.Claims;
@@ -32,6 +34,7 @@ public class AuthService {
     private final UserComponent userComponent;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Transactional
     public TokenRes login(LoginReq request) {
@@ -71,6 +74,15 @@ public class AuthService {
         refreshService.update(userId, refreshToken);
 
         return TokenRes.of(accessToken, refreshToken);
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetReq request) {
+        emailService.checkEmailVerified(request.email());
+
+        User user = userComponent.getByEmail(request.email());
+        String encodedPassword = passwordEncoder.encode(request.password());
+        user.resetPassword(encodedPassword);
     }
 
     // === Private Methods ===

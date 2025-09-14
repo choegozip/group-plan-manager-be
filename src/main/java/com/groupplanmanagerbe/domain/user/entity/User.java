@@ -94,4 +94,8 @@ public class User extends BaseEntity {
         }
         this.deleted = true;
     }
+
+    public void resetPassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
