@@ -102,7 +102,7 @@ public class ToBuyItemService {
 
     public ToBuyPageRes getToBuyList(Long userId, Long spaceId, CursorPageRequest request, ParamReq params) {
         List<ToBuyListProjection> toBuyList = toBuyComponent.getToBuyItemsNative(spaceId, userId, params, request);
-        Map<Long, List<ToBuyManager>> managerMap = mapToBuyManagersByItemId(toBuyList);
+        Map<Long, List<ToBuyManager>> managerMap = mapToBuyManagersByItemId(toBuyList, userId);
         List<ToBuyListRes> toBuyListResList = toRes(toBuyList, managerMap);
         return ToBuyPageRes.of(toBuyListResList, request.size());
     }
@@ -144,9 +144,9 @@ public class ToBuyItemService {
                 request.imageUrl(), request.referenceUrl(), request.memo(), managers);
     }
 
-    private Map<Long, List<ToBuyManager>> mapToBuyManagersByItemId(List<ToBuyListProjection> toBuyList) {
+    private Map<Long, List<ToBuyManager>> mapToBuyManagersByItemId(List<ToBuyListProjection> toBuyList, Long userId) {
         List<Long> toBuyIds = toBuyList.stream().map(ToBuyListProjection::getToBuyId).toList();
-        List<ToBuyManager> allManagers = toBuyComponent.getByToBuyItemIdsWithUser(toBuyIds);
+        List<ToBuyManager> allManagers = toBuyComponent.getByToBuyItemIdsWithUser(toBuyIds, userId);
         return allManagers.stream()
                 .collect(groupingBy(m -> m.getToBuyItem().getId()));
     }

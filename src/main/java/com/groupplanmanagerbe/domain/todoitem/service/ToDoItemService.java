@@ -104,7 +104,7 @@ public class ToDoItemService {
 
     public ToDoPageRes getToDoList(Long userId, Long spaceId, CursorPageRequest request, ParamReq params) {
         List<ToDoListProjection> toDoList = toDoComponent.getToDoItemsNative(spaceId, userId, params, request);
-        Map<Long, List<ToDoManager>> managerMap = mapToDoManagersByItemId(toDoList);
+        Map<Long, List<ToDoManager>> managerMap = mapToDoManagersByItemId(toDoList, userId);
         List<ToDoListRes> toDoListResList = toRes(toDoList, managerMap);
         return ToDoPageRes.of(toDoListResList, request.size());
     }
@@ -146,9 +146,9 @@ public class ToDoItemService {
                 request.imageUrl(), request.referenceUrl(), managers);
     }
 
-    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoListProjection> toDoList) {
+    private Map<Long, List<ToDoManager>> mapToDoManagersByItemId (List<ToDoListProjection> toDoList, Long userId) {
         List<Long> toDoIds = toDoList.stream().map(ToDoListProjection::getToDoId).toList();
-        List<ToDoManager> allManagers = toDoComponent.getByToDoItemIdsWithUser(toDoIds);
+        List<ToDoManager> allManagers = toDoComponent.getByToDoItemIdsWithUser(toDoIds, userId);
         return allManagers.stream()
                 .collect(groupingBy(m -> m.getToDoItem().getId()));
     }
