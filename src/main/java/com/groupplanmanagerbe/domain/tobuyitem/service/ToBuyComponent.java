@@ -10,8 +10,10 @@ import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyListProjection;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,9 +45,12 @@ public class ToBuyComponent {
 
     public List<ToBuyListProjection> getToBuyItemsNative(
             Long spaceId, Long userId, ParamReq params, CursorPageRequest request) {
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+
         return toBuyItemRepository.findToBuyItemsNative(
                 spaceId, userId, params.managerId(), params.urgency(), request.cursor(),
-                request.direction(), request.size(), params.includeExpired(), LocalDateTime.now());
+                request.direction(), request.size(), params.includeExpired(), startOfDay);
     }
 
     public ToBuyManager getByIdAndSpaceIdAndToBuyIdWithToBuy(Long managerId, Long spaceId, Long toBuyId) {
