@@ -14,6 +14,9 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
+import com.groupplanmanagerbe.global.sse.SseService;
+import com.groupplanmanagerbe.global.sse.dto.ManagerStatusData;
+import com.groupplanmanagerbe.global.sse.dto.ToBuyData;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
@@ -47,6 +50,7 @@ public class ToDoItemService {
     private final UserComponent userComponent;
     private final ToDoCommentComponent commentComponent;
     private final ApplicationEventPublisher eventPublisher;
+    private final SseService sseService;
 
     @Transactional
     public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
@@ -69,6 +73,9 @@ public class ToDoItemService {
                 ? Collections.emptyList()
                 : assignManagersToToDo(request.managerIds(), toDo.getSpace(), toDo);
         updateToDoItem(request, toDo, managers);
+
+        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ToBuyData.of(toDoId, request, managers));
+
         return ToDoRes.of(toDo.getId());
     }
 
@@ -89,6 +96,7 @@ public class ToDoItemService {
         ToDoManager manager = toDoComponent.getByIdAndSpaceIdAndToDoIdWithToDo(managerId, spaceId, toDoId);
         manager.updateStatus(request.managerStatus());
 
+        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ManagerStatusData.of(toDoId, manager));
         publishChangeStatusEvent(manager, request);
 
         return UpdateManagerStatusRes.of(manager.getStatus());

@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ToDoCommentRepository extends JpaRepository<ToDoComment, Long> {
+    @Query("SELECT EXISTS(SELECT 1 FROM ToDoComment c WHERE c.toDoItem.id = :toDoId)")
+    boolean existComment(@Param("toDoId") Long toDoId);
+
     @EntityGraph(attributePaths = {"user"})
     List<ToDoComment> findAllByToDoItemId(Long toDoItemId);
 
