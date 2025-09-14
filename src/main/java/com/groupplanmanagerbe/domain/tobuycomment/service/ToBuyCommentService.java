@@ -11,6 +11,8 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.global.sse.SseService;
+import com.groupplanmanagerbe.global.sse.dto.CommentData;
 import com.groupplanmanagerbe.presentation.comment.dto.CommentListProjection;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentListRes;
@@ -18,12 +20,14 @@ import com.groupplanmanagerbe.presentation.comment.dto.response.CommentPageRes;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -33,12 +37,15 @@ public class ToBuyCommentService {
     private final UserComponent userComponent;
     private final SpaceComponent spaceComponent;
     private final ToBuyComponent toBuyComponent;
+    private final SseService sseService;
 
     @Transactional
     public CommentRes createComment(Long userId, CommentReq request, Long spaceId, Long toBuyId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
+            createEventIfFirstComment(spaceId, toBuyId);
+
             User user = userComponent.getByIdAndDeleteFalse(userId);
             ToBuyItem toBuyItem = toBuyComponent.getReferenceById(toBuyId);
             toBuyItem.addComment(ToBuyComment.of(toBuyItem, user, request.content()));
@@ -76,6 +83,14 @@ public class ToBuyCommentService {
                 .map(CommentListRes::from)
                 .toList();
         return CommentPageRes.of(commentListRes, request.size());
+    }
+
+    // ## private ##
+    private void createEventIfFirstComment(Long spaceId, Long toBuyId) {
+        boolean existed = commentRepository.existComment(toBuyId);
+        if (!existed) {
+            sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_BUY, CommentData.of(toBuyId));
+        }
     }
 
     private ToBuyComment getComment(Long userId, Long commentId) {

@@ -12,6 +12,7 @@ import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -43,9 +44,11 @@ public class ToDoComponent {
 
     public List<ToDoListProjection> getToDoItemsNative(
             Long spaceId, Long userId, ParamReq params, CursorPageRequest request) {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+
         return toDoItemRepository.findToDoItemsNative(
                 spaceId, userId, params.managerId(), params.urgency(), request.cursor(),
-                request.direction(), request.size(), params.includeExpired(), LocalDateTime.now());
+                request.direction(), request.size(), params.includeExpired(), startOfDay);
     }
 
     public ToDoManager getByIdAndSpaceIdAndToDoIdWithToDo(Long managerId, Long spaceId, Long toDoId) {
