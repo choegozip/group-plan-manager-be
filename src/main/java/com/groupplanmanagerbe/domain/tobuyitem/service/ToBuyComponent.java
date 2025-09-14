@@ -62,7 +62,7 @@ public class ToBuyComponent {
         return toBuyManagerRepository.findByToBuyItemIdsWithUser(toBuyIds, userId);
     }
 
-    public List<ToBuyManager> getAllByToBuyItemId(Long toBuyId) {
-        return toBuyManagerRepository.findAllByToBuyItemId(toBuyId);
+    public List<ToBuyManager> getAllByToBuyItemId(Long toBuyId, Long userId) {
+        return toBuyManagerRepository.findAllByToBuyItemId(toBuyId, userId);
     }
 }

@@ -38,5 +38,18 @@ public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long
                                                   @Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"user"})
-    List<ToBuyManager> findAllByToBuyItemId(Long toBuyItemId);
+    @Query("""
+            SELECT tm FROM ToBuyManager tm
+            JOIN FETCH tm.user
+            WHERE tm.toBuyItem.id = :toBuyItemId
+               ORDER BY
+                CASE WHEN tm.user.id = :userId THEN 0 ELSE 1 END,
+                CASE tm.status
+                    WHEN 'DONE' THEN 0
+                    WHEN 'ACCEPT' THEN 1
+                    ELSE 2
+                END
+            """)
+    List<ToBuyManager> findAllByToBuyItemId(@Param("toBuyItemId") Long toBuyItemId,
+                                            @Param("userId") Long userId);
 }

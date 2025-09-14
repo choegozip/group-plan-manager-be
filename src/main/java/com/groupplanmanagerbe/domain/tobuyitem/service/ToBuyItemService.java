@@ -107,10 +107,10 @@ public class ToBuyItemService {
         return ToBuyPageRes.of(toBuyListResList, request.size());
     }
 
-    public ToBuyDetailRes getToBuy(Long spaceId, Long toBuyId) {
+    public ToBuyDetailRes getToBuy(Long userId, Long spaceId, Long toBuyId) {
         ToBuyItem toBuy = toBuyComponent.getByIdAndSpaceId(toBuyId, spaceId);
         List<ToBuyComment> comments = commentComponent.getCommentList(toBuyId);
-        List<ToBuyManager> managers = toBuyComponent.getAllByToBuyItemId(toBuyId);
+        List<ToBuyManager> managers = toBuyComponent.getAllByToBuyItemId(toBuyId, userId);
         return ToBuyDetailRes.of(toBuy, comments, managers);
     }
 
