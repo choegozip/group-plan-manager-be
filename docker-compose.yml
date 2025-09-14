@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    volumes:
-      - C:/Users/goo3o/Documents/fcm/gpm-service-account.json:/app/config/gpm-service-account.json
     depends_on:
       - db
       - redis
@@ -14,6 +12,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DATA_REDIS_URL: redis://redis:6379
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
     ports:
       - "8080:8080"
 
