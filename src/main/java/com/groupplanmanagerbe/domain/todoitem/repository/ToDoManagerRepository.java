@@ -38,5 +38,18 @@ public interface ToDoManagerRepository extends JpaRepository<ToDoManager, Long> 
                                                 @Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"user"})
-    List<ToDoManager> findAllByToDoItemId(Long toDoItemId);
+    @Query("""
+            SELECT tm FROM ToDoManager tm
+            JOIN FETCH tm.user
+            WHERE tm.toDoItem.id = :toDoItemId
+            ORDER BY
+                CASE WHEN tm.user.id = :userId THEN 0 ELSE 1 END,
+                CASE tm.status
+                    WHEN 'DONE' THEN 0
+                    WHEN 'ACCEPT' THEN 1
+                    ELSE 2
+                END
+            """)
+    List<ToDoManager> findAllByToDoItemId(@Param("toDoItemId") Long toDoItemId,
+                                          @Param("userId") Long userId);
 }

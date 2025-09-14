@@ -56,11 +56,11 @@ public class ToDoComponent {
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
     }
 
-    public List<ToDoManager> getByToDoItemIdsWithUser(List<Long> toBuyIds, Long userId) {
-        return toDoManagerRepository.findByToDoItemIdsWithUser(toBuyIds, userId);
+    public List<ToDoManager> getByToDoItemIdsWithUser(List<Long> todoIds, Long userId) {
+        return toDoManagerRepository.findByToDoItemIdsWithUser(todoIds, userId);
     }
 
-    public List<ToDoManager> getAllByToDoItemId(Long toBuyId) {
-        return toDoManagerRepository.findAllByToDoItemId(toBuyId);
+    public List<ToDoManager> getAllByToDoItemId(Long todoId, Long userId) {
+        return toDoManagerRepository.findAllByToDoItemId(todoId, userId);
     }
 }

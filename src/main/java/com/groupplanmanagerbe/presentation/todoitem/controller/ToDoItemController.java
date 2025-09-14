@@ -89,10 +89,11 @@ public class ToDoItemController {
 
     @GetMapping("/{toDoItemId}")
     public ResponseEntity<ApiSuccessRes<ToDoDetailRes>> getToBuy(
+            @AuthenticationPrincipal AuthUser authUser,
             @PathVariable Long spaceId,
             @PathVariable Long toDoItemId
     ) {
-        ToDoDetailRes response = toDoItemService.getToDo(spaceId, toDoItemId);
+        ToDoDetailRes response = toDoItemService.getToDo(authUser.userId(), spaceId, toDoItemId);
         return ApiSuccessRes.success(ApiSuccessCode.SUCCESS_GET_TO_DO, response);
     }
 }
