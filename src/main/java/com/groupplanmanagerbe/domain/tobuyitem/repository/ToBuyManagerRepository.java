@@ -26,9 +26,16 @@ public interface ToBuyManagerRepository extends JpaRepository<ToBuyManager, Long
             SELECT tm FROM ToBuyManager tm
             JOIN FETCH tm.user
             WHERE tm.toBuyItem.id IN :itemIds
-            ORDER BY tm.toBuyItem.id
+            ORDER BY
+                CASE WHEN tm.user.id = :userId THEN 0 ELSE 1 END,
+                CASE tm.status
+                    WHEN 'DONE' THEN 0
+                    WHEN 'ACCEPT' THEN 1
+                    ELSE 2
+                END
             """)
-    List<ToBuyManager> findByToBuyItemIdsWithUser(@Param("itemIds") List<Long> itemIds);
+    List<ToBuyManager> findByToBuyItemIdsWithUser(@Param("itemIds") List<Long> itemIds,
+                                                  @Param("userId") Long userId);
 
     @EntityGraph(attributePaths = {"user"})
     List<ToBuyManager> findAllByToBuyItemId(Long toBuyItemId);

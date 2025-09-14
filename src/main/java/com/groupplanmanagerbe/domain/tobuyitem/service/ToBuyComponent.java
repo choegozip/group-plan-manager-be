@@ -58,8 +58,8 @@ public class ToBuyComponent {
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
     }
 
-    public List<ToBuyManager> getByToBuyItemIdsWithUser(List<Long> toBuyIds) {
-        return toBuyManagerRepository.findByToBuyItemIdsWithUser(toBuyIds);
+    public List<ToBuyManager> getByToBuyItemIdsWithUser(List<Long> toBuyIds, Long userId) {
+        return toBuyManagerRepository.findByToBuyItemIdsWithUser(toBuyIds, userId);
     }
 
     public List<ToBuyManager> getAllByToBuyItemId(Long toBuyId) {
