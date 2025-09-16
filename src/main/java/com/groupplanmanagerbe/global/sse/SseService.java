@@ -1,5 +1,6 @@
 package com.groupplanmanagerbe.global.sse;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -12,12 +13,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
+@Getter
 public class SseService {
 
     private final Map<Long, Map<String, List<SseEmitter>>> emitterMap = new ConcurrentHashMap<>();
 
     public final String TYPE_OF_TO_BUY = "toBuy";
-    public final String TYPE_OF_TO_DO= "toDo";
+    public final String TYPE_OF_TO_DO = "toDo";
 
     public SseEmitter subscribe(Long spaceId, String type) {
         SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30분
@@ -26,24 +28,26 @@ public class SseService {
                 .computeIfAbsent(spaceId, k -> new ConcurrentHashMap<>())
                 .computeIfAbsent(type, k -> new CopyOnWriteArrayList<>())
                 .add(emitter);
-        log.info("SSE 구독 시작: spaceId={}, type={},currentSubscribers={}", spaceId, type, emitterMap.get(spaceId).size());
+
+        int currentSubscribers = getConnectionsBySpace(spaceId);
+        log.info("SSE 구독 시작: spaceId={}, type={},currentSubscribers={}", spaceId, type, currentSubscribers);
 
         emitter.onCompletion(() -> {
             removeEmitter(spaceId, type, emitter);
             log.info("SSE 구독 종료(completion): spaceId={}, currentSubscribers={}",
-                    spaceId, emitterMap.get(spaceId).size());
+                    spaceId, currentSubscribers);
         });
 
         emitter.onTimeout(() -> {
             removeEmitter(spaceId, type, emitter);
             log.info("SSE 구독 종료(timeout): spaceId={}, currentSubscribers={}",
-                    spaceId, emitterMap.get(spaceId).size());
+                    spaceId, currentSubscribers);
         });
 
         emitter.onError((throwable) -> {
             removeEmitter(spaceId, type, emitter);
             log.error("SSE 구독 종료(error): spaceId={}, currentSubscribers={}, error={}",
-                    spaceId, emitterMap.get(spaceId).size(), throwable.getMessage());
+                    spaceId, currentSubscribers, throwable.getMessage());
         });
 
         return emitter;
@@ -85,6 +89,14 @@ public class SseService {
     public int getTotalConnections() {
         return emitterMap.values().stream()
                 .flatMap(typeMap -> typeMap.values().stream())
+                .mapToInt(List::size)
+                .sum();
+    }
+
+    public int getConnectionsBySpace(Long spaceId) {
+        return emitterMap.getOrDefault(spaceId, Map.of())
+                .values()
+                .stream()
                 .mapToInt(List::size)
                 .sum();
     }
