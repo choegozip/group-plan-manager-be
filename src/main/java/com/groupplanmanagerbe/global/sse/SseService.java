@@ -81,4 +81,15 @@ public class SseService {
             }
         }
     }
+
+    public int getTotalConnections() {
+        return emitterMap.values().stream()
+                .flatMap(typeMap -> typeMap.values().stream())
+                .mapToInt(List::size)
+                .sum();
+    }
+
+    public int getTotalSpaces() {
+        return emitterMap.size();
+    }
 }

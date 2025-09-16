@@ -87,8 +87,8 @@ jwt:
       - /api/users/signup
       - /api/auth/login
       - /invite
-      - /actuator/health
-      - /actuator/prometheus
+      - /admin/health
+      - /admin/prometheus
       - /api/auth/refresh
   token:
     prefix: "Bearer "
