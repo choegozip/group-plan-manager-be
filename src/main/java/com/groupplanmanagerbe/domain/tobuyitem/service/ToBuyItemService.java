@@ -52,6 +52,10 @@ public class ToBuyItemService {
 
     @Transactional
     public ToBuyRes createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
+        if (toBuyComponent.countBySpaceId(spaceId) > 100) {
+           throw new InvalidException(ApiErrorCode.TO_BUY_LIMIT_EXCEEDED);
+        }
+
         User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         ToBuyItem toBuy = createToBuyItem(request, user, space);

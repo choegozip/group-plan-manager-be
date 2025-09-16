@@ -64,6 +64,8 @@ public enum ApiErrorCode {
     INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
     TO_DO_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.do.not.found"),
     INVALID_TO_DO_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.do.id.invalid"),
+    TO_BUY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.limit.exceeded"),
+    TO_DO_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "to.do.limit.exceeded"),
 
     // 코멘트
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "comment.not.found"),

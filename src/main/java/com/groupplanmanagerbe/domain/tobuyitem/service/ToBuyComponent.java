@@ -24,6 +24,10 @@ public class ToBuyComponent {
     private final ToBuyItemRepository toBuyItemRepository;
     private final ToBuyManagerRepository toBuyManagerRepository;
 
+    public int countBySpaceId(Long spaceId) {
+        return toBuyItemRepository.countBySpaceId(spaceId);
+    }
+
     public ToBuyItem getReferenceById(Long toBuyId) {
         return toBuyItemRepository.getReferenceById(toBuyId);
     }

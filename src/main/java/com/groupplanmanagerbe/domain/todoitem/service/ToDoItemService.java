@@ -54,6 +54,10 @@ public class ToDoItemService {
 
     @Transactional
     public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
+        if (toDoComponent.countBySpaceId(spaceId) > 100) {
+            throw new InvalidException(ApiErrorCode.TO_DO_LIMIT_EXCEEDED);
+        }
+
         User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         ToDoItem toDo = createToDoItem(request, user, space);

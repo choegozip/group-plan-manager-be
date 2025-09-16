@@ -23,6 +23,10 @@ public class ToDoComponent {
     private final ToDoItemRepository toDoItemRepository;
     private final ToDoManagerRepository toDoManagerRepository;
 
+    public int countBySpaceId(Long spaceId) {
+        return toDoItemRepository.countBySpaceId(spaceId);
+    }
+
     public ToDoItem getReferenceById(Long toDoId) {
         return toDoItemRepository.getReferenceById(toDoId);
     }
