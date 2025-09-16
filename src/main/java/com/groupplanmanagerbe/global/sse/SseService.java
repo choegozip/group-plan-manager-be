@@ -20,7 +20,7 @@ public class SseService {
     public final String TYPE_OF_TO_DO= "toDo";
 
     public SseEmitter subscribe(Long spaceId, String type) {
-        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); // 30분
+        SseEmitter emitter = new SseEmitter(0L); // 30분
 
         emitterMap
                 .computeIfAbsent(spaceId, k -> new ConcurrentHashMap<>())
