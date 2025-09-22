@@ -3,6 +3,8 @@ package com.groupplanmanagerbe.global.notification.listener;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.groupplanmanagerbe.domain.tobuyitem.event.ChangeToBuyMgrStatusEvent;
 import com.groupplanmanagerbe.domain.todoitem.event.ChangeToDoMgrStatusEvent;
+import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.notification.service.FcmRetryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ public class ManagerNotificationListener {
             String managerNickname,
             String item,
             String status) throws FirebaseMessagingException {
+        retryService.recoverFromTopicFailure(new InvalidException(ApiErrorCode.TO_BUY_NOT_FOUND), authorId, managerNickname, item, status);
         retryService.sendManagerStatusWithRetry(authorId, managerNickname, item, status);
     }
 }
