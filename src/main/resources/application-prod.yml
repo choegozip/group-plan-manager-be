@@ -99,3 +99,6 @@ jwt:
 
 firebase:
   service-account-json: ${GOOGLE_SERVICE_ACCOUNT}
+
+slack:
+  webhook-url: ${WEBHOOK_URL}
