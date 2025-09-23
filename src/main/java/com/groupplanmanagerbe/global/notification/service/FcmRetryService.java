@@ -81,7 +81,7 @@ public class FcmRetryService {
             String item
     ) {
         String topic = prefix + manager.getUser().getId();
-        String title = "\uD83E\uDD29" + author + "님이 새로운 " + itemType + "을 추가했어요. 확인해보세요!";
+        String title = "\uD83E\uDD29" + author + "님이 새로운 " + itemType + "을 추가했어요.";
         String body = "추가한 항목: " + item + "✨";
 
         slackAlertService.sendAlert("FCM 전송 실패: " + topic, ex.getMessage() + "\n제목: " + title + "\n본문: " + body);
