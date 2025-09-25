@@ -52,7 +52,7 @@ public class ToBuyItemService {
 
     @Transactional
     public ToBuyRes createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
-        if (toBuyComponent.countBySpaceId(spaceId) > 100) {
+        if (toBuyComponent.countBySpaceId(spaceId) > 10) {
            throw new InvalidException(ApiErrorCode.TO_BUY_LIMIT_EXCEEDED);
         }
 
