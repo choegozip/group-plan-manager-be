@@ -14,9 +14,6 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
-import com.groupplanmanagerbe.global.sse.SseService;
-import com.groupplanmanagerbe.global.sse.dto.ManagerStatusData;
-import com.groupplanmanagerbe.global.sse.dto.ToBuyData;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.ToBuyListProjection;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.CreateToBuyReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
@@ -48,7 +45,6 @@ public class ToBuyItemService {
     private final UserComponent userComponent;
     private final ToBuyCommentComponent commentComponent;
     private final ApplicationEventPublisher eventPublisher;
-    private final SseService sseService;
 
     @Transactional
     public ToBuyRes createToBuy(Long userId, CreateToBuyReq request, Long spaceId) {
@@ -76,8 +72,6 @@ public class ToBuyItemService {
                 : assignManagersToToBuy(request.managerIds(), toBuy.getSpace(), toBuy);
         updateToBuyItem(request, toBuy, managers);
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_BUY, ToBuyData.of(toBuyId, request, managers));
-
         return ToBuyRes.of(toBuy.getId());
     }
 
@@ -98,7 +92,6 @@ public class ToBuyItemService {
         ToBuyManager manager = toBuyComponent.getByIdAndSpaceIdAndToBuyIdWithToBuy(managerId, spaceId, toBuyId);
         manager.updateStatus(request.managerStatus());
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_BUY, ManagerStatusData.of(toBuyId, manager));
         publishChangeStatusEvent(manager, request);
 
         return UpdateManagerStatusRes.of(manager.getStatus());

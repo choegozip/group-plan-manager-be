@@ -50,7 +50,6 @@ public class ToDoItemService {
     private final UserComponent userComponent;
     private final ToDoCommentComponent commentComponent;
     private final ApplicationEventPublisher eventPublisher;
-    private final SseService sseService;
 
     @Transactional
     public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
@@ -78,8 +77,6 @@ public class ToDoItemService {
                 : assignManagersToToDo(request.managerIds(), toDo.getSpace(), toDo);
         updateToDoItem(request, toDo, managers);
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ToBuyData.of(toDoId, request, managers));
-
         return ToDoRes.of(toDo.getId());
     }
 
@@ -100,7 +97,6 @@ public class ToDoItemService {
         ToDoManager manager = toDoComponent.getByIdAndSpaceIdAndToDoIdWithToDo(managerId, spaceId, toDoId);
         manager.updateStatus(request.managerStatus());
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ManagerStatusData.of(toDoId, manager));
         publishChangeStatusEvent(manager, request);
 
         return UpdateManagerStatusRes.of(manager.getStatus());
