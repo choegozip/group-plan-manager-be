@@ -1,4 +1,4 @@
-package com.groupplanmanagerbe.global.notification.service;
+package com.groupplanmanagerbe.global.alert.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

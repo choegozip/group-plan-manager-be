@@ -1,4 +1,4 @@
-package com.groupplanmanagerbe.global.notification.listener;
+package com.groupplanmanagerbe.global.alert.listener;
 
 import com.groupplanmanagerbe.domain.user.entity.User;
 
