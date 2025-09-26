@@ -1,9 +1,9 @@
-package com.groupplanmanagerbe.global.notification.service;
+package com.groupplanmanagerbe.global.alert.service;
 
 import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
-import com.groupplanmanagerbe.global.notification.listener.ItemManager;
+import com.groupplanmanagerbe.global.alert.listener.ItemManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -18,7 +18,7 @@ import java.net.SocketTimeoutException;
 @RequiredArgsConstructor
 public class FcmRetryService {
 
-    private static final String prefix = "common-";
+    private static final String prefix = "alert-userId";
     private final SlackAlertService slackAlertService;
     private final FcmService fcmService;
 
@@ -36,15 +36,13 @@ public class FcmRetryService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
-    public void sendToSingleManagerWithRetry(
+    public void sendToEachManagerOnCreate(
             ItemManager manager,
-            String author,
-            String itemType,
-            String item) throws FirebaseMessagingException {
+            String title,
+            String body) throws FirebaseMessagingException {
         String topic = prefix + manager.getUser().getId();
-        fcmService.sendToUser(topic,
-                "\uD83E\uDD29" + author + "님이 새로운 " + itemType + "을 추가했어요. 확인해보세요!",
-                "추가한 항목: " + item + "✨");
+
+        fcmService.sendToUser(topic, title, body);
     }
 
     @Retryable(
@@ -61,15 +59,35 @@ public class FcmRetryService {
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2)
     )
-    public void sendManagerStatusWithRetry(
+    public void sendToEachManagerOnUpdate(
+            ItemManager manager,
+            String title,
+            String body) throws FirebaseMessagingException {
+        String topic = prefix + manager.getUser().getId();
+
+        fcmService.sendToUser(topic, title, body);
+    }
+
+    @Retryable(
+            retryFor = {
+                    FirebaseException.class,
+                    FirebaseMessagingException.class,
+                    IOException.class,              // 네트워크 오류
+                    ConnectException.class,         // 연결 오류
+                    SocketTimeoutException.class    // 타임아웃
+            },
+            noRetryFor = {
+                    IllegalArgumentException.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2)
+    )
+    public void sendToManagerOnStatusChange(
             Long authorId,
-            String managerNickname,
-            String item, String status) throws FirebaseMessagingException
-    {
-        fcmService.sendToUser(
-                prefix + authorId,
-                managerNickname + "님이 '" + item + "' 요청에 " + "응답했어요!",
-                ManagerStatus.of(status).getMessage());
+            String title,
+            String body) throws FirebaseMessagingException {
+
+        fcmService.sendToUser(prefix + authorId, title, body);
     }
 
     @Recover
@@ -81,10 +99,9 @@ public class FcmRetryService {
             String item
     ) {
         String topic = prefix + manager.getUser().getId();
-        String title = "\uD83E\uDD29" + author + "님이 새로운 " + itemType + "을 추가했어요.";
-        String body = "추가한 항목: " + item + "✨";
-
-        slackAlertService.sendAlert("FCM 전송 실패: " + topic, ex.getMessage() + "\n제목: " + title + "\n본문: " + body);
+        slackAlertService.sendAlert(
+                "FCM 전송 실패: " + topic,
+                ex.getMessage() + "\n작성자: " + author + "\n항목: " + itemType + item);
     }
 
     @Recover
@@ -96,9 +113,8 @@ public class FcmRetryService {
             String status
     ) {
         String topic = prefix + authorId;
-        String title = managerNickname + "님이 '" + item + "' 요청에 응답했어요!";
-        String body = ManagerStatus.of(status).getMessage();
-
-        slackAlertService.sendAlert("FCM 전송 실패: " + topic, ex.getMessage() + "\n제목: " + title + "\n본문: " + body);
+        slackAlertService.sendAlert(
+                "FCM 전송 실패: " + topic,
+                ex.getMessage() + "\n항목: " + item + "\n담당자: " + managerNickname + "\n상태: " + status);
     }
 }

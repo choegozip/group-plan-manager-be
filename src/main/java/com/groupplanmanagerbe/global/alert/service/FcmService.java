@@ -1,4 +1,4 @@
-package com.groupplanmanagerbe.global.notification.service;
+package com.groupplanmanagerbe.global.alert.service;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -26,5 +26,13 @@ public class FcmService {
         String response = FirebaseMessaging.getInstance(firebaseApp).send(message);
         log.info("메시지 전송 성공: {}", response);
         log.info("보낼 메시지 JSON: {}", new Gson().toJson(message));
+    }
+
+    public void sendToUser(String topic, Long spaceId) throws FirebaseMessagingException {
+        Message message = Message.builder()
+                .setTopic(topic)
+                .putData("spaceId", spaceId.toString())
+                .build();
+        log.info("리프레시 시그널 전송 성공: {}", topic);
     }
 }
