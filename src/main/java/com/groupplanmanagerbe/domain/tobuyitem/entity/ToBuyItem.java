@@ -144,7 +144,7 @@ public class ToBuyItem extends BaseEntity {
             this.memo = memo;
         }
 
-        if (!managers.isEmpty()) {
+        if (managers != null) {
             setManagers(managers);
         }
     }
