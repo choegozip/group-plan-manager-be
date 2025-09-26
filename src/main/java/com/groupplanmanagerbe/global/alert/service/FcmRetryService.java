@@ -18,7 +18,7 @@ import java.net.SocketTimeoutException;
 @RequiredArgsConstructor
 public class FcmRetryService {
 
-    private static final String prefix = "alert-userId";
+    private static final String prefix = "alert-userId-";
     private final SlackAlertService slackAlertService;
     private final FcmService fcmService;
 
