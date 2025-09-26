@@ -68,7 +68,7 @@ public class ToDoItemService {
         toDoItemRepository.save(toDo);
 
         publishCreateEvent(user.getNickname(), request.title(), managers);
-        publishRefreshEvent(spaceId);
+        publishRefreshEvent(spaceId, userId);
 
         return ToDoRes.of(toDo.getId());
     }
@@ -77,7 +77,7 @@ public class ToDoItemService {
     public ToDoRes updateToDo(Long userId, UpdateToDoReq request, Long spaceId, Long toDoId) {
         ToDoItem todo = toDoComponent.getByIdAndSpaceIdAndUserIdWithSpaceAndUser(toDoId, spaceId, userId);
 
-        alertNewManagers(todo, request.managerIds());
+        alertNewManagers(todo, request.managerIds(), userId);
 
         List<ToDoManager> assignedManagers = assignManagersToToDo(request.managerIds(), todo.getSpace(), todo);
         updateToDoItem(request, todo, assignedManagers);
@@ -103,7 +103,7 @@ public class ToDoItemService {
         manager.updateStatus(request.managerStatus());
 
         publishChangeStatusEvent(manager, request);
-        publishRefreshEvent(spaceId);
+        publishRefreshEvent(spaceId, userId);
 
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
@@ -131,8 +131,8 @@ public class ToDoItemService {
         eventPublisher.publishEvent(new TdUpdatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
     }
 
-    private void publishRefreshEvent(Long spaceId) {
-        eventPublisher.publishEvent(new RefreshEvent(spaceId));
+    private void publishRefreshEvent(Long spaceId, Long actorId) {
+        eventPublisher.publishEvent(new RefreshEvent(spaceId, actorId));
     }
 
     private void publishChangeStatusEvent(ToDoManager manager, UpdateManagerStatusReq request) {
@@ -150,12 +150,12 @@ public class ToDoItemService {
                 request.imageUrl(), request.referenceUrl());
     }
 
-    private void alertNewManagers(ToDoItem todo, List<Long> requestManagerIds) {
+    private void alertNewManagers(ToDoItem todo, List<Long> requestManagerIds, Long actorId) {
         List<Long> newManagerIds = getNewMemberList(todo, requestManagerIds);
         if (!newManagerIds.isEmpty()) {
             List<ToDoManager> nesManagers = assignManagersToToDo(newManagerIds, todo.getSpace(), todo);
             publishUpdateEvent(todo.getUser().getNickname(), todo.getTitle(), nesManagers);
-            publishRefreshEvent(todo.getSpace().getId());
+            publishRefreshEvent(todo.getSpace().getId(), actorId);
         }
     }
 

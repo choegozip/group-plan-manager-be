@@ -20,6 +20,6 @@ public class RefreshListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleRefreshEvent(RefreshEvent event) throws FirebaseMessagingException {
         String topic =  prefix + event.spaceId();
-        fcmService.sendToUser(topic, event.spaceId());
+        fcmService.sendToUser(topic, event.spaceId(), event.actorId());
     }
 }

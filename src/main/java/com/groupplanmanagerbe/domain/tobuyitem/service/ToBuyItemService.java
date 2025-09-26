@@ -61,7 +61,7 @@ public class ToBuyItemService {
         toBuyItemRepository.save(toBuy);
 
         publishCreateEvent(user.getNickname(), request.title(), managers);
-        publishRefreshEvent(spaceId);
+        publishRefreshEvent(spaceId, userId);
 
         return ToBuyRes.of(toBuy.getId());
     }
@@ -70,7 +70,7 @@ public class ToBuyItemService {
     public ToBuyRes updateToBuy(Long userId, UpdateToBuyReq request, Long spaceId, Long toBuyId) {
         ToBuyItem toBuy = toBuyComponent.getByIdAndSpaceIdAndUserIdWithSpaceAndUser(toBuyId, spaceId, userId);
 
-        alertNewManagers(toBuy, request.managerIds());
+        alertNewManagers(toBuy, request.managerIds(), userId);
 
         List<ToBuyManager> assignedManagers = assignManagersToToBuy(request.managerIds(), toBuy.getSpace(), toBuy);
         updateToBuyItem(request, toBuy, assignedManagers);
@@ -96,7 +96,7 @@ public class ToBuyItemService {
         manager.updateStatus(request.managerStatus());
 
         publishChangeStatusEvent(manager, request);
-        publishRefreshEvent(spaceId);
+        publishRefreshEvent(spaceId, userId);
 
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
@@ -124,8 +124,8 @@ public class ToBuyItemService {
         eventPublisher.publishEvent(new TbUpdatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
     }
 
-    private void publishRefreshEvent(Long spaceId) {
-        eventPublisher.publishEvent(new RefreshEvent(spaceId));
+    private void publishRefreshEvent(Long spaceId, Long actorId) {
+        eventPublisher.publishEvent(new RefreshEvent(spaceId, actorId));
     }
 
     private void publishChangeStatusEvent(ToBuyManager manager, UpdateManagerStatusReq request) {
@@ -143,12 +143,12 @@ public class ToBuyItemService {
                 request.imageUrl(), request.referenceUrl(), request.memo());
     }
 
-    private void alertNewManagers(ToBuyItem toBuy, List<Long> requestedManagerIds) {
+    private void alertNewManagers(ToBuyItem toBuy, List<Long> requestedManagerIds, Long actorId) {
         List<Long> newManagerIds = getNewManagerList(toBuy, requestedManagerIds);
         if (!newManagerIds.isEmpty()) {
             List<ToBuyManager> newManagers = assignManagersToToBuy(newManagerIds, toBuy.getSpace(), toBuy);
             publishUpdateEvent(toBuy.getUser().getNickname(), toBuy.getTitle(), newManagers);
-            publishRefreshEvent(toBuy.getSpace().getId());
+            publishRefreshEvent(toBuy.getSpace().getId(), actorId);
         }
     }
 
