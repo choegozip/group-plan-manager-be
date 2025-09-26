@@ -33,6 +33,9 @@ public class FcmService {
                 .setTopic(topic)
                 .putData("spaceId", spaceId.toString())
                 .build();
+
+        String response = FirebaseMessaging.getInstance(firebaseApp).send(message);
         log.info("리프레시 시그널 전송 성공: {}", topic);
+        log.info("보낼 메시지 JSON: {}", new Gson().toJson(message));
     }
 }
