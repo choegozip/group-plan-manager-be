@@ -192,6 +192,7 @@ jobs:
             --parameters 'commands=[
               "cd /home/ec2-user",
               "docker compose logs || true",
-              "docker compose down || true"
+              "docker compose down || true",
+              "docker system prune -af --volumes || true"
             ]' \
             --comment "Cleanup failed deployment"
