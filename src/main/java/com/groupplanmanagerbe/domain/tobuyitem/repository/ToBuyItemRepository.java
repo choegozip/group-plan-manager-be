@@ -13,6 +13,10 @@ import java.util.Optional;
 
 public interface ToBuyItemRepository extends JpaRepository<ToBuyItem, Long> {
 
+    @Query("SELECT COUNT(t) FROM ToBuyItem t " +
+            "WHERE t.space.id = :spaceId")
+    int countBySpaceId(@Param("spaceId") Long spaceId);
+
     @EntityGraph(attributePaths = {"user"})
     @Query("SELECT t FROM ToBuyItem t " +
             "WHERE t.id = :toBuyItemId " +

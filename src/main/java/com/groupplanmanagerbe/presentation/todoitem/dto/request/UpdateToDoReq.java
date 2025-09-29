@@ -1,10 +1,7 @@
 package com.groupplanmanagerbe.presentation.todoitem.dto.request;
 
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.ItemValidationConst;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 
 import java.util.List;
 
@@ -18,6 +15,8 @@ public record UpdateToDoReq(
         String urgency,
         String imageUrl,
         String referenceUrl,
+
+        @NotEmpty(message = ItemValidationConst.MANAGER_IDS_BLANK_MESSAGE)
         List<Long> managerIds
 ) {
 }

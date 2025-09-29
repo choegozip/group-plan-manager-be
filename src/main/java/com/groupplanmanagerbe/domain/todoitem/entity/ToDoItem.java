@@ -135,7 +135,7 @@ public class ToDoItem extends BaseEntity {
             this.referenceUrl = referenceUrl;
         }
 
-        if (!managers.isEmpty()) {
+        if (managers != null) {
             setManagers(managers);
         }
     }

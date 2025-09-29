@@ -11,8 +11,6 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
-import com.groupplanmanagerbe.global.sse.SseService;
-import com.groupplanmanagerbe.global.sse.dto.CommentData;
 import com.groupplanmanagerbe.presentation.comment.dto.CommentListProjection;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentListRes;
@@ -35,15 +33,12 @@ public class ToDoCommentService {
     private final UserComponent userComponent;
     private final SpaceComponent spaceComponent;
     private final ToDoComponent toDoComponent;
-    private final SseService sseService;
 
     @Transactional
     public CommentRes createComment(Long userId, CommentReq request, Long spaceId, Long toDoId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
-            createEventIfFirstComment(spaceId, toDoId);
-
             User user = userComponent.getByIdAndDeleteFalse(userId);
             ToDoItem toDo = toDoComponent.getReferenceById(toDoId);
             ToDoComment comment = ToDoComment.of(toDo, user, request.content());
@@ -83,13 +78,6 @@ public class ToDoCommentService {
     }
 
     // ## private ##
-    private void createEventIfFirstComment(Long spaceId, Long toDoId) {
-        boolean existed = commentRepository.existComment(toDoId);
-        if (!existed) {
-            sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, CommentData.of(toDoId));
-        }
-    }
-
     private ToDoComment getComment(Long userId, Long commentId) {
         return commentRepository.findByIdAndUserId(userId, commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));

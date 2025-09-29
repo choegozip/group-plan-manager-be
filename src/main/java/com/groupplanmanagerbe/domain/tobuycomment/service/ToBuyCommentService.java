@@ -37,15 +37,12 @@ public class ToBuyCommentService {
     private final UserComponent userComponent;
     private final SpaceComponent spaceComponent;
     private final ToBuyComponent toBuyComponent;
-    private final SseService sseService;
 
     @Transactional
     public CommentRes createComment(Long userId, CommentReq request, Long spaceId, Long toBuyId) {
         validateSpaceMembership(userId, spaceId);
 
         try {
-            createEventIfFirstComment(spaceId, toBuyId);
-
             User user = userComponent.getByIdAndDeleteFalse(userId);
             ToBuyItem toBuyItem = toBuyComponent.getReferenceById(toBuyId);
             toBuyItem.addComment(ToBuyComment.of(toBuyItem, user, request.content()));
@@ -86,13 +83,6 @@ public class ToBuyCommentService {
     }
 
     // ## private ##
-    private void createEventIfFirstComment(Long spaceId, Long toBuyId) {
-        boolean existed = commentRepository.existComment(toBuyId);
-        if (!existed) {
-            sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_BUY, CommentData.of(toBuyId));
-        }
-    }
-
     private ToBuyComment getComment(Long userId, Long commentId) {
         return commentRepository.findByIdAndUserId(userId, commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));

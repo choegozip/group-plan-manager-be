@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public enum ManagerStatus {
 
-    PENDING("아직 대기 상태예요\uD83D\uDE42"),
-    ACCEPT("제가 처리할게요😎"),
-    DENY("지금은 처리하기 어려워요 \uD83D\uDE22"),
-    DONE("처리 완료했습니다\uD83E\uDD70");
+    PENDING("manager.pending"),
+    ACCEPT("manager.accept"),
+    DENY("manager.deny"),
+    DONE("manager.done");
 
     private final String message;
 

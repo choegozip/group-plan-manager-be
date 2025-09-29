@@ -21,6 +21,7 @@ public record UpdateToBuyReq(
         String imageUrl,
         String referenceUrl,
 
+        @NotEmpty(message = ItemValidationConst.MANAGER_IDS_BLANK_MESSAGE)
         List<Long> managerIds
 ) {
 }

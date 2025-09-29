@@ -6,17 +6,17 @@ import com.groupplanmanagerbe.domain.todocomment.entity.ToDoComment;
 import com.groupplanmanagerbe.domain.todocomment.service.ToDoCommentComponent;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoItem;
 import com.groupplanmanagerbe.domain.todoitem.entity.ToDoManager;
-import com.groupplanmanagerbe.domain.todoitem.event.ChangeToDoMgrStatusEvent;
-import com.groupplanmanagerbe.domain.todoitem.event.CreateToDoEvent;
+import com.groupplanmanagerbe.global.alert.event.alert.AlertMgrStatusChangedEvent;
+import com.groupplanmanagerbe.global.alert.event.alert.TdCreatedAlertEvent;
 import com.groupplanmanagerbe.domain.todoitem.repository.ToDoItemRepository;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.service.UserComponent;
+import com.groupplanmanagerbe.global.alert.event.alert.TdUpdatedAlertEvent;
+import com.groupplanmanagerbe.global.alert.event.refresh.RefreshEvent;
+import com.groupplanmanagerbe.global.alert.listener.ItemManager;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
-import com.groupplanmanagerbe.global.sse.SseService;
-import com.groupplanmanagerbe.global.sse.dto.ManagerStatusData;
-import com.groupplanmanagerbe.global.sse.dto.ToBuyData;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.UpdateManagerStatusReq;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.UpdateManagerStatusRes;
@@ -28,7 +28,9 @@ import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoListRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoPageRes;
 import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +41,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.groupingBy;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -50,10 +53,13 @@ public class ToDoItemService {
     private final UserComponent userComponent;
     private final ToDoCommentComponent commentComponent;
     private final ApplicationEventPublisher eventPublisher;
-    private final SseService sseService;
 
     @Transactional
     public ToDoRes createToDo(Long userId, CreateToDoReq request, Long spaceId) {
+        if (toDoComponent.countBySpaceId(spaceId) > 100) {
+            throw new InvalidException(ApiErrorCode.TO_DO_LIMIT_EXCEEDED);
+        }
+
         User user = userComponent.getByIdAndDeleteFalse(userId);
         Space space = spaceComponent.getByIdAndUserId(spaceId, userId, ApiErrorCode.SPACE_NOT_FOUND);
         ToDoItem toDo = createToDoItem(request, user, space);
@@ -62,21 +68,21 @@ public class ToDoItemService {
         toDoItemRepository.save(toDo);
 
         publishCreateEvent(user.getNickname(), request.title(), managers);
+        publishRefreshEvent(spaceId, userId);
 
         return ToDoRes.of(toDo.getId());
     }
 
     @Transactional
     public ToDoRes updateToDo(Long userId, UpdateToDoReq request, Long spaceId, Long toDoId) {
-        ToDoItem toDo = toDoComponent.getByIdAndSpaceIdAndUserIdWithSpaceAndUser(toDoId, spaceId, userId);
-        List<ToDoManager> managers = (request.managerIds() == null || request.managerIds().isEmpty())
-                ? Collections.emptyList()
-                : assignManagersToToDo(request.managerIds(), toDo.getSpace(), toDo);
-        updateToDoItem(request, toDo, managers);
+        ToDoItem todo = toDoComponent.getByIdAndSpaceIdAndUserIdWithSpaceAndUser(toDoId, spaceId, userId);
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ToBuyData.of(toDoId, request, managers));
+        alertNewManagers(todo, request.managerIds(), userId);
 
-        return ToDoRes.of(toDo.getId());
+        List<ToDoManager> assignedManagers = assignManagersToToDo(request.managerIds(), todo.getSpace(), todo);
+        updateToDoItem(request, todo, assignedManagers);
+
+        return ToDoRes.of(todo.getId());
     }
 
     @Transactional
@@ -96,8 +102,8 @@ public class ToDoItemService {
         ToDoManager manager = toDoComponent.getByIdAndSpaceIdAndToDoIdWithToDo(managerId, spaceId, toDoId);
         manager.updateStatus(request.managerStatus());
 
-        sseService.sendEvent(spaceId, sseService.TYPE_OF_TO_DO, ManagerStatusData.of(toDoId, manager));
         publishChangeStatusEvent(manager, request);
+        publishRefreshEvent(spaceId, userId);
 
         return UpdateManagerStatusRes.of(manager.getStatus());
     }
@@ -118,18 +124,50 @@ public class ToDoItemService {
 
     // === Private Methods ===
     private void publishCreateEvent(String author, String item, List<ToDoManager> managers) {
-        eventPublisher.publishEvent(new CreateToDoEvent(author, item, managers));
+        eventPublisher.publishEvent(new TdCreatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+    }
+
+    private void publishUpdateEvent(String author, String item, List<ToDoManager> managers) {
+        eventPublisher.publishEvent(new TdUpdatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+    }
+
+    private void publishRefreshEvent(Long spaceId, Long actorId) {
+        eventPublisher.publishEvent(new RefreshEvent(spaceId, actorId));
     }
 
     private void publishChangeStatusEvent(ToDoManager manager, UpdateManagerStatusReq request) {
         ToDoItem toDo  = manager.getToDoItem();
-        eventPublisher.publishEvent(new ChangeToDoMgrStatusEvent(
-                toDo.getUser().getId(), manager.getUser().getNickname(), toDo.getTitle(), request.managerStatus()));
+        eventPublisher.publishEvent(new AlertMgrStatusChangedEvent(
+                toDo.getUser().getId(),
+                manager.getUser().getNickname(),
+                toDo.getTitle(),
+                request.managerStatus(),
+                LocaleContextHolder.getLocale()));
     }
 
     private ToDoItem createToDoItem(CreateToDoReq request, User user, Space space) {
         return ToDoItem.of(space, user, request.title(), request.detail(), request.dueDate(), request.urgency(),
                 request.imageUrl(), request.referenceUrl());
+    }
+
+    private void alertNewManagers(ToDoItem todo, List<Long> requestManagerIds, Long actorId) {
+        List<Long> newManagerIds = getNewMemberList(todo, requestManagerIds);
+        if (!newManagerIds.isEmpty()) {
+            List<ToDoManager> nesManagers = assignManagersToToDo(newManagerIds, todo.getSpace(), todo);
+            publishUpdateEvent(todo.getUser().getNickname(), todo.getTitle(), nesManagers);
+            publishRefreshEvent(todo.getSpace().getId(), actorId);
+        }
+    }
+
+    private List<Long> getNewMemberList(ToDoItem toDo, List<Long> managerList) {
+        List<Long> existingManagerId = toDo.getManagers().stream()
+                .map(ItemManager::getUser)
+                .map(User::getId)
+                .toList();
+
+        return managerList.stream()
+                .filter(id -> !existingManagerId.contains(id))
+                .toList();
     }
 
     private List<ToDoManager> assignManagersToToDo(List<Long> memberIds, Space space, ToDoItem toDoItem) {
