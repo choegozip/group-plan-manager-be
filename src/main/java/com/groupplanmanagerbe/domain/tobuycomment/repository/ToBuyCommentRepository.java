@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ToBuyCommentRepository extends JpaRepository<ToBuyComment, Long> {
-    @Query("SELECT EXISTS(SELECT 1 FROM ToBuyComment c WHERE c.toBuyItem.id = :toBuyId)")
-    boolean existComment(@Param("toBuyId") Long toBuyId);
-
     @EntityGraph(attributePaths = {"user"})
     List<ToBuyComment> findAllByToBuyItemId(Long toBuyItemId);
 

@@ -9,16 +9,16 @@ spring:
     hikari:
       # 연결 풀 크기 조정 (에러 방지)
       maximum-pool-size: 20
-      minimum-idle: 2
+      minimum-idle: 5
 
       # 적당한 생명주기
-      idle-timeout: 10000  # 10초
-      max-lifetime: 30000  # 30초
+      idle-timeout: 600000    # 10분
+      max-lifetime: 1800000   # 30분
 
       # 타임아웃 설정
-      connection-timeout: 5000  #5초
+      connection-timeout: 10000  #10초
       validation-timeout: 3000
-      leak-detection-threshold: 8000
+      leak-detection-threshold: 30000 #30초
 
       # 단순한 헬스체크만
       connection-test-query: "SELECT 1"
@@ -129,7 +129,7 @@ jwt:
       - /invite
       - /actuator/health
       - /actuator/prometheus
-    token:
+  token:
     prefix: "Bearer "
     refreshPrefix: "Refresh:"
     blackListPrefix: "BlackList:"
@@ -138,3 +138,6 @@ jwt:
 
 firebase:
   service-account-json: ${GOOGLE_SERVICE_ACCOUNT}
+
+slack:
+  webhook-url: ${WEBHOOK_URL}
