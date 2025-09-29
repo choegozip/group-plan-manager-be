@@ -1,5 +1,8 @@
-package com.groupplanmanagerbe.global.security;
+package com.groupplanmanagerbe.global.config;
 
+import com.groupplanmanagerbe.global.oauth2.CustomOAuth2UserService;
+import com.groupplanmanagerbe.global.oauth2.handler.OAuth2FailureHandler;
+import com.groupplanmanagerbe.global.oauth2.handler.OAuth2SuccessHandler;
 import com.groupplanmanagerbe.global.security.filter.JwtFilter;
 import com.groupplanmanagerbe.global.security.handler.GpmAccessDeniedHandler;
 import com.groupplanmanagerbe.global.security.handler.GpmAuthEntryPoint;
@@ -13,8 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
@@ -35,6 +36,9 @@ public class SecurityConfig {
     private final JwtSecurityProperties jwtSecurityProperties;
     private final GpmAuthEntryPoint gpmAuthEntryPoint;
     private final GpmAccessDeniedHandler gpmAccessDeniedHandler;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final CustomOAuth2UserService oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -56,8 +60,13 @@ public class SecurityConfig {
                                 "default-src 'self'; " +
                                         "frame-ancestors 'self' http://localhost:63342"
                         ))
-                        .referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
-                )
+                        .referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
+
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/api/spaces/spacemember").permitAll()
@@ -83,10 +92,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
         src.registerCorsConfiguration("/**", config);
         return src;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

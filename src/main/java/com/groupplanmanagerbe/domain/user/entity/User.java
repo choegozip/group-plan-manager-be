@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(
@@ -35,15 +36,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
     private String profileImageKey;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
-
-    private LocalDateTime confirmedAt;
 
     @Builder
     public User(String nickname, String email, String password, String profileImageKey) {
@@ -59,6 +57,14 @@ public class User extends BaseEntity {
                 .nickname(nickname)
                 .password(password)
                 .profileImageKey(profileImageKey)
+                .build();
+    }
+
+    public static User of(String email, String nickname, String password) {
+        return User.builder()
+                .email(email)
+                .nickname(nickname)
+                .password(password)
                 .build();
     }
 

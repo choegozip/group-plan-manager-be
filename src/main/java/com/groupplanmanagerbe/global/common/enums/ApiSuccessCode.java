@@ -13,6 +13,7 @@ public enum ApiSuccessCode {
     SUCCESS_LOGIN("SUCCESS", "user.login.success"),
     SUCCESS_LOGOUT("SUCCESS", "user.logout.success"),
     SUCCESS_REFRESH_TOKEN("SUCCESS", "user.refresh.token"),
+    SUCCESS_GOOGLE_LOGIN("SUCCESS", "google.login.success"),
 
     // SPACE
     SUCCESS_SPACE_CREATE("SUCCESS", "space.create.success"),
@@ -43,7 +44,7 @@ public enum ApiSuccessCode {
     SUCCESS_COMMENT_CREATE("SUCCESS", "comment.create.success"),
     SUCCESS_COMMENT_UPDATE("SUCCESS","comment.update.success"),
     SUCCESS_COMMENT_DELETE("SUCCESS","comment.delete.success"),
-    SUCCESS_COMMENT_GET("SUCCESS","comment.get.success")
+    SUCCESS_COMMENT_GET("SUCCESS","comment.get.success"),
     ;
 
     private final String code;

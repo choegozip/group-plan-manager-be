@@ -20,6 +20,10 @@ public enum ApiErrorCode {
     AUTH_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.access.denied"),
     AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.unauthorized"),
     AUTH_INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"ERROR", "auth.invalid.password"),
+    OAUTH2_LOGIN_FAILED(HttpStatus.UNAUTHORIZED,"ERROR", "oauth2.login.failed"),
+
+    // 소셜 로그인 관련 익셉션
+    PROVIDER_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "provider.invalid"),
 
     // 토큰 관련 익셉션
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "token.expired"),
@@ -75,7 +79,8 @@ public enum ApiErrorCode {
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
-    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid");
+    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid"),
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;
