@@ -1,7 +1,7 @@
 package com.groupplanmanagerbe.domain.social.repository;
 
 import com.groupplanmanagerbe.domain.social.entity.SocialUser;
-import com.groupplanmanagerbe.global.common.enums.OAuthProvider;
+import com.groupplanmanagerbe.global.common.enums.SocialProvider;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +17,6 @@ public interface SocialUserRepository extends JpaRepository<SocialUser, Long> {
             WHERE s.provider = :provider
             AND s.providerId = :providerId
             """)
-    Optional<SocialUser> findByProviderAndProviderId(@Param("provider") OAuthProvider provider,
+    Optional<SocialUser> findByProviderAndProviderId(@Param("provider") SocialProvider provider,
                                                      @Param("providerId") String providerId);
 }

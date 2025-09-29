@@ -1,7 +1,7 @@
 package com.groupplanmanagerbe.global.oauth2.provider;
 
 import com.groupplanmanagerbe.domain.social.entity.SocialUser;
-import com.groupplanmanagerbe.global.common.enums.OAuthProvider;
+import com.groupplanmanagerbe.global.common.enums.SocialProvider;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,14 +14,14 @@ import java.util.Map;
 @Builder
 public record NaverUser(
         Map<String, Object> attributes,
-        OAuthProvider provider,
+        SocialProvider provider,
         SocialUser socialUser
 ) implements ProviderUser {
 
     private static final String NAVER_ID_KEY = "id";
 
     @SuppressWarnings("unchecked")
-    public static NaverUser of(OAuth2User oAuth2User, OAuthProvider provider) {
+    public static NaverUser of(OAuth2User oAuth2User, SocialProvider provider) {
         Map<String, Object> attrs = (Map<String, Object>) oAuth2User.getAttributes().get("response");
         return NaverUser.builder()
                 .attributes(attrs)
@@ -50,7 +50,7 @@ public record NaverUser(
     }
 
     @Override
-    public OAuthProvider getProvider() {
+    public SocialProvider getProvider() {
         return provider;
     }
 

@@ -2,7 +2,7 @@ package com.groupplanmanagerbe.domain.social.entity;
 
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.global.common.entity.BaseEntity;
-import com.groupplanmanagerbe.global.common.enums.OAuthProvider;
+import com.groupplanmanagerbe.global.common.enums.SocialProvider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,19 +26,19 @@ public class SocialUser extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OAuthProvider provider;
+    private SocialProvider provider;
 
     @Column(name = "provider_id", nullable = false)
     private String providerId;
 
     @Builder
-    public SocialUser(User user, OAuthProvider provider, String providerId) {
+    public SocialUser(User user, SocialProvider provider, String providerId) {
         this.user = user;
         this.provider = provider;
         this.providerId = providerId;
     }
 
-    public static SocialUser of(User user, OAuthProvider provider, String providerId) {
+    public static SocialUser of(User user, SocialProvider provider, String providerId) {
         return SocialUser.builder()
                 .user(user)
                 .provider(provider)

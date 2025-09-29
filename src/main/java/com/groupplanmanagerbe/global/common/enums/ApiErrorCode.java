@@ -77,7 +77,7 @@ public enum ApiErrorCode {
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
-    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid")
+    SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid"),
     ;
 
     private final HttpStatus httpStatus;

@@ -1,7 +1,7 @@
 package com.groupplanmanagerbe.global.oauth2.provider;
 
 import com.groupplanmanagerbe.domain.social.entity.SocialUser;
-import com.groupplanmanagerbe.global.common.enums.OAuthProvider;
+import com.groupplanmanagerbe.global.common.enums.SocialProvider;
 import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,13 +14,13 @@ import java.util.Map;
 @Builder
 public record GoogleUser(
         Map<String, Object> attributes,
-        OAuthProvider provider,
+        SocialProvider provider,
         SocialUser socialUser
 ) implements ProviderUser {
 
     private static final String GOOGLE_ID_KEY = "sub";
 
-    public static GoogleUser of(OAuth2User oAuth2User, OAuthProvider provider) {
+    public static GoogleUser of(OAuth2User oAuth2User, SocialProvider provider) {
         Map<String, Object> attrs = oAuth2User.getAttributes();
         return GoogleUser.builder()
                 .attributes(attrs)
@@ -49,7 +49,7 @@ public record GoogleUser(
     }
 
     @Override
-    public OAuthProvider getProvider() {
+    public SocialProvider getProvider() {
         return provider;
     }
 
