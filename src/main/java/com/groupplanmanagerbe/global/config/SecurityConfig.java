@@ -1,8 +1,5 @@
 package com.groupplanmanagerbe.global.config;
 
-import com.groupplanmanagerbe.global.oauth2.CustomOAuth2UserService;
-import com.groupplanmanagerbe.global.oauth2.handler.OAuth2FailureHandler;
-import com.groupplanmanagerbe.global.oauth2.handler.OAuth2SuccessHandler;
 import com.groupplanmanagerbe.global.security.filter.JwtFilter;
 import com.groupplanmanagerbe.global.security.handler.GpmAccessDeniedHandler;
 import com.groupplanmanagerbe.global.security.handler.GpmAuthEntryPoint;
@@ -36,9 +33,6 @@ public class SecurityConfig {
     private final JwtSecurityProperties jwtSecurityProperties;
     private final GpmAuthEntryPoint gpmAuthEntryPoint;
     private final GpmAccessDeniedHandler gpmAccessDeniedHandler;
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final OAuth2FailureHandler oAuth2FailureHandler;
-    private final CustomOAuth2UserService oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -61,11 +55,6 @@ public class SecurityConfig {
                                         "frame-ancestors 'self' http://localhost:63342"
                         ))
                         .referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER)))
-
-                .oauth2Login(oauth -> oauth
-                        .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
-                        .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler))
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/images/**", "/css/**", "/js/**").permitAll()

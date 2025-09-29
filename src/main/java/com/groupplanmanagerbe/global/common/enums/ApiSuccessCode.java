@@ -13,7 +13,7 @@ public enum ApiSuccessCode {
     SUCCESS_LOGIN("SUCCESS", "user.login.success"),
     SUCCESS_LOGOUT("SUCCESS", "user.logout.success"),
     SUCCESS_REFRESH_TOKEN("SUCCESS", "user.refresh.token"),
-    SUCCESS_GOOGLE_LOGIN("SUCCESS", "google.login.success"),
+    SUCCESS_SOCIAL_LOGIN("SUCCESS", "social.login.success"),
 
     // SPACE
     SUCCESS_SPACE_CREATE("SUCCESS", "space.create.success"),
