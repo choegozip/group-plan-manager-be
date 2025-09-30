@@ -2,7 +2,7 @@ package com.groupplanmanagerbe.global.alert.service;
 
 import com.google.firebase.FirebaseException;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.groupplanmanagerbe.global.common.enums.ManagerStatus;
+import com.groupplanmanagerbe.global.alert.listener.message.AlertLocale;
 import com.groupplanmanagerbe.global.alert.listener.ItemManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
@@ -38,11 +38,9 @@ public class FcmRetryService {
     )
     public void sendToEachManagerOnCreate(
             ItemManager manager,
-            String title,
-            String body) throws FirebaseMessagingException {
+            AlertLocale alertLocale) throws FirebaseMessagingException {
         String topic = prefix + manager.getUser().getId();
-
-        fcmService.sendToUser(topic, title, body);
+        fcmService.sendToUser(topic, alertLocale);
     }
 
     @Retryable(
@@ -61,11 +59,9 @@ public class FcmRetryService {
     )
     public void sendToEachManagerOnUpdate(
             ItemManager manager,
-            String title,
-            String body) throws FirebaseMessagingException {
+            AlertLocale alertLocale) throws FirebaseMessagingException {
         String topic = prefix + manager.getUser().getId();
-
-        fcmService.sendToUser(topic, title, body);
+        fcmService.sendToUser(topic, alertLocale);
     }
 
     @Retryable(
@@ -84,37 +80,32 @@ public class FcmRetryService {
     )
     public void sendToManagerOnStatusChange(
             Long authorId,
-            String title,
-            String body) throws FirebaseMessagingException {
+            AlertLocale alertLocale) throws FirebaseMessagingException {
 
-        fcmService.sendToUser(prefix + authorId, title, body);
+        fcmService.sendToUser(prefix + authorId, alertLocale);
     }
 
     @Recover
     public void recoverFromTopicFailure(
             Exception ex,
             ItemManager manager,
-            String author,
-            String itemType,
-            String item
+            AlertLocale alertLocale
     ) {
         String topic = prefix + manager.getUser().getId();
         slackAlertService.sendAlert(
                 "FCM 전송 실패: " + topic,
-                ex.getMessage() + "\n작성자: " + author + "\n항목: " + itemType + item);
+                ex.getMessage() + "\n제목: " + alertLocale.title_ko() + "\n내용: " + alertLocale.body_ko());
     }
 
     @Recover
     public void recoverFromTopicFailure(
             Exception ex,
             Long authorId,
-            String managerNickname,
-            String item,
-            String status
+            AlertLocale alertLocale
     ) {
         String topic = prefix + authorId;
         slackAlertService.sendAlert(
                 "FCM 전송 실패: " + topic,
-                ex.getMessage() + "\n항목: " + item + "\n담당자: " + managerNickname + "\n상태: " + status);
+                ex.getMessage() + "\n제목: " + alertLocale.title_ko() + "\n내용: " + alertLocale.body_ko());
     }
 }

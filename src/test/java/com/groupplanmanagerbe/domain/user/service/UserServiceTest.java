@@ -6,9 +6,9 @@
 //import com.groupplanmanagerbe.global.exception.custom.DuplicateException;
 //import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 //import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
-//import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
-//import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
-//import com.groupplanmanagerbe.presentation.user.dto.response.UserRes;
+//import com.groupplanmanagerbe.presentation.user.message.request.CreateUserReq;
+//import com.groupplanmanagerbe.presentation.user.message.request.UpdateUserReq;
+//import com.groupplanmanagerbe.presentation.user.message.response.UserRes;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;

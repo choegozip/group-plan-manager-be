@@ -4,8 +4,8 @@
 //import com.groupplanmanagerbe.domain.user.service.UserService;
 //import com.groupplanmanagerbe.global.exception.GlobalExceptionHandler;
 //import com.groupplanmanagerbe.global.message.MessageResolver;
-//import com.groupplanmanagerbe.presentation.user.dto.request.CreateUserReq;
-//import com.groupplanmanagerbe.presentation.user.dto.request.UpdateUserReq;
+//import com.groupplanmanagerbe.presentation.user.message.request.CreateUserReq;
+//import com.groupplanmanagerbe.presentation.user.message.request.UpdateUserReq;
 //import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.junit.jupiter.api.extension.ExtendWith;

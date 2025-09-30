@@ -26,7 +26,6 @@ import com.groupplanmanagerbe.presentation.tobuyitem.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,11 +116,11 @@ public class ToBuyItemService {
 
     // === Private Methods ===
     private void publishCreateEvent(String author, String item, List<ToBuyManager> managers) {
-        eventPublisher.publishEvent(new TbCreatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+        eventPublisher.publishEvent(new TbCreatedAlertEvent(author, item, managers));
     }
 
     private void publishUpdateEvent(String author, String item, List<ToBuyManager> managers) {
-        eventPublisher.publishEvent(new TbUpdatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+        eventPublisher.publishEvent(new TbUpdatedAlertEvent(author, item, managers));
     }
 
     private void publishRefreshEvent(Long spaceId, Long actorId) {
@@ -134,8 +133,7 @@ public class ToBuyItemService {
                 toBuy.getUser().getId(),
                 manager.getUser().getNickname(),
                 toBuy.getTitle(),
-                request.managerStatus(),
-                LocaleContextHolder.getLocale()));
+                request.managerStatus()));
     }
 
     private ToBuyItem createToBuyItem(CreateToBuyReq request, User user, Space space) {

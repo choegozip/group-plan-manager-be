@@ -5,6 +5,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.gson.Gson;
+import com.groupplanmanagerbe.global.alert.listener.message.AlertLocale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,11 +17,15 @@ public class FcmService {
 
     private final FirebaseApp firebaseApp;
 
-    public void sendToUser(String topic, String title, String body) throws FirebaseMessagingException {
+    public void sendToUser(
+            String topic,
+            AlertLocale alertLocale) throws FirebaseMessagingException {
         Message message = Message.builder()
                 .setTopic(topic)
-                .putData("title", title)
-                .putData("body", body)
+                .putData("title", alertLocale.title())
+                .putData("body", alertLocale.body())
+                .putData("title_ko", alertLocale.title_ko())
+                .putData("body_ko", alertLocale.body_ko())
                 .build();
 
         String response = FirebaseMessaging.getInstance(firebaseApp).send(message);

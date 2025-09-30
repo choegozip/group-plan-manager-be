@@ -10,9 +10,9 @@ import java.util.Locale;
 @Getter
 @RequiredArgsConstructor
 public class TbUpdatedAlertEvent {
-    private final String itemType = "살 것";
+    private final String itemType = "item to buy";
+    private final String itemType_ko = "살 것";
     private final String author;
     private final String item;
     private final List<ToBuyManager> managers;
-    private final Locale locale;
 }

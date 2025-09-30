@@ -10,9 +10,9 @@ import java.util.Locale;
 @Getter
 @RequiredArgsConstructor
 public class TdCreatedAlertEvent {
-    private final String itemType = "할 것";
+    private final String itemType = "item to do";
+    private final String itemType_ko = "할 것";
     private final String author;
     private final String item;
     private final List<ToDoManager> managers;
-    private final Locale locale;
 }

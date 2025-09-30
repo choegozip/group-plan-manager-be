@@ -124,11 +124,11 @@ public class ToDoItemService {
 
     // === Private Methods ===
     private void publishCreateEvent(String author, String item, List<ToDoManager> managers) {
-        eventPublisher.publishEvent(new TdCreatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+        eventPublisher.publishEvent(new TdCreatedAlertEvent(author, item, managers));
     }
 
     private void publishUpdateEvent(String author, String item, List<ToDoManager> managers) {
-        eventPublisher.publishEvent(new TdUpdatedAlertEvent(author, item, managers, LocaleContextHolder.getLocale()));
+        eventPublisher.publishEvent(new TdUpdatedAlertEvent(author, item, managers));
     }
 
     private void publishRefreshEvent(Long spaceId, Long actorId) {
@@ -141,8 +141,7 @@ public class ToDoItemService {
                 toDo.getUser().getId(),
                 manager.getUser().getNickname(),
                 toDo.getTitle(),
-                request.managerStatus(),
-                LocaleContextHolder.getLocale()));
+                request.managerStatus()));
     }
 
     private ToDoItem createToDoItem(CreateToDoReq request, User user, Space space) {
