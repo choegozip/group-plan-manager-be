@@ -109,16 +109,22 @@ jobs:
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters '{"commands":[
               "set -e",
-              "cd /home/ssm-user",
-              "sudo docker compose down || echo \"No containers to stop\"",
-              "sudo docker pull ${{ env.DOCKER_IMAGE }}",
-              "sudo docker compose up -d",
+          
+            "COMPOSE_DIR=/home/ssm-user",
+             "COMPOSE_FILE=$COMPOSE_DIR/docker-compose.yml",
+
+              "sudo docker compose -f \"$COMPOSE_FILE\" down || echo \"No containers to stop\"",
+              "sudo docker compose -f \"$COMPOSE_FILE\" pull",
+              "sudo docker compose -f \"$COMPOSE_FILE\" up -d",
+          
               "sleep 10",
-              "sudo docker compose ps",
-              "sudo docker compose logs --tail=50 app",
-              "sudo docker compose logs --tail=50 nginx",
+             "sudo docker compose -f \"$COMPOSE_FILE\" ps",
+             "sudo docker compose -f \"$COMPOSE_FILE\" logs --tail=50 app",
+             "sudo docker compose -f \"$COMPOSE_FILE\" logs --tail=50 nginx",
+          
               "if sudo docker compose ps | grep -q \"app.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
               "if sudo docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
+            
               "echo \"Deployment completed at $(date)\""
             ]}' \
             --timeout-seconds 600 \
@@ -128,7 +134,6 @@ jobs:
           
           echo "command-id=$COMMAND_ID" >> $GITHUB_OUTPUT
           echo "SSM Command ID: $COMMAND_ID"
-
 
       - name: Wait for command completion
         run: |
@@ -182,13 +187,18 @@ jobs:
         if: failure()
         run: |
           echo "🧹 Cleaning up failed deployment..."
+          
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
-              "cd /home/ssm-user",
-              "docker compose logs || true",
-              "docker compose down || true",
-              "docker system prune -af --volumes || true"
+              "set +e",
+          
+              "COMPOSE_DIR=/home/ssm-user",
+              "COMPOSE_FILE=$COMPOSE_DIR/docker-compose.yml",
+          
+              "sudo docker compose -f \"$COMPOSE_FILE\" logs || true",
+              "sudo docker compose -f \"$COMPOSE_FILE\" down || true",
+              "sudo docker system prune -af --volumes || true"
             ]' \
             --comment "Cleanup failed deployment"
