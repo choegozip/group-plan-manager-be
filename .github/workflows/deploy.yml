@@ -62,7 +62,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $NGINX_CONF | base64 -d | sudo tee /home/ubuntu/nginx.conf > /dev/null"] \
+            --parameters commands=["bash","-c","echo $NGINX_CONF | base64 -d | sudo tee /home/nginx.conf > /dev/null"] \
             --comment "Copy nginx.conf" \
             --timeout-seconds 60
           
@@ -70,7 +70,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $DEFAULT_CONF | base64 -d | sudo tee /home/ubuntu/default.conf > /dev/null"] \
+            --parameters commands=["bash","-c","echo $DEFAULT_CONF | base64 -d | sudo tee /home/default.conf > /dev/null"] \
             --comment "Copy default.conf" \
             --timeout-seconds 60
 
@@ -80,7 +80,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters 'commands=["bash","-c","echo '"'"${COMPOSE_CONTENT}"'"' | base64 -d | sudo tee /home/ubuntu/docker-compose.yml > /dev/null"]' \
+            --parameters 'commands=["bash","-c","echo '"'"${COMPOSE_CONTENT}"'"' | base64 -d | sudo tee /home/docker-compose.yml > /dev/null"]' \
             --comment "Copy docker-compose.yml" \
             --timeout-seconds 60
 
@@ -90,7 +90,7 @@ jobs:
           aws ssm send-command \
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
-            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d | sudo tee /home/ubuntu/.env > /dev/null"] \
+            --parameters commands=["bash","-c","echo $ENV_CONTENT | base64 -d | sudo tee /home/.env > /dev/null"] \
             --comment "Copy .env file" \
             --timeout-seconds 60
 
