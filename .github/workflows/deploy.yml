@@ -22,6 +22,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create .env from Github secrets
+        run: |
+          echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> .env
+          echo "SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}" >> .env
+          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
+          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
+          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
+          echo "GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" >> .env
+          echo "WEBHOOK_URL=${{ secrets.WEBHOOK_URL }}" >> .env
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::647431119876:role/githubAction
+          aws-region: ap-northeast-2
+
       # ========== 여기에 테스트 단계 추가 ==========
       - name: Test SSM Connection
         run: |
@@ -52,25 +70,6 @@ jobs:
           
           echo "✅ SSM connection test passed"
       # ========== 테스트 단계 끝 ==========
-
-
-      - name: Create .env from Github secrets
-        run: |
-          echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> .env
-          echo "SPRING_PROFILES_ACTIVE=${{ secrets.SPRING_PROFILES_ACTIVE }}" >> .env
-          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> .env
-          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
-          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
-          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
-          echo "GOOGLE_SERVICE_ACCOUNT=${{ secrets.GOOGLE_SERVICE_ACCOUNT }}" >> .env
-          echo "WEBHOOK_URL=${{ secrets.WEBHOOK_URL }}" >> .env
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::647431119876:role/githubAction
-          aws-region: ap-northeast-2
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
