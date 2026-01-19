@@ -122,8 +122,8 @@ jobs:
              "sudo docker compose -f \"$COMPOSE_FILE\" logs --tail=50 app",
              "sudo docker compose -f \"$COMPOSE_FILE\" logs --tail=50 nginx",
           
-              "if sudo docker compose ps | grep -q \"app.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
-              "if sudo docker compose ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
+           "if sudo docker compose -f \"$COMPOSE_FILE\" ps | grep -q \"app.*Up\"; then echo \"App OK\"; else echo \"App FAIL\" && exit 1; fi",
+           "if sudo docker compose -f \"$COMPOSE_FILE\" ps | grep -q \"nginx.*Up\"; then echo \"Nginx OK\"; else echo \"Nginx FAIL\" && exit 1; fi",
             
               "echo \"Deployment completed at $(date)\""
             ]}' \
