@@ -5,10 +5,6 @@ services:
     container_name: group-pm
     env_file:
       - /home/ec2-user/.env
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
     networks:
       - group-pm-net
     restart: unless-stopped
@@ -25,6 +21,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    # 443 → HTTPS 서비스
+    #  80 → 보통 HTTPS 리다이렉트용
     depends_on:
       - app
     networks:
