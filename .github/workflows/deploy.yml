@@ -111,7 +111,6 @@ jobs:
               "set -e",
               "cd /home/ubuntu",
               "docker compose version",
-              "sudo docker rm -f nginx || true",
               "sudo docker compose down || echo \"No containers to stop\"",
               "sudo docker pull ${{ env.DOCKER_IMAGE }}",
               "sudo docker compose up -d",
