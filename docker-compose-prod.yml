@@ -18,6 +18,7 @@ services:
       # SSL 인증서 볼륨
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot
     ports:
       - "80:80"
       - "443:443"
