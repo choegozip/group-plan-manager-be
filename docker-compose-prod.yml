@@ -4,7 +4,7 @@ services:
     image: ${DOCKER_IMAGE}
     container_name: group-pm
     env_file:
-      - /home/ec2-user/.env
+      - .env
     networks:
       - group-pm-net
     restart: unless-stopped
