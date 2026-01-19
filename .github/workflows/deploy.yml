@@ -110,7 +110,7 @@ jobs:
             --parameters '{"commands":[
               "set -e",
           
-            "COMPOSE_DIR=/home/ssm-user",
+             "COMPOSE_DIR=/home",
              "COMPOSE_FILE=$COMPOSE_DIR/docker-compose.yml",
 
               "sudo docker compose -f \"$COMPOSE_FILE\" down || echo \"No containers to stop\"",
