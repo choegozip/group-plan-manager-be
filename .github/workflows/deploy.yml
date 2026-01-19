@@ -109,8 +109,7 @@ jobs:
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters '{"commands":[
               "set -e",
-              "cd /home/ubuntu",
-              "docker compose version",
+              "cd /home/ssm-user",
               "sudo docker compose down || echo \"No containers to stop\"",
               "sudo docker pull ${{ env.DOCKER_IMAGE }}",
               "sudo docker compose up -d",
@@ -187,7 +186,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --targets "Key=instanceIds,Values=${{ secrets.EC2_INSTANCE_ID }}" \
             --parameters 'commands=[
-              "cd /home/ubuntu",
+              "cd /home/ssm-user",
               "docker compose logs || true",
               "docker compose down || true",
               "docker system prune -af --volumes || true"
