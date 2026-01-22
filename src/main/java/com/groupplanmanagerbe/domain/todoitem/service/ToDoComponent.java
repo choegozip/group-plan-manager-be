@@ -12,6 +12,7 @@ import com.groupplanmanagerbe.presentation.todoitem.dto.ToDoListProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class ToDoComponent {
 
     private final ToDoItemRepository toDoItemRepository;
     private final ToDoManagerRepository toDoManagerRepository;
+
+    public int countBySpaceId(Long spaceId) {
+        return toDoItemRepository.countBySpaceId(spaceId);
+    }
 
     public ToDoItem getReferenceById(Long toDoId) {
         return toDoItemRepository.getReferenceById(toDoId);
@@ -43,9 +48,11 @@ public class ToDoComponent {
 
     public List<ToDoListProjection> getToDoItemsNative(
             Long spaceId, Long userId, ParamReq params, CursorPageRequest request) {
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+
         return toDoItemRepository.findToDoItemsNative(
                 spaceId, userId, params.managerId(), params.urgency(), request.cursor(),
-                request.direction(), request.size(), params.includeExpired(), LocalDateTime.now());
+                request.direction(), request.size(), params.includeExpired(), startOfDay);
     }
 
     public ToDoManager getByIdAndSpaceIdAndToDoIdWithToDo(Long managerId, Long spaceId, Long toDoId) {
@@ -53,11 +60,11 @@ public class ToDoComponent {
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.MANAGER_NOT_FOUND));
     }
 
-    public List<ToDoManager> getByToDoItemIdsWithUser(List<Long> toBuyIds) {
-        return toDoManagerRepository.findByToDoItemIdsWithUser(toBuyIds);
+    public List<ToDoManager> getByToDoItemIdsWithUser(List<Long> todoIds, Long userId) {
+        return toDoManagerRepository.findByToDoItemIdsWithUser(todoIds, userId);
     }
 
-    public List<ToDoManager> getAllByToDoItemId(Long toBuyId) {
-        return toDoManagerRepository.findAllByToDoItemId(toBuyId);
+    public List<ToDoManager> getAllByToDoItemId(Long todoId, Long userId) {
+        return toDoManagerRepository.findAllByToDoItemId(todoId, userId);
     }
 }

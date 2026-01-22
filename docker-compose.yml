@@ -15,8 +15,9 @@ services:
       GOOGLE_USER_NAME: ${GOOGLE_USER_NAME}
       GOOGLE_APP_PASSWORD: ${GOOGLE_APP_PASSWORD}
       FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      WEBHOOK_URL: ${WEBHOOK_URL}
 
-    ports:
+ports:
       - "8080:8080"
 
   db:

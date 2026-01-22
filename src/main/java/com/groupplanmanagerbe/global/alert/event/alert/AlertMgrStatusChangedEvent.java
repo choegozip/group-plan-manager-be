@@ -1,6 +1,6 @@
-package com.groupplanmanagerbe.domain.tobuyitem.event;
+package com.groupplanmanagerbe.global.alert.event.alert;
 
-public record ChangeToBuyMgrStatusEvent(
+public record AlertMgrStatusChangedEvent(
         Long authorId,
         String managerNickname,
         String item,

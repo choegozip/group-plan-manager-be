@@ -11,6 +11,8 @@ import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.exception.custom.NotFoundException;
+import com.groupplanmanagerbe.global.sse.SseService;
+import com.groupplanmanagerbe.global.sse.dto.CommentData;
 import com.groupplanmanagerbe.presentation.comment.dto.CommentListProjection;
 import com.groupplanmanagerbe.presentation.comment.dto.request.CommentReq;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentListRes;
@@ -18,12 +20,14 @@ import com.groupplanmanagerbe.presentation.comment.dto.response.CommentPageRes;
 import com.groupplanmanagerbe.presentation.comment.dto.response.CommentRes;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -78,6 +82,7 @@ public class ToBuyCommentService {
         return CommentPageRes.of(commentListRes, request.size());
     }
 
+    // ## private ##
     private ToBuyComment getComment(Long userId, Long commentId) {
         return commentRepository.findByIdAndUserId(userId, commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));

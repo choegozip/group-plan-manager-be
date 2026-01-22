@@ -77,6 +77,7 @@ public class ToDoCommentService {
         return CommentPageRes.of(commentListRes, request.size());
     }
 
+    // ## private ##
     private ToDoComment getComment(Long userId, Long commentId) {
         return commentRepository.findByIdAndUserId(userId, commentId)
                 .orElseThrow(() -> new NotFoundException(ApiErrorCode.COMMENT_NOT_FOUND));

@@ -20,6 +20,10 @@ public enum ApiErrorCode {
     AUTH_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.access.denied"),
     AUTH_UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "auth.unauthorized"),
     AUTH_INVALID_PASSWORD(HttpStatus.BAD_REQUEST,"ERROR", "auth.invalid.password"),
+    OAUTH2_LOGIN_FAILED(HttpStatus.UNAUTHORIZED,"ERROR", "oauth2.login.failed"),
+
+    // 소셜 로그인 관련 익셉션
+    PROVIDER_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "provider.invalid"),
 
     // 토큰 관련 익셉션
     REFRESH_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "token.expired"),
@@ -64,6 +68,8 @@ public enum ApiErrorCode {
     INVALID_TO_BUY_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.id.invalid"),
     TO_DO_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "to.do.not.found"),
     INVALID_TO_DO_ID(HttpStatus.BAD_REQUEST, "ERROR", "to.do.id.invalid"),
+    TO_BUY_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "to.buy.limit.exceeded"),
+    TO_DO_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ERROR", "to.do.limit.exceeded"),
 
     // 코멘트
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ERROR", "comment.not.found"),
@@ -75,13 +81,14 @@ public enum ApiErrorCode {
     UNVERIFIED_EMAIL(HttpStatus.BAD_REQUEST, "ERROR", "email.unverified"),
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "ERROR", "email.verification.failed"),
 
-            // 공통
+    // 공통
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"ERROR", "server.internal.error"),
     PERMISSION_DENIED(HttpStatus.FORBIDDEN,"ERROR", "permission.denied"),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date.format"),
     INVALID_DATE(HttpStatus.BAD_REQUEST, "ERROR", "invalid.date"),
     SORT_DIRECTION_INVALID(HttpStatus.BAD_REQUEST, "ERROR", "sort_direction_invalid"),
     ;
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;

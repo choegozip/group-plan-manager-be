@@ -4,11 +4,7 @@ services:
     image: ${DOCKER_IMAGE}
     container_name: group-pm
     env_file:
-      - /home/ec2-user/.env
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
+      - .env
     networks:
       - group-pm-net
     restart: unless-stopped
@@ -22,9 +18,12 @@ services:
       # SSL 인증서 볼륨
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot
     ports:
       - "80:80"
       - "443:443"
+    # 443 → HTTPS 서비스
+    #  80 → 보통 HTTPS 리다이렉트용
     depends_on:
       - app
     networks:

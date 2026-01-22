@@ -17,7 +17,7 @@ public record ToBuyListRes(
         Short quantity,
         LocalDateTime dueDate,
         Urgency urgency,
-        boolean hasMamo,
+        boolean hasMemo,
         boolean hasLink,
         boolean hasComment,
         LocalDateTime createdAt,
@@ -37,7 +37,7 @@ public record ToBuyListRes(
                 .quantity(projection.getQuantity())
                 .dueDate(projection.getDueDate())
                 .urgency(Urgency.of(projection.getUrgency()))
-                .hasMamo(projection.getHasMemo())
+                .hasMemo(projection.getHasMemo())
                 .hasLink(projection.getHasLink())
                 .hasComment(projection.getHasComment())
                 .createdAt(projection.getCreatedAt())
