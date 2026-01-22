@@ -1,5 +1,6 @@
 package com.groupplanmanagerbe.domain.user.service;
 
+import com.groupplanmanagerbe.domain.mail.service.EmailService;
 import com.groupplanmanagerbe.domain.user.entity.User;
 import com.groupplanmanagerbe.domain.user.repository.UserRepository;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
@@ -21,9 +22,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserComponent userComponent;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     @Transactional
     public UserCreateRes create(CreateUserReq request) {
+        emailService.checkEmailVerified(request.email());
+
         if (userComponent.isExist(request.email())) {
             throw new DuplicateException(ApiErrorCode.USER_DUPLICATED_EMAIL);
         }
@@ -44,7 +48,7 @@ public class UserService {
     public void update(Long userId, UpdateUserReq request) {
         User savedUser = userComponent.getByIdAndDeleteFalse(userId);
 
-        String encodedPassword  = null;
+        String encodedPassword = null;
         if (request.password() != null && !request.password().isBlank()) {
             encodedPassword = passwordEncoder.encode(request.password());
         }

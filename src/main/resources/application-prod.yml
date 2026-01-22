@@ -66,6 +66,21 @@ spring:
           max-wait: 2000ms
         shutdown-timeout: 100ms
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GOOGLE_USER_NAME}
+    password: ${GOOGLE_APP_PASSWORD}
+    properties:
+      mail.smtp.auth: true #SMTP 서버가 TLS를 사용하여 안전한 연결을 요구하는 경우 true로 설정
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.connectiontimeout: 5000 # 클라이언트가 SMTP 서버와의 연결을 설정하는데 대기해야 하는 시간
+      mail.smtp.timeout: 5000 # 클라이언트가 SMTP 서버로부터 응답을 대기해야 하는 시간
+      mail.smtp.writetimeout: 5000 # 클라이언트가 작업을 완료하는데 대기해야 하는 시간
+  auth:
+    code-expiration-millis: 1800000 # 30 * 60 * 1000 == 30분
+
 app:
   base-url: https://goo3oo.online
   invitation-path: invite
@@ -84,13 +99,17 @@ jwt:
   secret:
     key: "${JWT_SECRET_KEY}"
     whiteList:
+      - /api/users/send-email
+      - /api/users/verify-email
       - /api/users/signup
       - /api/auth/login
-      - /api/auth/social/*
-      - /api/auth/refresh
-      - /invite
+      - /api/invite
       - /actuator/health
       - /actuator/prometheus
+      - /api/auth/social/*
+      - /actuator/health
+      - /api/auth/refresh
+      
   token:
     prefix: "Bearer "
     refreshPrefix: "Refresh:"

@@ -18,5 +18,7 @@ public class UserValidationConst {
     public static final String NICKNAME_BLANK_MESSAGE = "user.nickname.blank";
     public static final String NICKNAME_RANGE_MESSAGE = "user.nickname.range";
 
+    public static final String CODE_BLANK_MESSAGE = "mail.code.blank";
+
     public static final String USER_ROLE_MESSAGE = "user.role.required";
 }
