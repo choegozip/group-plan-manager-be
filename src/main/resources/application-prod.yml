@@ -57,12 +57,12 @@ spring:
       url: ${REDIS_URL}
       ssl:
         enabled: true
-      timeout: 8s
+      timeout: 1s
       lettuce:
         pool:
-          max-active: 8
-          max-idle: 4
-          min-idle: 1
+          max-active: 30
+          max-idle: 10
+          min-idle: 3
           max-wait: 2000ms
         shutdown-timeout: 100ms
 
