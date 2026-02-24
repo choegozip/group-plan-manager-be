@@ -14,6 +14,7 @@ import com.groupplanmanagerbe.domain.user.service.UserComponent;
 import com.groupplanmanagerbe.global.alert.event.alert.TbUpdatedAlertEvent;
 import com.groupplanmanagerbe.global.alert.listener.ItemManager;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.common.enums.RefreshType;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.global.alert.event.refresh.RefreshEvent;
@@ -124,7 +125,7 @@ public class ToBuyItemService {
     }
 
     private void publishRefreshEvent(Long spaceId, Long actorId) {
-        eventPublisher.publishEvent(new RefreshEvent(spaceId, actorId));
+        eventPublisher.publishEvent(new RefreshEvent(RefreshType.TOBUY, spaceId, actorId));
     }
 
     private void publishChangeStatusEvent(ToBuyManager manager, UpdateManagerStatusReq request) {

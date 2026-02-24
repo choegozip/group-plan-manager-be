@@ -15,6 +15,7 @@ import com.groupplanmanagerbe.global.alert.event.alert.TdUpdatedAlertEvent;
 import com.groupplanmanagerbe.global.alert.event.refresh.RefreshEvent;
 import com.groupplanmanagerbe.global.alert.listener.ItemManager;
 import com.groupplanmanagerbe.global.common.enums.ApiErrorCode;
+import com.groupplanmanagerbe.global.common.enums.RefreshType;
 import com.groupplanmanagerbe.global.common.response.page.CursorPageRequest;
 import com.groupplanmanagerbe.global.exception.custom.InvalidException;
 import com.groupplanmanagerbe.presentation.tobuyitem.dto.request.ParamReq;
@@ -30,11 +31,9 @@ import com.groupplanmanagerbe.presentation.todoitem.dto.response.ToDoRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -132,7 +131,7 @@ public class ToDoItemService {
     }
 
     private void publishRefreshEvent(Long spaceId, Long actorId) {
-        eventPublisher.publishEvent(new RefreshEvent(spaceId, actorId));
+        eventPublisher.publishEvent(new RefreshEvent(RefreshType.TODO, spaceId, actorId));
     }
 
     private void publishChangeStatusEvent(ToDoManager manager, UpdateManagerStatusReq request) {
